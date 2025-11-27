@@ -1,0 +1,91 @@
+.balance_graph{
+  background-color:#fff;
+  padding: 28px 24px;
+  box-shadow: 1px 2px 6px rgba(0,0,0,0.12);
+  border-radius: 18px;
+  height: 500px;
+  box-sizing: border-box;
+  display:flex;
+  flex-direction:column;
+}
+
+.balance_header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.balance_header span{
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 26px;
+  line-height: 16px;
+}
+
+/* year select wrapper you had */
+.year-select {
+  background: #685bc7;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 20px;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+/* native select styling */
+.year-select select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  padding-right: 18px;
+  cursor: pointer;
+}
+
+.year-select select:focus {
+  outline: none;
+}
+
+.year-select .arrow {
+  position: absolute;
+  right: 10px;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* chart area */
+.chart-area {
+  flex: 1 1 auto;
+  margin-top: 10px;
+  position: relative;
+  min-height: 360px;
+}
+
+.chart-area canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* export button */
+.export-btn {
+  background: #4F46E5;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* responsive: shrink title on small screens */
+@media (max-width: 680px) {
+  .balance_header span { font-size: 20px; }
+  .year-select { padding: 8px 12px; }
+  .export-btn { padding: 6px 10px; }
+}

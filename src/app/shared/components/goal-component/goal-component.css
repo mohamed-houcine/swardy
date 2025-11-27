@@ -1,0 +1,76 @@
+:host { display:block; font-family: "Poppins", sans-serif; }
+
+.container{
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(15,20,30,0.06);
+  padding: 18px 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.title-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom: 16px;
+}
+
+.title{
+  font-weight: 600;
+  font-size: 1rem;
+  color: #111827;
+}
+
+.amount{
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: #5A5A5A;
+}
+
+/* progress layout */
+.progress-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* pill background */
+.progress-bar{
+  flex: 1 1 auto;
+  height: 20px;
+  background: #e6e6ea; /* light grey pill */
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+}
+
+/* colored fill */
+.progress-fill{
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  transition: width 700ms cubic-bezier(.22,.9,.35,1);
+  /* default background set inline via ngStyle (accent) */
+  box-shadow: 0 4px 10px rgba(99,102,241,0.14);
+}
+
+/* percent on the right */
+.percent-text{
+  min-width:48px;
+  text-align:right;
+  font-weight:700;
+  color: #4C1D95; /* deep purple - you can also compute contrasting color from accent */
+  font-size: 1rem;
+}
+
+/* small screens */
+@media (max-width:480px) {
+  .container { padding: 14px; }
+  .title { font-size: 0.95rem; }
+  .amount { font-size: 0.9rem; }
+  .progress-row { gap:8px; }
+  .percent-text { font-size: 0.95rem; min-width:40px; }
+  .progress-bar { height: 16px; }
+}

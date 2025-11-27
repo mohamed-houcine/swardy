@@ -1,0 +1,29 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+<div id="sort-selection">
+
+  <span id="year-selector" (click)="toggleSortingMethodMenu($event)">
+    Year – {{ selectedYear }}
+    <img
+      src="assets/icons/home/arrow-down.png"
+      [class.profile-open]="sortingPostsMethodOpen"
+    />
+  </span>
+
+  <div class="sorting-posts-menu"
+       *ngIf="sortingPostsMethodOpen"
+       role="menu"
+       (click)="$event.stopPropagation()">
+
+    <button
+      *ngFor="let y of years"
+      (click)="selectYear(y)">
+      {{ y }}
+    </button>
+
+  </div>
+
+</div>

@@ -1,0 +1,24 @@
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="container" role="region" aria-label="Goal card">
+  <div class="mini_container">
+    <div class="title-row">
+      <span class="title">{{ title }}:</span>
+      <span class="amount">Reach {{ currency }}{{ formattedGoal }}</span>
+    </div>
+
+    <div class="progress-row">
+      <div class="progress-bar" role="progressbar"
+           [attr.aria-valuemin]="0"
+           [attr.aria-valuemax]="100"
+           [attr.aria-valuenow]="percent"
+           [attr.aria-label]="'Progress to ' + title">
+        <div class="progress-fill" [ngStyle]="{ 'width': fillWidth(), 'background-color': accent }"></div>
+      </div>
+
+      <div class="percent-text" title="{{ percent }}%">
+        {{ percent }}%
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="balance_graph">
+  <div class="balance_header">
+    <span>Net Balance</span>
+
+    <div style="display:flex;align-items:center;gap:12px">
+      <!-- listen to the event emitted by ToggleMenuComponent -->
+      <app-toggle-menu-component
+        (yearSelected)="onYearSelected($event)">
+      </app-toggle-menu-component>
+
+      <!-- export button -->
+      <button class="export-btn" (click)="exportPNG()">Export</button>
+    </div>
+  </div>
+
+  <!-- chart area -->
+  <div class="chart-area" style="margin-top:18px; height:380px;">
+    <canvas #canvas></canvas>
+  </div>
+</div>
+
