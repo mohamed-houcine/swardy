@@ -13,7 +13,7 @@ export class InterfOptions {
   interfOptions = [
     { key: 0, name: 'Dashboard', iconUrl: '/assets/icons/dashboard_0.svg', activeIconUrl: '/assets/icons/dashboard_1.svg' },
     { key: 1, name: 'Income', iconUrl: '/assets/icons/income_0.svg', activeIconUrl: '/assets/icons/income_1.svg' },
-    { key: 2, name: 'Expense', iconUrl: '/assets/icons/expense_0.svg', activeIconUrl: '/assets/icons/expense_1.svg' },
+    { key: 2, name: 'Expenses', iconUrl: '/assets/icons/expense_0.svg', activeIconUrl: '/assets/icons/expense_1.svg' },
     { key: 3, name: 'Employees', iconUrl: '/assets/icons/employees_0.svg', activeIconUrl: '/assets/icons/employees_1.svg' },
     { key: 4, name: 'Products', iconUrl: '/assets/icons/products_0.svg', activeIconUrl: '/assets/icons/products_1.svg' },
   ];
