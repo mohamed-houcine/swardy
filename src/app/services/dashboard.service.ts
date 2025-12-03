@@ -29,12 +29,12 @@ export class DashboardService {
   //------------------------------------------
 
   private mockIncomes: Income[] = [
-    { id:'i1', amount:10000, date:'2025-01-12', userId:'u1', source_type:'personal' as any },
-    { id:'i2', amount:20000, date:'2025-02-19', userId:'u1', source_type:'personal' as any },
-    { id:'i3', amount:40000, date:'2025-03-05', userId:'u1', source_type:'personal' as any },
-    { id:'i4', amount:35000, date:'2025-05-07', userId:'u1', source_type:'personal' as any },
-    { id:'i5', amount:18000, date:'2025-07-10', userId:'u1', source_type:'personal' as any },
-    { id:'i6', amount:36000, date:'2025-12-01', userId:'u1', source_type:'personal' as any }
+    { id:'i1', name:"prod1",amount:10000, date:'2025-01-12', userId:'u1', type:'product' as any },
+    { id:'i2', name:"prod1",amount:20000, date:'2025-02-19', userId:'u1', type:'product' as any },
+    { id:'i3', name:"prod1",amount:40000, date:'2025-03-05', userId:'u1', type:'product' as any },
+    { id:'i4', name:"prod1",amount:35000, date:'2025-05-07', userId:'u1', type:'product' as any },
+    { id:'i5', name:"prod1",amount:18000, date:'2025-07-10', userId:'u1', type:'product' as any },
+    { id:'i6', name:"prod1",amount:36000, date:'2025-12-01', userId:'u1', type:'product' as any }
   ];
 
   private mockExpenses: Expense[] = [

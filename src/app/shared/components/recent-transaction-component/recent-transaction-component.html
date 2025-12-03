@@ -1,0 +1,24 @@
+<div class="container">
+    <span class="title">Recent Transactions</span>
+
+    <div class="content">
+        <div class="row" *ngFor="let t of arr">
+            
+            <div class="left">
+                <div class="icon" [style.backgroundColor]="getIconColor(t)">
+                    <img [src]="getIcon(t)" alt="">
+                </div>
+
+                <div class="text">
+                    <div class="name">{{ t.name }}</div>
+                    <div class="date">{{ t.date }}</div>
+                </div>
+            </div>
+
+            <div class="right" [style.color]="getAmountColor(t)">
+                ${{ t.amount }}
+                <img [src]="getArrow(t)" class="arrow" alt="" />
+            </div>
+        </div>
+    </div>
+</div>
