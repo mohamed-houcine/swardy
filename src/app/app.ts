@@ -13,7 +13,7 @@ import { OverviewChartComponent } from './shared/components/overview-chart/overv
 
 @Component({
   selector: 'app-root',
-  imports: [TotalComponent,InterfOptions,FormsModule,GoalComponent,NetBalanceComponent,PieChartComponent,RecentTransactionComponent],
+  imports: [TotalComponent,InterfOptions,FormsModule,GoalComponent,NetBalanceComponent,PieChartComponent,RecentTransactionComponent,OverviewChartComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

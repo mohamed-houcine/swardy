@@ -4,10 +4,16 @@
     <span>{{ title }}</span>
 
     <div class="dropdown">
-      <button class="range-btn">
-        Last 28 Days
+      <button class="range-btn" (click)="toggleMenu()">
+        {{ modeLabel }}
         <img src="assets/icons/arrow-down-white.png" />
       </button>
+
+      <div class="menu" *ngIf="menuOpen">
+        <div (click)="changeMode('weekly')">Hebdomadaire</div>
+        <div (click)="changeMode('monthly')">Mensuel</div>
+        <div (click)="changeMode('yearly')">Annuel</div>
+      </div>
     </div>
   </div>
 

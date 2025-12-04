@@ -167,4 +167,89 @@ export class DashboardService {
 
     return result;
   }
+
+//------------------------------------------
+// OVERVIEW MODES: weekly / monthly / yearly
+//------------------------------------------
+
+private formatDay(d: string): string {
+  return new Date(d).toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "short"
+  });
+}
+
+private convertToOverview(data: { date: string; amount: number }[]) {
+  return data
+    .sort((a, b) => +new Date(a.date) - +new Date(b.date))
+    .map(d => ({
+      date: this.formatDay(d.date),
+      amount: d.amount
+    }));
+}
+
+private getWeeklyOverview(data: { date: string; amount: number }[]) {
+  return data.slice(-7); // last 7 days
+}
+
+private getMonthlyOverview(data: { date: string; amount: number }[]) {
+  return data.slice(-30); // last 30 days
+}
+
+private getYearlyOverview(data: Income[] | Expense[]) {
+  const buckets = new Array(12).fill(0);
+
+  data.forEach(item => {
+    const d = new Date(item.date);
+    buckets[d.getMonth()] += item.amount;
+  });
+
+  return buckets.map((amount, idx) => ({
+    date: this.months[idx],
+    amount
+  }));
+}
+
+//------------------------------------------
+// PUBLIC API FOR CHARTS
+//------------------------------------------
+
+async getIncomeOverview(mode: 'weekly' | 'monthly' | 'yearly') {
+  const incomes = await this.fetchIncomes();
+
+  if (mode === 'yearly') {
+    return this.getYearlyOverview(incomes);
+  }
+
+  const raw = incomes.map(i => ({
+    date: i.date,
+    amount: i.amount
+  }));
+
+  const converted = this.convertToOverview(raw);
+
+  return mode === 'weekly'
+    ? this.getWeeklyOverview(converted)
+    : this.getMonthlyOverview(converted);
+}
+
+async getExpenseOverview(mode: 'weekly' | 'monthly' | 'yearly') {
+  const expenses = await this.fetchExpenses();
+
+  if (mode === 'yearly') {
+    return this.getYearlyOverview(expenses);
+  }
+
+  const raw = expenses.map(e => ({
+    date: e.date,
+    amount: e.amount
+  }));
+
+  const converted = this.convertToOverview(raw);
+
+  return mode === 'weekly'
+    ? this.getWeeklyOverview(converted)
+    : this.getMonthlyOverview(converted);
+}
+
 }
