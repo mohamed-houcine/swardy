@@ -1,41 +1,39 @@
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable } from '@angular/core';
+import { SupabaseService } from '../../services/supabase.service';
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private TOKEN_KEY = 'auth_token';
+  constructor(private supabase: SupabaseService, private router: Router) {}
 
-  constructor(@Inject(PLATFORM_ID) private platformId: any) {}
+  async login(email: string, password: string) {
+    const { data, error } = await this.supabase.client.auth.signInWithPassword({
+      email,
+      password
+    });
 
-  private isBrowser(): boolean {
-    return isPlatformBrowser(this.platformId);
+    if (error) throw error;
+    return data;
   }
 
-  login(email: string): void {
-    if (!this.isBrowser()) return;
-    const fakeToken = 'token-' + email + '-' + new Date().getTime();
-    localStorage.setItem(this.TOKEN_KEY, fakeToken);
+  async signup(email: string, password: string) {
+    const { data, error } = await this.supabase.client.auth.signUp({
+      email,
+      password
+    });
+
+    if (error) throw error;
+    return data;
   }
 
-  signup(email: string): void {
-    if (!this.isBrowser()) return;
-    const fakeToken = 'token-' + email + '-' + new Date().getTime();
-    localStorage.setItem(this.TOKEN_KEY, fakeToken);
+  async logout() {
+    await this.supabase.client.auth.signOut();
+    this.router.navigate(['/login']);
   }
 
-  logout(): void {
-    if (!this.isBrowser()) return;
-    localStorage.removeItem(this.TOKEN_KEY);
-  }
-
-  isLoggedIn(): boolean {
-    if (!this.isBrowser()) return false;
-    return !!localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  getToken(): string | null {
-    if (!this.isBrowser()) return null;
-    return localStorage.getItem(this.TOKEN_KEY);
+  async isLoggedIn(): Promise<boolean> {
+    const { data } = await this.supabase.client.auth.getUser();
+    return !!data.user;
   }
 }

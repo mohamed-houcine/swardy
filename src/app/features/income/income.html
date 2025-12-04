@@ -1,6 +1,8 @@
+<h2>Income Overview</h2>
+
 <app-overview-chart
-  title="Income"
+  title="Income Overview"
   type="income"
-  [data]="incomeOverview"
-  (modeChange)="loadIncomeOverview($event)"
-></app-overview-chart>
+  [data]="overview"
+  (modeChange)="onModeChange($event)">
+</app-overview-chart>

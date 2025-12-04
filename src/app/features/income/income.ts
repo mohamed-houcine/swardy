@@ -1,28 +1,28 @@
 import { Component, OnInit } from '@angular/core';
-import { DashboardService } from '../../services/dashboard.service';
 import { OverviewChartComponent } from '../../shared/components/overview-chart/overview-chart';
-
+import { DashboardService } from '../../services/dashboard.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-income',
-  imports: [OverviewChartComponent],
+  standalone: true,
+  imports: [CommonModule, OverviewChartComponent],
   templateUrl: './income.html',
-  styleUrl: './income.css',
+  styleUrls: ['./income.css']
 })
 export class Income implements OnInit {
 
-  incomeOverview: any[] = [];
-  loading = true;
+  overview: { date: string; amount: number }[] = [];
+  mode: 'weekly' | 'monthly' | 'yearly' = 'monthly';
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private dash: DashboardService) {}
 
   async ngOnInit() {
-    await this.loadIncomeOverview('monthly'); // default mode
+    this.overview = await this.dash.getIncomeOverview(this.mode);
   }
 
-  async loadIncomeOverview(mode: 'weekly' | 'monthly' | 'yearly') {
-    this.loading = true;
-    this.incomeOverview = await this.dashboardService.getIncomeOverview(mode);
-    this.loading = false;
+  async onModeChange(m: 'weekly' | 'monthly' | 'yearly') {
+    this.mode = m;
+    this.overview = await this.dash.getIncomeOverview(m);
   }
 }

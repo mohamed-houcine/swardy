@@ -51,10 +51,10 @@ export class OverviewChartComponent implements AfterViewInit, OnChanges {
 
   get modeLabel() {
     return this.mode === 'weekly'
-      ? 'Hebdomadaire'
+      ? 'Weekly'
       : this.mode === 'yearly'
-      ? 'Annuel'
-      : 'Mensuel';
+      ? 'Yearly'
+      : 'Monthly';
   }
 
   toggleMenu() {
@@ -64,7 +64,7 @@ export class OverviewChartComponent implements AfterViewInit, OnChanges {
   changeMode(m: 'weekly' | 'monthly' | 'yearly') {
     this.mode = m;
     this.menuOpen = false;
-    this.modeChange.emit(m); // SEND MODE TO PARENT
+    this.modeChange.emit(m);
   }
 
   @ViewChild('canvas') canvas!: ElementRef<HTMLCanvasElement>;

@@ -4,6 +4,7 @@ import { SupabaseService } from '../services/supabase.service';
 import { Income } from '../shared/model/income';
 import { Expense } from '../shared/model/expense';
 import { Category } from '../shared/model/category';
+import { Product } from '../shared/model/product';
 
 // returned objects
 export interface MonthlyPoint {
@@ -22,14 +23,13 @@ export interface CategorySlice {
 })
 export class DashboardService {
 
-  constructor(private supabase: SupabaseService) {}
+  constructor(public supabase: SupabaseService) {}
 
   private months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
   // ---------------------------------------------------
   //  FETCHING FROM SUPABASE
   // ---------------------------------------------------
-
   private async getUserId(): Promise<string | null> {
     const { data } = await this.supabase.client.auth.getUser();
     return data.user?.id ?? null;
@@ -88,6 +88,20 @@ export class DashboardService {
     return data as Category[];
   }
 
+  // 🔹 NOUVEAU : récupérer les produits
+  async fetchProducts(): Promise<Product[]> {
+    const { data, error } = await this.supabase.client
+      .from('product')
+      .select('*');
+
+    if (error) {
+      console.error('fetchProducts error:', error);
+      return [];
+    }
+
+    return data as Product[];
+  }
+
   // ---------------------------------------------------
   //  MONTHLY TOTALS
   // ---------------------------------------------------
@@ -139,14 +153,34 @@ export class DashboardService {
   }
 
   // ---------------------------------------------------
-  //  CATEGORY DISTRIBUTION — Incomes
+  //  CATEGORY DISTRIBUTION — Incomes (FIXED)
+  //  income.product_id -> product.id -> product.id_category -> category.id
   // ---------------------------------------------------
 
-  async categoryDistributionForIncomes(incomes: Income[], categories: Category[]): Promise<CategorySlice[]> {
+  async categoryDistributionForIncomes(
+    incomes: Income[],
+    products: Product[],
+    categories: Category[]
+  ): Promise<CategorySlice[]> {
     const map = new Map<string, number>();
 
     incomes.forEach(i => {
-      const key = (i as any).categoryId || 'uncategorized';
+      // gérer productId camelCase OU product_id snake_case
+      const productId =
+        (i as any).productId ??
+        (i as any).product_id ??
+        null;
+
+      let categoryId: string | null = null;
+
+      if (productId) {
+        const prod = products.find(p => p.id === productId);
+        if (prod) {
+          categoryId = (prod as any).id_category ?? null;
+        }
+      }
+
+      const key = categoryId ?? 'uncategorized';
       map.set(key, (map.get(key) || 0) + i.amount);
     });
 
@@ -154,9 +188,9 @@ export class DashboardService {
     for (const [catId, value] of map.entries()) {
       const cat = categories.find(c => c.id === catId);
       result.push({
-        label: cat ? cat.name : catId,
+        label: cat ? cat.name : 'Uncategorized',
         value,
-        color: cat?.color
+        color: cat?.color || '#ccc'
       });
     }
 
@@ -164,14 +198,18 @@ export class DashboardService {
   }
 
   // ---------------------------------------------------
-  //  CATEGORY DISTRIBUTION — Expenses
+  //  CATEGORY DISTRIBUTION — Expenses (camelCase/snake_case)
   // ---------------------------------------------------
 
   async categoryDistributionForExpenses(expenses: Expense[], categories: Category[]): Promise<CategorySlice[]> {
     const map = new Map<string, number>();
 
     expenses.forEach(e => {
-      const key = e.categoryId || 'uncategorized';
+      const key =
+        (e as any).categoryId ??
+        (e as any).category_id ??
+        'uncategorized';
+
       map.set(key, (map.get(key) || 0) + e.amount);
     });
 
@@ -179,9 +217,9 @@ export class DashboardService {
     for (const [catId, value] of map.entries()) {
       const cat = categories.find(c => c.id === catId);
       result.push({
-        label: cat ? cat.name : catId,
+        label: cat ? cat.name : 'Uncategorized',
         value,
-        color: cat?.color
+        color: cat?.color || '#ccc'
       });
     }
 
