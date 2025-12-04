@@ -1,10 +1,18 @@
 import { NgIf } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  OnChanges
+} from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
-// Plugin: draw values above bars
 const drawValuesPlugin = {
   id: 'drawValuesPlugin',
   afterDatasetsDraw(chart: any) {
@@ -27,19 +35,17 @@ const drawValuesPlugin = {
   selector: 'app-overview-chart',
   templateUrl: './overview-chart.html',
   styleUrls: ['./overview-chart.css'],
-  imports:[NgIf]
+  imports: [NgIf],
+  standalone: true
 })
-export class OverviewChartComponent implements AfterViewInit {
+export class OverviewChartComponent implements AfterViewInit, OnChanges {
 
-  // INPUTS
   @Input() title = 'Overview';
   @Input() type: 'income' | 'expense' = 'income';
   @Input() data: { date: string; amount: number }[] = [];
 
-  // OUTPUT to tell the parent about mode switching
   @Output() modeChange = new EventEmitter<'weekly' | 'monthly' | 'yearly'>();
 
-  // Dropdown menu state
   menuOpen = false;
   mode: 'weekly' | 'monthly' | 'yearly' = 'monthly';
 
@@ -58,59 +64,62 @@ export class OverviewChartComponent implements AfterViewInit {
   changeMode(m: 'weekly' | 'monthly' | 'yearly') {
     this.mode = m;
     this.menuOpen = false;
-    this.modeChange.emit(m);
+    this.modeChange.emit(m); // SEND MODE TO PARENT
   }
 
-  // Chart fields
   @ViewChild('canvas') canvas!: ElementRef<HTMLCanvasElement>;
   chart?: Chart<'bar'>;
 
-  // ✔ Angular calls this AFTER the view loads → we draw the chart here
   ngAfterViewInit() {
     this.drawChart();
   }
 
-  // 🔥 THE FUNCTION YOU WERE MISSING
+  ngOnChanges() {
+    if (this.chart) this.drawChart();
+  }
+
   drawChart() {
     if (!this.canvas) return;
 
     const labels = this.data.map(d => d.date);
     const values = this.data.map(d => d.amount);
-
     const max = Math.max(...values);
 
     const colorSoft =
       this.type === 'income'
-        ? 'rgba(16,185,129,0.45)'  // green soft
-        : 'rgba(239,68,68,0.45)';  // red soft
+        ? 'rgba(16,185,129,0.45)'
+        : 'rgba(239,68,68,0.45)';
 
     const colorBold =
       this.type === 'income'
-        ? 'rgb(16,185,129)'        // green bold
-        : 'rgb(239,68,68)';        // red bold
+        ? 'rgb(16,185,129)'
+        : 'rgb(239,68,68)';
 
-    const backgroundColors = values.map(v => (v === max ? colorBold : colorSoft));
+    const backgroundColors = values.map(v =>
+      v === max ? colorBold : colorSoft
+    );
 
     const ctx = this.canvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    // destroy old chart if exists (fix for mode switching)
     if (this.chart) this.chart.destroy();
 
     this.chart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels,
-        datasets: [{
-          data: values,
-          backgroundColor: backgroundColors,
-          borderRadius: 14,
-          borderSkipped: false
-        }]
+        datasets: [
+          {
+            data: values,
+            backgroundColor: backgroundColors,
+            borderRadius: 14,
+            borderSkipped: false
+          }
+        ]
       },
       options: {
-        maintainAspectRatio: false,
         responsive: true,
+        maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
           x: {
@@ -120,19 +129,10 @@ export class OverviewChartComponent implements AfterViewInit {
               font: { family: 'Poppins', size: 12 }
             }
           },
-          y: {
-            display: false
-          }
+          y: { display: false }
         }
       },
       plugins: [drawValuesPlugin]
     });
-  }
-
-  // OPTIONAL: refresh chart automatically when @Input data changes
-  ngOnChanges() {
-    if (this.chart) {
-      this.drawChart();
-    }
   }
 }

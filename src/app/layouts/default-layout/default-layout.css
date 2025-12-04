@@ -1,0 +1,13 @@
+.container {
+    display: flex;
+}
+
+main {
+    height: 100vh;
+    overflow: auto;
+    flex: 1;
+}
+app-interf-options {
+    max-width: 300px;
+    width: 100%;
+}

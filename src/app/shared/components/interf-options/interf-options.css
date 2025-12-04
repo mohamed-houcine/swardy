@@ -1,31 +1,23 @@
 .container{
-
-
-    padding: 25px;
-    height: 100vh;
-    background-color: #fff;
-    max-width: 305px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     display: flex;
+    height: calc(100vh - 50px);
     flex-direction: column;
     align-items: center;
-
-    gap: 165px;
-
+    justify-content: space-between;
+    padding: 25px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .title{
     color: #493D9E;
-    font-family: "Poppins", sans-serif;
     font-weight: 700;
     font-style: Bold;
     font-size: 36px;
     line-height: 16px;
     text-align: center;
-
 }
 span{
-    font-family: "Poppins", sans-serif;
     font-weight: 400;
     font-size: 40px;
     color: rgba(0, 0, 0, 1);
@@ -39,7 +31,6 @@ a{
     gap: 10px;
 
 }
-
 
 .container-header{
     display: flex;
@@ -55,95 +46,71 @@ a{
     cursor: pointer;
 }
 
-
-
-img{
-    height: 50px;
-    width: 50px;
-}
-
-
-
 .interfOptions {
-    margin-top: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
     align-items: center;
+    justify-content: space-around;
     user-select: none;
+    gap: 20px;
+}
+
+.interfOptions a {
+    cursor: pointer;
+    position: relative;
     width: 100%;
+    z-index: 2;
 }
 
 .interfOptions div {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    gap: 50px;
-    align-items: center;
-    cursor: pointer;
-    padding: 8px 0px;
-}
-
-.interfOptions div:hover {
-    color: #609966;
+    justify-content: center;
 }
 
 .interfOptions a.active span {
-    color: #fff;
     font-weight: 600;
-    cursor: pointer;
+    color: #fff;
 }
 
-.interfOptions a.active {
+.interfOptions a.active::before {
+    content: "";
     background-color:#6558BF ;
-    border-radius:25px ;
-
-    padding: 16px 16px;
+    position: absolute;
+    width: 120%;
+    height: 120%;
+    left: -20px;
+    z-index: -1;
+    border-radius:25px;
     box-shadow: 1px 2px 4.5px 0px rgba(0, 0, 0, 0.25);
-
 }
 
 .interfOptions span{
-    font-family: "Poppins", sans-serif;
     font-weight: 600;
-    font-size: 20px;
+    font-size: 1.3em;
     padding: 15px;
-    cursor: pointer;
-
 }
-.interfOptions span:hover{
+.interfOptions a:not(.active) span:hover{
     color: #6558BF;
-
 }
-
-.interfOptions a {
-    width: 200px;
-    height: 50px;
-    margin-bottom: 50px;
-}
-.interfOptions a:last-child {
-    margin-bottom: 0;
-}
-
-
 
 .profile{
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 22px;
-    
-
+    gap: 20px;
+    cursor: pointer;
 }
+
 .profile img{
     border-radius: 50%;
-    height: 60px;
-    width: 60px;
+    height: 50px;
+    width: 50px;
 }
 
 .profile span{
     font-weight: 700;
     font-style: Bold;
-    font-size: 24px;
+    font-size: 1.4em;
     line-height: 16px;
 }
