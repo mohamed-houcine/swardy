@@ -87,7 +87,7 @@ color: rgba(90, 90, 90, 1);
 
 
 
-.left_wing{
+.left_wing,.right_wing {
   display: flex;
   flex-direction: column;
   gap: 30px;

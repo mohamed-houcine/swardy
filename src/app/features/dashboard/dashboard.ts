@@ -3,10 +3,11 @@ import { TotalComponent } from "../../shared/components/total-component/total-co
 import { NetBalanceComponent } from "../../shared/components/net-balance/net-balance";
 import { GoalComponent } from "../../shared/components/goal-component/goal-component";
 import { PieChartComponent } from "../../shared/components/pie-chart/pie-chart";
+import { RecentTransactionComponent } from "../../shared/components/recent-transaction-component/recent-transaction-component";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [TotalComponent, NetBalanceComponent, GoalComponent, PieChartComponent],
+  imports: [TotalComponent, NetBalanceComponent, GoalComponent, PieChartComponent, RecentTransactionComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

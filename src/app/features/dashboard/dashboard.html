@@ -28,7 +28,11 @@
             imagePath="/assets/icons/expense_1.svg"
             ></app-total-component>
 
-            <app-net-balance></app-net-balance>
+            <div class="left">
+                <app-net-balance></app-net-balance>
+                <app-recent-transaction-component></app-recent-transaction-component>
+            </div>
+            
 
             <div class="right">
                 <app-goal-component [title]="'Goal'" [goal]="40000" [current]="21000" [currency]="'$'"></app-goal-component>
