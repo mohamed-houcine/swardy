@@ -1,0 +1,44 @@
+<div class="container">
+    <header>
+        <span class="title">{{ title }} List</span>
+        <div class="searchbar">Search by {{ SearchFactors[0] }} {{ SearchFactors.length > 1 ? ("or " + SearchFactors[1] + "...") : "" }}</div>
+        <button id="filter">
+            <img src="assets/icons/filter.svg" alt="filter_icon">
+            <span>Filter</span>
+        </button>
+        <button id="export">
+            <span>Export</span>
+            <img src="assets/icons/arrow_down.svg" alt="arrow_down_icon">
+        </button>
+        <button id="add">
+            <span>Add {{ title }}</span>
+            <img src="assets/icons/plus.svg" alt="arrow_down_icon">
+        </button>
+    </header>
+    <main>
+        <table>
+            <tr>
+                <th *ngFor="let column of columns" (click)="onSort(column)">
+                    <div class="th-content">
+                        <img [src]="column.iconUrl" />
+                        <span>{{ column.title }}</span>
+
+                        <img
+                        *ngIf="column.sortIconUrl"
+                        [src]="column.sortIconUrl"
+                        [class.asc]="column.direction === 'asc'"
+                        [class.desc]="column.direction === 'desc'"
+                        />
+                    </div>
+                </th>
+            </tr>
+            <tr *ngFor="let row of data">
+                <td *ngFor="let column of columns">
+                {{ row[column.title] }}
+                </td>
+            </tr>
+
+        </table>
+    </main>
+    <footer></footer>
+</div>

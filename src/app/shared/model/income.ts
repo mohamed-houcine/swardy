@@ -13,7 +13,7 @@ export interface Income {
   amount: number;
   quantity?: number;        
   date: string;             
-  scan_type?: ScanType;     
+  scan_type?: ScanType;
   notes?: string;
   productId?: string;       
   userId: string; 
