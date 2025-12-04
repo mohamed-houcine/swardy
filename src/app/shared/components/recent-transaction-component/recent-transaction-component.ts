@@ -52,6 +52,10 @@ export class RecentTransactionComponent {
   getArrow(t: Transaction) {
     return t.type === Type.EXPENSE ? "/assets/icons/downtrend.svg" : "/assets/icons/trending.svg";
   }
+
+  getbackgroundcolor(t:Transaction){
+    return t.type === Type.EXPENSE ? "#FBF2EE" : "#EAFBF3";
+  }
 }
 
 

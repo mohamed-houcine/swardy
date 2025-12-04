@@ -13,7 +13,26 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard)
-      }
+      },
+      {
+        path: 'income',
+        loadComponent: () => import('./features/income/income').then(m => m.Income)
+      },
+      {
+        path: 'expenses',
+        loadComponent: () =>
+          import('./features/expenses/expenses').then(m => m.Expenses)
+      },
+      {
+        path: 'employees',
+        loadComponent: () =>
+          import('./features/employees/employees').then(m => m.Employees)
+      },
+      {
+        path: 'products',
+        loadComponent: () =>
+          import('./features/products/products').then(m => m.Products)
+      },
     ]
   },
   {

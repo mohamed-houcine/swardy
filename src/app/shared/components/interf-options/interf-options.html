@@ -8,7 +8,9 @@
   <div class="interfOptions">
     <a *ngFor="let f of interfOptions"
        (click)="setActiveinterfOptionsKey(f.key)"
-       [class.active]="f.key === activeinterfOptionsKey">
+       [class.active]="f.key === activeinterfOptionsKey"
+       [routerLink]="f.path"
+       >
       <div class="icon-wrap" [class.active]="f.key === activeinterfOptionsKey">
         <img [src]="f.key === activeinterfOptionsKey ? f.activeIconUrl : f.iconUrl" />
       </div>

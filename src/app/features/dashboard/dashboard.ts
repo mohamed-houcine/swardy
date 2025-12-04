@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { DashboardService } from '../../services/dashboard.service';
 import { TotalComponent } from "../../shared/components/total-component/total-component";
 import { NetBalanceComponent } from "../../shared/components/net-balance/net-balance";
 import { GoalComponent } from "../../shared/components/goal-component/goal-component";
@@ -11,20 +12,40 @@ import { RecentTransactionComponent } from "../../shared/components/recent-trans
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard {
-  name:string="Mohamed";
 
-  years = [2023, 2024, 2025, 2026, 2027];
-  selectedYear = 2025;
+export class Dashboard implements OnInit {
 
-  months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  netValues = [10000,20000,40000,30000,35000,20000,38000,36000,39000,35000,30000,36000];
+  constructor(private dashboardService: DashboardService) {}
 
-  incomeLabels = ['Monitor OLED','Diamond FF','Keyboard','Mouse'];
-  incomeData = [50,20,13,7];
-  incomeColors = ['#2F80ED','#56CCF2','#6FCF97','#F2994A'];
+  name:string = "Mohamed";
 
-  expenseLabels = ['Bills','Product','Transport','Other'];
-  expenseData = [1000,1500,700,300];
-  expenseColors = ['#2F80ED','#9B51E0','#6FCF97','#F2994A'];
+  incomeLabels: string[] = [];
+  incomeData: number[] = [];
+  incomeColors: string[] = [];
+
+  expenseLabels: string[] = [];
+  expenseData: number[] = [];
+  expenseColors: string[] = [];
+
+  async ngOnInit() {
+    await this.loadCategoryCharts();
+  }
+
+  async loadCategoryCharts() {
+    const categories = await this.dashboardService.fetchCategories();
+    const incomes = await this.dashboardService.fetchIncomes();
+    const expenses = await this.dashboardService.fetchExpenses();
+
+    // Income distribution
+    const incomeDist = await this.dashboardService.categoryDistributionForIncomes(incomes, categories);
+    this.incomeLabels = incomeDist.map(i => i.label);
+    this.incomeData = incomeDist.map(i => i.value);
+    this.incomeColors = incomeDist.map(i => i.color || '#999');
+
+    // Expense distribution
+    const expenseDist = await this.dashboardService.categoryDistributionForExpenses(expenses, categories);
+    this.expenseLabels = expenseDist.map(i => i.label);
+    this.expenseData = expenseDist.map(i => i.value);
+    this.expenseColors = expenseDist.map(i => i.color || '#999');
+  }
 }

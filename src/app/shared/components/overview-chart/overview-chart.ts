@@ -1,9 +1,18 @@
-import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { Chart, registerables, ChartConfiguration } from 'chart.js';
+import { NgIf } from '@angular/common';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  OnChanges
+} from '@angular/core';
+import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
-// plugin → draw values above bars
 const drawValuesPlugin = {
   id: 'drawValuesPlugin',
   afterDatasetsDraw(chart: any) {
@@ -25,40 +34,75 @@ const drawValuesPlugin = {
 @Component({
   selector: 'app-overview-chart',
   templateUrl: './overview-chart.html',
-  styleUrls: ['./overview-chart.css']
+  styleUrls: ['./overview-chart.css'],
+  imports: [NgIf],
+  standalone: true
 })
-export class OverviewChartComponent implements AfterViewInit {
+export class OverviewChartComponent implements AfterViewInit, OnChanges {
 
   @Input() title = 'Overview';
   @Input() type: 'income' | 'expense' = 'income';
   @Input() data: { date: string; amount: number }[] = [];
 
+  @Output() modeChange = new EventEmitter<'weekly' | 'monthly' | 'yearly'>();
+
+  menuOpen = false;
+  mode: 'weekly' | 'monthly' | 'yearly' = 'monthly';
+
+  get modeLabel() {
+    return this.mode === 'weekly'
+      ? 'Hebdomadaire'
+      : this.mode === 'yearly'
+      ? 'Annuel'
+      : 'Mensuel';
+  }
+
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  changeMode(m: 'weekly' | 'monthly' | 'yearly') {
+    this.mode = m;
+    this.menuOpen = false;
+    this.modeChange.emit(m); // SEND MODE TO PARENT
+  }
+
   @ViewChild('canvas') canvas!: ElementRef<HTMLCanvasElement>;
   chart?: Chart<'bar'>;
 
   ngAfterViewInit() {
-    this.initializeChart();
+    this.drawChart();
   }
 
-  initializeChart() {
+  ngOnChanges() {
+    if (this.chart) this.drawChart();
+  }
+
+  drawChart() {
+    if (!this.canvas) return;
+
     const labels = this.data.map(d => d.date);
     const values = this.data.map(d => d.amount);
-
-    const colorBase =
-      this.type === 'income'
-        ? 'rgba(34,197,94,0.45)'    // green soft
-        : 'rgba(244,63,94,0.45)';  // red soft
-
-    const colorHighlight =
-      this.type === 'income'
-        ? 'rgb(16, 185, 129)'       // green bold
-        : 'rgb(239, 68, 68)';        // red bold
-
     const max = Math.max(...values);
-    const backgroundColors = values.map(v => (v === max ? colorHighlight : colorBase));
+
+    const colorSoft =
+      this.type === 'income'
+        ? 'rgba(16,185,129,0.45)'
+        : 'rgba(239,68,68,0.45)';
+
+    const colorBold =
+      this.type === 'income'
+        ? 'rgb(16,185,129)'
+        : 'rgb(239,68,68)';
+
+    const backgroundColors = values.map(v =>
+      v === max ? colorBold : colorSoft
+    );
 
     const ctx = this.canvas.nativeElement.getContext('2d');
     if (!ctx) return;
+
+    if (this.chart) this.chart.destroy();
 
     this.chart = new Chart(ctx, {
       type: 'bar',

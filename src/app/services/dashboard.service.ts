@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { SupabaseService } from '../services/supabase.service';
 
 import { Income } from '../shared/model/income';
 import { Expense } from '../shared/model/expense';
@@ -21,59 +22,75 @@ export interface CategorySlice {
 })
 export class DashboardService {
 
-  // Month names
+  constructor(private supabase: SupabaseService) {}
+
   private months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-  //------------------------------------------
-  // TEMPORARY MOCK DATA (replace with backend)
-  //------------------------------------------
+  // ---------------------------------------------------
+  //  FETCHING FROM SUPABASE
+  // ---------------------------------------------------
 
-  private mockIncomes: Income[] = [
-    { id:'i1', name:"prod1",amount:10000, date:'2025-01-12', userId:'u1', type:'product' as any },
-    { id:'i2', name:"prod1",amount:20000, date:'2025-02-19', userId:'u1', type:'product' as any },
-    { id:'i3', name:"prod1",amount:40000, date:'2025-03-05', userId:'u1', type:'product' as any },
-    { id:'i4', name:"prod1",amount:35000, date:'2025-05-07', userId:'u1', type:'product' as any },
-    { id:'i5', name:"prod1",amount:18000, date:'2025-07-10', userId:'u1', type:'product' as any },
-    { id:'i6', name:"prod1",amount:36000, date:'2025-12-01', userId:'u1', type:'product' as any }
-  ];
-
-  private mockExpenses: Expense[] = [
-    { id:'e1', amount:500, date:'2025-11-12', userId:'u1', categoryId:'c1' },
-    { id:'e2', amount:800, date:'2025-11-10', userId:'u1', categoryId:'c2' },
-    { id:'e3', amount:750, date:'2025-11-12', userId:'u1', categoryId:'c1' },
-    { id:'e4', amount:150, date:'2025-11-12', userId:'u1', categoryId:'c3' },
-    { id:'e5', amount:230, date:'2025-11-12', userId:'u1', categoryId:'c4' },
-    { id:'e6', amount:20000, date:'2025-03-10', userId:'u1', categoryId:'c5' },
-    { id:'e7', amount:5000, date:'2025-03-12', userId:'u1', categoryId:'c2' }
-  ];
-
-  private mockCategories: Category[] = [
-    { id:'c1', name:'Monitor OLED', icon:'', color:'#2F80ED', userId:'u1'},
-    { id:'c2', name:'Bills', icon:'', color:'#56CCF2', userId:'u1'},
-    { id:'c3', name:'Transport', icon:'', color:'#6FCF97', userId:'u1'},
-    { id:'c4', name:'Keyboard', icon:'', color:'#F2994A', userId:'u1'},
-    { id:'c5', name:'Office', icon:'', color:'#9B51E0', userId:'u1'}
-  ];
-
-  //------------------------------------------
-  // FETCHING — replace with HttpClient later
-  //------------------------------------------
+  private async getUserId(): Promise<string | null> {
+    const { data } = await this.supabase.client.auth.getUser();
+    return data.user?.id ?? null;
+  }
 
   async fetchIncomes(): Promise<Income[]> {
-    return Promise.resolve(this.mockIncomes);
+    const userId = await this.getUserId();
+    if (!userId) return [];
+
+    const { data, error } = await this.supabase.client
+      .from('income')
+      .select('*')
+      .eq('user_id', userId)
+      .order('date', { ascending: true });
+
+    if (error) {
+      console.error('fetchIncomes error:', error);
+      return [];
+    }
+
+    return data as Income[];
   }
 
   async fetchExpenses(): Promise<Expense[]> {
-    return Promise.resolve(this.mockExpenses);
+    const userId = await this.getUserId();
+    if (!userId) return [];
+
+    const { data, error } = await this.supabase.client
+      .from('expense')
+      .select('*')
+      .eq('user_id', userId)
+      .order('date', { ascending: true });
+
+    if (error) {
+      console.error('fetchExpenses error:', error);
+      return [];
+    }
+
+    return data as Expense[];
   }
 
   async fetchCategories(): Promise<Category[]> {
-    return Promise.resolve(this.mockCategories);
+    const userId = await this.getUserId();
+    if (!userId) return [];
+
+    const { data, error } = await this.supabase.client
+      .from('category')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('fetchCategories error:', error);
+      return [];
+    }
+
+    return data as Category[];
   }
 
-  //------------------------------------------
-  // AGGREGATION METHODS (USED BY CHARTS)
-  //------------------------------------------
+  // ---------------------------------------------------
+  //  MONTHLY TOTALS
+  // ---------------------------------------------------
 
   async monthlyTotalsIncome(year: number, incomes: Income[]): Promise<MonthlyPoint[]> {
     const buckets = new Array(12).fill(0);
@@ -107,9 +124,10 @@ export class DashboardService {
     }));
   }
 
-  //------------------------------------------
-  // NET BALANCE (Income – Expense per month)
-  //------------------------------------------
+  // ---------------------------------------------------
+  //  NET BALANCE (Income – Expense per month)
+  // ---------------------------------------------------
+
   async monthlyNetBalance(year: number, incomes: Income[], expenses: Expense[]): Promise<MonthlyPoint[]> {
     const inc = await this.monthlyTotalsIncome(year, incomes);
     const exp = await this.monthlyTotalsExpenses(year, expenses);
@@ -120,9 +138,10 @@ export class DashboardService {
     }));
   }
 
-  //------------------------------------------
-  // CATEGORY DISTRIBUTION — Incomes
-  //------------------------------------------
+  // ---------------------------------------------------
+  //  CATEGORY DISTRIBUTION — Incomes
+  // ---------------------------------------------------
+
   async categoryDistributionForIncomes(incomes: Income[], categories: Category[]): Promise<CategorySlice[]> {
     const map = new Map<string, number>();
 
@@ -144,9 +163,10 @@ export class DashboardService {
     return result;
   }
 
-  //------------------------------------------
-  // CATEGORY DISTRIBUTION — Expenses
-  //------------------------------------------
+  // ---------------------------------------------------
+  //  CATEGORY DISTRIBUTION — Expenses
+  // ---------------------------------------------------
+
   async categoryDistributionForExpenses(expenses: Expense[], categories: Category[]): Promise<CategorySlice[]> {
     const map = new Map<string, number>();
 
@@ -167,4 +187,89 @@ export class DashboardService {
 
     return result;
   }
+
+  // ---------------------------------------------------
+  //  OVERVIEW MODES: weekly / monthly / yearly
+  // ---------------------------------------------------
+
+  private formatDay(d: string): string {
+    return new Date(d).toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "short"
+    });
+  }
+
+  private convertToOverview(data: { date: string; amount: number }[]) {
+    return data
+      .sort((a, b) => +new Date(a.date) - +new Date(b.date))
+      .map(d => ({
+        date: this.formatDay(d.date),
+        amount: d.amount
+      }));
+  }
+
+  private getWeeklyOverview(data: { date: string; amount: number }[]) {
+    return data.slice(-7); // last 7 days
+  }
+
+  private getMonthlyOverview(data: { date: string; amount: number }[]) {
+    return data.slice(-30); // last 30 days
+  }
+
+  private getYearlyOverview(data: Income[] | Expense[]) {
+    const buckets = new Array(12).fill(0);
+
+    data.forEach(item => {
+      const d = new Date(item.date);
+      buckets[d.getMonth()] += item.amount;
+    });
+
+    return buckets.map((amount, idx) => ({
+      date: this.months[idx],
+      amount
+    }));
+  }
+
+  // ---------------------------------------------------
+  //  PUBLIC API FOR CHARTS
+  // ---------------------------------------------------
+
+  async getIncomeOverview(mode: 'weekly' | 'monthly' | 'yearly') {
+    const incomes = await this.fetchIncomes();
+
+    if (mode === 'yearly') {
+      return this.getYearlyOverview(incomes);
+    }
+
+    const raw = incomes.map(i => ({
+      date: i.date,
+      amount: i.amount
+    }));
+
+    const converted = this.convertToOverview(raw);
+
+    return mode === 'weekly'
+      ? this.getWeeklyOverview(converted)
+      : this.getMonthlyOverview(converted);
+  }
+
+  async getExpenseOverview(mode: 'weekly' | 'monthly' | 'yearly') {
+    const expenses = await this.fetchExpenses();
+
+    if (mode === 'yearly') {
+      return this.getYearlyOverview(expenses);
+    }
+
+    const raw = expenses.map(e => ({
+      date: e.date,
+      amount: e.amount
+    }));
+
+    const converted = this.convertToOverview(raw);
+
+    return mode === 'weekly'
+      ? this.getWeeklyOverview(converted)
+      : this.getMonthlyOverview(converted);
+  }
+
 }

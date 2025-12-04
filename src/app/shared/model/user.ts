@@ -14,18 +14,17 @@ export enum ThemeMode {
 }
 
 export interface User {
-  id: string;
+  id: string;          
   type: UserType;
   role: UserRole;
   first_name: string;
   last_name: string;
   tel_number: number;
-  email: string;
-  id_country: string;    
-  id_currency: string;   
+  email: string;       
+  id_country: string;
+  id_currency: string;
   username: string;
-  password: string;
   language: string;
   theme: ThemeMode;
-  id_manager?: string;   
+  id_manager?: string;
 }
