@@ -1,3 +1,4 @@
+// dashboard.service.ts (updated overview helpers for 7d / 28d / 12m)
 import { Injectable } from '@angular/core';
 import { SupabaseService } from '../services/supabase.service';
 
@@ -28,7 +29,7 @@ export class DashboardService {
   private months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
   // ---------------------------------------------------
-  //  FETCHING FROM SUPABASE
+  //  FETCHING FROM SUPABASE (unchanged)
   // ---------------------------------------------------
   private async getUserId(): Promise<string | null> {
     const { data } = await this.supabase.client.auth.getUser();
@@ -103,9 +104,8 @@ export class DashboardService {
   }
 
   // ---------------------------------------------------
-  //  MONTHLY TOTALS
+  //  MONTHLY TOTALS (unchanged)
   // ---------------------------------------------------
-
   async monthlyTotalsIncome(year: number, incomes: Income[]): Promise<MonthlyPoint[]> {
     const buckets = new Array(12).fill(0);
 
@@ -138,10 +138,6 @@ export class DashboardService {
     }));
   }
 
-  // ---------------------------------------------------
-  //  NET BALANCE (Income – Expense per month)
-  // ---------------------------------------------------
-
   async monthlyNetBalance(year: number, incomes: Income[], expenses: Expense[]): Promise<MonthlyPoint[]> {
     const inc = await this.monthlyTotalsIncome(year, incomes);
     const exp = await this.monthlyTotalsExpenses(year, expenses);
@@ -153,10 +149,8 @@ export class DashboardService {
   }
 
   // ---------------------------------------------------
-  //  CATEGORY DISTRIBUTION — Incomes (FIXED)
-  //  income.product_id -> product.id -> product.id_category -> category.id
+  //  CATEGORY DISTRIBUTION (unchanged)
   // ---------------------------------------------------
-
   async categoryDistributionForIncomes(
     incomes: Income[],
     products: Product[],
@@ -165,7 +159,6 @@ export class DashboardService {
     const map = new Map<string, number>();
 
     incomes.forEach(i => {
-      // gérer productId camelCase OU product_id snake_case
       const productId =
         (i as any).productId ??
         (i as any).product_id ??
@@ -197,10 +190,6 @@ export class DashboardService {
     return result;
   }
 
-  // ---------------------------------------------------
-  //  CATEGORY DISTRIBUTION — Expenses (camelCase/snake_case)
-  // ---------------------------------------------------
-
   async categoryDistributionForExpenses(expenses: Expense[], categories: Category[]): Promise<CategorySlice[]> {
     const map = new Map<string, number>();
 
@@ -227,87 +216,153 @@ export class DashboardService {
   }
 
   // ---------------------------------------------------
-  //  OVERVIEW MODES: weekly / monthly / yearly
+  //  OVERVIEW HELPERS (NEW / UPDATED)
+  //  - daily = last N days (fills missing days with 0)
+  //  - monthly = last 12 months (month-year buckets, fills missing months with 0)
   // ---------------------------------------------------
 
-  private formatDay(d: string): string {
-    return new Date(d).toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short"
+  // format day shown on chart labels, e.g. "05 Dec"
+  private formatDay(d: Date | string): string {
+    const dt = (d instanceof Date) ? d : new Date(d);
+    return dt.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+  }
+
+  // format month shown on chart labels, e.g. "Dec 2024"
+  private formatMonthYear(year: number, monthIndex: number): string {
+    return `${this.months[monthIndex]} ${year}`;
+  }
+
+  // returns 'YYYY-MM-DD' normalized key for a date string
+  private dateKey(dateString: string | Date): string {
+    const d = (dateString instanceof Date) ? dateString : new Date(dateString);
+    const y = d.getFullYear();
+    const m = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  // returns 'YYYY-MM' key for month aggregation
+  private monthKey(dateString: string | Date): { key: string; year: number; monthIndex: number } {
+    const d = (dateString instanceof Date) ? dateString : new Date(dateString);
+    const y = d.getFullYear();
+    const m = d.getMonth(); // 0-based
+    return { key: `${y}-${(m + 1).toString().padStart(2, '0')}`, year: y, monthIndex: m };
+  }
+
+  // build last N days array of Date objects (inclusive: today and previous N-1 days)
+  private lastNDates(n: number): Date[] {
+    const arr: Date[] = [];
+    const today = new Date();
+    // normalize time to 00:00 local to avoid timezone label shifts
+    today.setHours(0,0,0,0);
+    for (let i = n - 1; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      arr.push(d);
+    }
+    return arr;
+  }
+
+  // Daily overview for last N days (returns { date: formatted, amount })
+  private dailyOverviewFromRecords(data: { date: string; amount: number }[], days: number) {
+    const daysArr = this.lastNDates(days);
+    const map = new Map<string, number>();
+    // initialize all days to 0
+    daysArr.forEach(d => map.set(this.dateKey(d), 0));
+
+    // aggregate
+    data.forEach(item => {
+      const k = this.dateKey(item.date);
+      if (map.has(k)) {
+        map.set(k, (map.get(k) || 0) + item.amount);
+      }
     });
+
+    // build ordered array
+    const result = daysArr.map(d => {
+      const key = this.dateKey(d);
+      return {
+        date: this.formatDay(d),
+        amount: Math.round(map.get(key) || 0)
+      };
+    });
+
+    return result;
   }
 
-  private convertToOverview(data: { date: string; amount: number }[]) {
-    return data
-      .sort((a, b) => +new Date(a.date) - +new Date(b.date))
-      .map(d => ({
-        date: this.formatDay(d.date),
-        amount: d.amount
-      }));
-  }
+  // Monthly overview for last 12 months (returns { date: 'Mon YYYY', amount })
+  private last12MonthsOverviewFromRecords(data: { date: string; amount: number }[]) {
+    const now = new Date();
+    // build last 12 months keys (from 11 months ago up to current month)
+    const monthsArr: { year: number; monthIndex: number; key: string }[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`; // YYYY-MM
+      monthsArr.push({ year: d.getFullYear(), monthIndex: d.getMonth(), key });
+    }
 
-  private getWeeklyOverview(data: { date: string; amount: number }[]) {
-    return data.slice(-7); // last 7 days
-  }
+    // initialize map
+    const map = new Map<string, number>();
+    monthsArr.forEach(m => map.set(m.key, 0));
 
-  private getMonthlyOverview(data: { date: string; amount: number }[]) {
-    return data.slice(-30); // last 30 days
-  }
-
-  private getYearlyOverview(data: Income[] | Expense[]) {
-    const buckets = new Array(12).fill(0);
-
+    // aggregate into YYYY-MM
     data.forEach(item => {
       const d = new Date(item.date);
-      buckets[d.getMonth()] += item.amount;
+      const key = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+      if (map.has(key)) {
+        map.set(key, (map.get(key) || 0) + item.amount);
+      }
     });
 
-    return buckets.map((amount, idx) => ({
-      date: this.months[idx],
-      amount
+    // build ordered array
+    const result = monthsArr.map(m => ({
+      date: this.formatMonthYear(m.year, m.monthIndex),
+      amount: Math.round(map.get(m.key) || 0)
     }));
+
+    return result;
   }
 
   // ---------------------------------------------------
-  //  PUBLIC API FOR CHARTS
+  //  PUBLIC API FOR CHARTS (updated)
+  //  Modes mapping:
+  //   - 'weekly' => last 7 days
+  //   - 'monthly' => last 28 days
+  //   - 'yearly' => last 12 months
   // ---------------------------------------------------
 
   async getIncomeOverview(mode: 'weekly' | 'monthly' | 'yearly') {
     const incomes = await this.fetchIncomes();
 
+    // convert supabase records to minimal shape
+    const raw = incomes.map(i => ({ date: i.date, amount: i.amount }));
+
     if (mode === 'yearly') {
-      return this.getYearlyOverview(incomes);
+      return this.last12MonthsOverviewFromRecords(raw);
     }
 
-    const raw = incomes.map(i => ({
-      date: i.date,
-      amount: i.amount
-    }));
-
-    const converted = this.convertToOverview(raw);
-
-    return mode === 'weekly'
-      ? this.getWeeklyOverview(converted)
-      : this.getMonthlyOverview(converted);
+    // daily ranges
+    if (mode === 'weekly') {
+      return this.dailyOverviewFromRecords(raw, 7); // last 7 days
+    } else { // monthly => last 28 days
+      return this.dailyOverviewFromRecords(raw, 28);
+    }
   }
 
   async getExpenseOverview(mode: 'weekly' | 'monthly' | 'yearly') {
     const expenses = await this.fetchExpenses();
 
+    const raw = expenses.map(e => ({ date: e.date, amount: e.amount }));
+
     if (mode === 'yearly') {
-      return this.getYearlyOverview(expenses);
+      return this.last12MonthsOverviewFromRecords(raw);
     }
 
-    const raw = expenses.map(e => ({
-      date: e.date,
-      amount: e.amount
-    }));
-
-    const converted = this.convertToOverview(raw);
-
-    return mode === 'weekly'
-      ? this.getWeeklyOverview(converted)
-      : this.getMonthlyOverview(converted);
+    if (mode === 'weekly') {
+      return this.dailyOverviewFromRecords(raw, 7);
+    } else {
+      return this.dailyOverviewFromRecords(raw, 28);
+    }
   }
 
 }
