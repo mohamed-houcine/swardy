@@ -40,7 +40,7 @@ export class Income implements OnInit {
     {title: "Date", iconUrl: "assets/icons/date.svg", canBeSorted: true, key: "date"},
     {title: "Actions", iconUrl: "assets/icons/actions.svg", canBeSorted: false, key: ""}
   ];
-  IncomeSearchFactors: string[] = ["Name", "Employee"];
+  IncomeSearchFactors: string[] = ["name", "employee"];
   IncomeData: IncomeModel[] = [
     { id: "1", name: "MSI OLED Monitor", type: IncomeType.PRODUCT, quantity: 2, employeeName: "Skander Boughnimi", paymentMethod: "Credit Card", amount: 1500, date: "2025-11-20" },
   { id: "2", name: "Logitech Mouse", type: IncomeType.PRODUCT, quantity: 5, employeeName: "Aymen Dridi", paymentMethod: "Cash", amount: 250, date: "2025-11-18" },

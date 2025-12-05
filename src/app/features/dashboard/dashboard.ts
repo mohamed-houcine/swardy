@@ -119,7 +119,7 @@ export class Dashboard implements OnInit {
         date: new Date(i.date).toLocaleDateString(),
         name: i.name,
         type: Type.INCOME,
-        incomeType: i.type === "product" ? IncomeType.Product : IncomeType.SOURCE
+        incomeType: i.type === "product" ? IncomeType.PRODUCT : IncomeType.SOURCE
       })),
       ...expenses.map(e => {
         const catId =
