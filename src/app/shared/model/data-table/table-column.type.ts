@@ -1,6 +1,7 @@
 export interface TableColumn {
     title: string;
     iconUrl: string;
-    sortIconUrl?: string;
+    canBeSorted: boolean;
     direction?: 'asc' | 'desc';
+    key: string;
 }

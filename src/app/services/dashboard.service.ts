@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from '../services/supabase.service';
 
-import { Income } from '../shared/model/income';
+import { IncomeModel } from '../shared/model/income';
 import { Expense } from '../shared/model/expense';
 import { Category } from '../shared/model/category';
 
@@ -35,7 +35,7 @@ export class DashboardService {
     return data.user?.id ?? null;
   }
 
-  async fetchIncomes(): Promise<Income[]> {
+  async fetchIncomes(): Promise<IncomeModel[]> {
     const userId = await this.getUserId();
     if (!userId) return [];
 
@@ -50,7 +50,7 @@ export class DashboardService {
       return [];
     }
 
-    return data as Income[];
+    return data as IncomeModel[];
   }
 
   async fetchExpenses(): Promise<Expense[]> {
@@ -92,7 +92,7 @@ export class DashboardService {
   //  MONTHLY TOTALS
   // ---------------------------------------------------
 
-  async monthlyTotalsIncome(year: number, incomes: Income[]): Promise<MonthlyPoint[]> {
+  async monthlyTotalsIncome(year: number, incomes: IncomeModel[]): Promise<MonthlyPoint[]> {
     const buckets = new Array(12).fill(0);
 
     incomes.forEach(i => {
@@ -128,7 +128,7 @@ export class DashboardService {
   //  NET BALANCE (Income – Expense per month)
   // ---------------------------------------------------
 
-  async monthlyNetBalance(year: number, incomes: Income[], expenses: Expense[]): Promise<MonthlyPoint[]> {
+  async monthlyNetBalance(year: number, incomes: IncomeModel[], expenses: Expense[]): Promise<MonthlyPoint[]> {
     const inc = await this.monthlyTotalsIncome(year, incomes);
     const exp = await this.monthlyTotalsExpenses(year, expenses);
 
@@ -142,7 +142,7 @@ export class DashboardService {
   //  CATEGORY DISTRIBUTION — Incomes
   // ---------------------------------------------------
 
-  async categoryDistributionForIncomes(incomes: Income[], categories: Category[]): Promise<CategorySlice[]> {
+  async categoryDistributionForIncomes(incomes: IncomeModel[], categories: Category[]): Promise<CategorySlice[]> {
     const map = new Map<string, number>();
 
     incomes.forEach(i => {
@@ -216,7 +216,7 @@ export class DashboardService {
     return data.slice(-30); // last 30 days
   }
 
-  private getYearlyOverview(data: Income[] | Expense[]) {
+  private getYearlyOverview(data: IncomeModel[] | Expense[]) {
     const buckets = new Array(12).fill(0);
 
     data.forEach(item => {

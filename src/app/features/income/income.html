@@ -1,6 +1,15 @@
-<app-overview-chart
+<main>
+  <app-overview-chart
   title="Income"
   type="income"
   [data]="incomeOverview"
   (modeChange)="loadIncomeOverview($event)"
 ></app-overview-chart>
+
+  <app-data-table
+    title="Income"
+    [columns]="IcomeColumnsNames"
+    [data]="IncomeData"
+    [SearchFactors]="IncomeSearchFactors"
+  ></app-data-table>
+</main>
