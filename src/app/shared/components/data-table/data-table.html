@@ -8,13 +8,13 @@
             [(ngModel)]="searchTerm"
             (input)="currentPage = 1"
         />
-        <button id="filter">
-            <img src="assets/icons/filter.svg" alt="filter_icon">
-            <span>Filter</span>
-        </button>
-        <button id="export">
+        <button id="export" (click)="toggleMenu()">
             <span>Export</span>
-            <img src="assets/icons/arrow_down.svg" alt="arrow_down_icon">
+            <img src="assets/icons/arrow_down.svg" alt="arrow_down_icon" [class.openMenu]="isExportMenuOpen">
+            <div class="menu" *ngIf="isExportMenuOpen" #exportMenu>
+                <div (click)="exportData('csv')">CSV (Excel)</div>
+                <div (click)="exportData('png')">PNG (Image)</div>
+            </div>
         </button>
         <button id="add">
             <span>Add {{ title }}</span>
@@ -23,7 +23,7 @@
     </header>
     <hr>
     <main>
-        <table>
+        <table #tableRef>
             <tr>
                 <ng-container *ngFor="let column of columns; let i = index">
                     <th *ngIf="i < columns.length - 1" (click)="onSort(column)">
@@ -59,8 +59,10 @@
                     </td>
                 </ng-container>
                 <td>
-                    <button>Details</button>
-                    <button>Delete</button>
+                    <div class="actions-container">
+                        <button>Details</button>
+                        <button>Delete</button>
+                    </div>
                 </td>
             </tr>
 

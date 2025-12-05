@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, ElementRef, EventEmitter, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Output, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-toggle-menu-component',
@@ -9,7 +9,16 @@ import { Component, ElementRef, EventEmitter, Output } from '@angular/core';
 })
 export class ToggleMenuComponent {
   constructor(private elementRef: ElementRef<HTMLElement>) {}
+  @ViewChild('sortMenu') sortMenu!: ElementRef;
 
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    if (!this.sortingPostsMethodOpen) return;
+
+    if (this.sortMenu && !this.sortMenu.nativeElement.contains(event.target)) {
+      this.sortingPostsMethodOpen = false;
+    }
+  }
   years = [2023, 2024, 2025, 2026, 2027];
   selectedYear = 2025;
 

@@ -7,7 +7,8 @@ import {
   Input,
   Output,
   ViewChild,
-  OnChanges
+  OnChanges,
+  HostListener
 } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 
@@ -45,6 +46,17 @@ export class OverviewChartComponent implements AfterViewInit, OnChanges {
   @Input() data: { date: string; amount: number }[] = [];
 
   @Output() modeChange = new EventEmitter<'weekly' | 'monthly' | 'yearly'>();
+
+  @ViewChild('sortMenu') sortMenu!: ElementRef;
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    if (!this.menuOpen) return;
+
+    if (this.sortMenu && !this.sortMenu.nativeElement.contains(event.target)) {
+      this.menuOpen = false;
+    }
+  }
 
   menuOpen = false;
   mode: 'weekly' | 'monthly' | 'yearly' = 'monthly';

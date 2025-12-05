@@ -7,6 +7,7 @@
   gap: 10px;
   margin: -10px 0;
   position: relative;
+  user-select: none;
 }
 
 
@@ -40,43 +41,6 @@
   transform: rotate(180deg);
 }
 
-.sorting-posts-menu {
-  position: absolute;
-  right: 7px;
-  top: 100%;
-  min-width: 160px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(11, 66, 130, 0.12);
-  padding: 6px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  z-index: 40;
-}
-
-.sorting-posts-menu::before {
-  content: '';
-  width: 0;
-  height: 0;
-  position: absolute;
-  right: 0;
-  top: -10px;
-  border-left: 15px solid transparent;
-  border-bottom: 15px solid #fff;
-}
-
-.sorting-posts-menu button {
-  text-align: left;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: transparent;
-  border: none;
-  color: #111;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.sorting-posts-menu button:hover {
-  background: rgba(11, 102, 209, 0.06);
+.menu {
+  top: 37px;
 }

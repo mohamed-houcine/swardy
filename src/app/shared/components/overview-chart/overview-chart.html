@@ -8,7 +8,7 @@
         <img src="assets/icons/arrow-down-white.png" />
       </button>
 
-      <div class="menu" *ngIf="menuOpen">
+      <div class="menu" *ngIf="menuOpen" #sortMenu>
         <div (click)="changeMode('weekly')">Hebdomadaire</div>
         <div (click)="changeMode('monthly')">Mensuel</div>
         <div (click)="changeMode('yearly')">Annuel</div>

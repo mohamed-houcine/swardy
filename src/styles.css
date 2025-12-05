@@ -21,3 +21,42 @@ body{
 ::-webkit-scrollbar-track {
   background-color: transparent;
 }
+
+.menu {
+  position: absolute;
+  right: 0;
+  top: 42px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 6px 0;
+  width: 160px;
+  z-index: 20;
+  color: #000;
+  text-align: left;
+  max-height: 200px;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+
+.menu div {
+  transition: all .1s ease-in-out;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.menu div:not(:last-child) {
+  border-bottom: 1px solid rgba(0,0,0,0.15);
+}
+
+.menu div:hover {
+  background: rgba(101, 88, 191, 0.6);
+  color: #fff;
+  border-radius: 5px;
+}
+
+button:active {
+  transform: scale(0.96);
+}

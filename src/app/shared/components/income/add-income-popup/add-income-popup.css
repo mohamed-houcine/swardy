@@ -1,0 +1,334 @@
+#main-container {
+    width: 100%;
+    overflow-y: auto;
+    height: 90vh;
+    scrollbar-width: thin;
+}
+
+
+#main-container header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 10px 5px 10px;
+}
+
+#main-container main {
+  max-height: calc(100% - 68px - 60px);
+  overflow: scroll;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 5px 0 5px;
+}
+
+hr {
+  border-top: .5px solid rgb(166, 166, 166);
+}
+
+.title {
+    font-size: 1.8em;
+    font-weight: normal;
+    font-family: 'pacifico', cursive;
+    padding-left: 20px;
+}
+
+#pictures {
+  position: relative;
+  height: 200px;
+}
+
+#banner-image {
+  height: 200px;
+  width: 100%;
+  border-radius: 20px;
+}
+
+#banner-image img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+}
+
+#profile-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 3.5px solid #fff;
+  position: absolute;
+  bottom: calc(-75px + 3.5px);
+  left: 20px;
+}
+
+#profile-image img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.edit-layer {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.3em;
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
+
+#profile-image:hover .edit-layer,
+#banner-image:hover .edit-layer {
+  opacity: 1;
+}
+
+#profile-image .edit-layer {
+  border-radius: 50%;
+}
+
+#banner-image .edit-layer {
+  border-radius: 20px;
+}
+
+#infos-form {
+  margin-top: 75px;
+  padding: 20px;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: #222;
+  margin-top: 100px;
+  padding: 20px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin: 20px 0 0 0;
+  flex-wrap: wrap;
+}
+
+.row > label {
+  max-width: 100px;
+  width: 100%;
+  font-size: 1.2em;
+  font-weight: 500;
+}
+
+.inputs {
+  flex-grow: 1;
+  display: flex;
+  gap: 20px;
+}
+
+footer {
+  display: flex;
+  flex-direction: row-reverse;
+  height: 60px;
+  gap: 10px;
+  padding: 10px 20px;
+}
+
+.btn {
+  padding: 0.7em 1em;
+  padding-left: 0.9em;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border: none;
+  border-radius: 15px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.save span {
+  display: block;
+  margin-left: 0.3em;
+  transition: all 0.3s ease-in-out;
+}
+
+.save svg {
+  display: block;
+  transform-origin: center center;
+  transition: transform 0.4s ease-in-out;
+}
+
+.save .svg-wrapper {
+  transform: scale(1.25);
+  transition: 0.5s linear;
+}
+
+.clicked svg {
+  transform: translateX(1.2em) scale(1.1);
+  fill: #fff;
+}
+
+.clicked span {
+  opacity: 0;
+  transition: 0.5s linear;
+}
+
+.save:active {
+  transform: scale(0.95);
+}
+
+.btn.discard {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.btn.discard:hover {
+  background-color: #f3f3f3;
+}
+
+.save {
+  background-color: var(--third-color);
+  color: #fff;
+  border: 1px solid var(--fourth-color);
+}
+
+.save:hover {
+  background-color: var(--fourth-color);
+}
+
+.inputGroup {
+  position: relative;
+  width: 100%;
+  min-width: 100px;
+}
+
+.inputGroup input,
+.inputGroup textarea {
+  font-size: 100%;
+  padding: 0.8em;
+  outline: none;
+  border: 2px solid rgb(200, 200, 200);
+  background-color: transparent;
+  border-radius: 10px;
+  width: 100%;
+  font-family: inherit;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.inputGroup label {
+  font-size: 100%;
+  position: absolute;
+  left: 0;
+  padding: 0.8em;
+  margin-left: 0.5em;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  color: rgb(100, 100, 100);
+}
+
+.inputGroup :is(input:focus, input:valid, textarea:focus, textarea:valid, select:focus, select:valid) ~ label {
+  transform: translateY(-50%) scale(0.9);
+  margin: 0;
+  margin-left: 0.8em;
+  padding: 0 0.5em;
+  background-color: #fff;
+}
+
+.inputGroup :is(input:focus, textarea:focus) {
+  border-color: rgb(150, 150, 200);
+}
+
+.inputGroup select {
+  font-size: 100%;
+  padding: 1em;
+  outline: none;
+  border: 2px solid rgb(200, 200, 200);
+  background-color: transparent;
+  border-radius: 10px;
+  width: 100%;
+  appearance: none;
+  cursor: pointer;
+}
+
+.inputGroup :is(select:focus) {
+  border-color: rgb(150, 150, 200);
+}
+
+.inputGroup input[type="date"] {
+  font-size: 100%;
+  padding: 0.8em;
+  outline: none;
+  border: 2px solid rgb(200, 200, 200);
+  background-color: transparent;
+  border-radius: 10px;
+  width: 100%;
+  font-family: inherit;
+  color: #222;
+  box-sizing: border-box;
+}
+
+.inputGroup input[type="date"] + label {
+  transform: translateY(-50%) scale(0.9);
+  margin: 0;
+  margin-left: 0.8em;
+  padding: 0 0.5em;
+  background-color: #fff;
+}
+
+
+::ng-deep .mat-mdc-dialog-container.responsive-dialog {
+  width: 90vw !important;
+  max-width: 700px !important;
+  height: auto !important;
+  max-height: 90vh !important;
+  border-radius: 15px !important;
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+}
+
+::ng-deep .mat-mdc-dialog-surface {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: 90vh !important;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: none;
+}
+
+@media (max-width: 700px) {
+  .row {
+    gap: 10px;
+  }
+  .inputs {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 450px) {
+  
+  header .title {
+    font-size: 1.5em;
+  }
+  .close-btn {
+    width: 30px; 
+    height: 30px;
+  }
+}
