@@ -1,10 +1,10 @@
 <main>
   <app-overview-chart
-  title="Income"
-  type="income"
-  [data]="incomeOverview"
-  (modeChange)="loadIncomeOverview($event)"
-></app-overview-chart>
+    title="Income Overview"
+    type="income"
+    [data]="overview"
+    (modeChange)="onModeChange($event)">
+  </app-overview-chart>
 
   <app-data-table
     title="Income"

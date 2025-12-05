@@ -6,31 +6,33 @@
         </div>
 
         <div class="dashboard">
-            <app-total-component
+           <app-total-component
             color="#6558BF"
             title="Total Balance"
-            [value]="'31,350'"
+            [value]="totalBalance"
             imagePath="/assets/icons/balance_1.svg"
             ></app-total-component>
-
 
             <app-total-component
             color="#67C090"
             title="Total Income"
-            [value]="'40,000'"
+            [value]="totalIncome"
             imagePath="/assets/icons/income_1.svg"
             ></app-total-component>
 
             <app-total-component
             color="#FF5555"
             title="Total Expenses"
-            [value]="'8,650'"
+            [value]="totalExpense"
             imagePath="/assets/icons/expense_1.svg"
             ></app-total-component>
 
+
+
             <div class="left">
                 <app-net-balance></app-net-balance>
-                <app-recent-transaction-component></app-recent-transaction-component>
+                <app-recent-transaction-component [arr]="transactions"></app-recent-transaction-component>
+
             </div>
             
 
