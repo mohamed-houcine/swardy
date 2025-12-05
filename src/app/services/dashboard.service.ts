@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from '../services/supabase.service';
 
-import { Income } from '../shared/model/income';
+import { IncomeModel } from '../shared/model/income';
 import { Expense } from '../shared/model/expense';
 import { Category } from '../shared/model/category';
 import { Product } from '../shared/model/product';
@@ -36,7 +36,7 @@ export class DashboardService {
     return data.user?.id ?? null;
   }
 
-  async fetchIncomes(): Promise<Income[]> {
+  async fetchIncomes(): Promise<IncomeModel[]> {
     const userId = await this.getUserId();
     if (!userId) return [];
 
@@ -51,26 +51,61 @@ export class DashboardService {
       return [];
     }
 
-    return data as Income[];
+    return data as IncomeModel[];
   }
 
-  async fetchExpenses(): Promise<Expense[]> {
-    const userId = await this.getUserId();
-    if (!userId) return [];
+ async fetchExpenses(): Promise<Expense[]> {
+  const userId = await this.getUserId();
+  if (!userId) return [];
 
-    const { data, error } = await this.supabase.client
-      .from('expense')
-      .select('*')
-      .eq('user_id', userId)
-      .order('date', { ascending: true });
+  const { data, error } = await this.supabase.client
+    .from('expense')
+    .select(`
+      id,
+      amount,
+      date,
+      notes,
+      receipt,
+      user_id,
+      category:category_id ( name ),
+      product:product_id ( name )
+    `)
+    .eq('user_id', userId)
+    .order('date', { ascending: false });
 
-    if (error) {
-      console.error('fetchExpenses error:', error);
-      return [];
-    }
-
-    return data as Expense[];
+  if (error) {
+    console.error('fetchExpenses error:', error);
+    return [];
   }
+
+  return data.map((e: any) => {
+    const productName =
+      e.product?.name ??
+      e.category?.name ??
+      e.notes ??
+      "Undetermined";
+
+    return {
+      id: e.id,
+      amount: e.amount,
+      date: e.date,
+      notes: e.notes,
+      receipt: e.receipt,
+      userId: e.user_id,
+
+      // 🎯 Use fallbacks
+      productName,
+      categoryName: e.category?.name ?? "Undetermined",
+
+      // 🎯 No such fields in DB → always define fallback values
+      quantity: "-",
+      employeeName: "-",
+      paymentMethod: "-",
+    };
+  });
+}
+
+
 
   async fetchCategories(): Promise<Category[]> {
     const userId = await this.getUserId();
@@ -106,7 +141,7 @@ export class DashboardService {
   // ---------------------------------------------------
   //  MONTHLY TOTALS (unchanged)
   // ---------------------------------------------------
-  async monthlyTotalsIncome(year: number, incomes: Income[]): Promise<MonthlyPoint[]> {
+  async monthlyTotalsIncome(year: number, incomes: IncomeModel[]): Promise<MonthlyPoint[]> {
     const buckets = new Array(12).fill(0);
 
     incomes.forEach(i => {
@@ -138,7 +173,7 @@ export class DashboardService {
     }));
   }
 
-  async monthlyNetBalance(year: number, incomes: Income[], expenses: Expense[]): Promise<MonthlyPoint[]> {
+  async monthlyNetBalance(year: number, incomes: IncomeModel[], expenses: Expense[]): Promise<MonthlyPoint[]> {
     const inc = await this.monthlyTotalsIncome(year, incomes);
     const exp = await this.monthlyTotalsExpenses(year, expenses);
 
@@ -152,7 +187,7 @@ export class DashboardService {
   //  CATEGORY DISTRIBUTION (unchanged)
   // ---------------------------------------------------
   async categoryDistributionForIncomes(
-    incomes: Income[],
+    incomes: IncomeModel[],
     products: Product[],
     categories: Category[]
   ): Promise<CategorySlice[]> {

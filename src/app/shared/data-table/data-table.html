@@ -1,0 +1,116 @@
+<div class="container">
+    <header>
+        <span class="title">{{ title }} List</span>
+        <input
+            type="search" 
+            id="searchbar"
+            [placeholder]="'Search by ' + SearchFactors[0] + (SearchFactors.length > 1 ? ' or ' + SearchFactors[1] + '...' : '')"
+            [(ngModel)]="searchTerm"
+            (input)="currentPage = 1"
+        />
+        <button id="filter">
+            <img src="assets/icons/filter.svg" alt="filter_icon">
+            <span>Filter</span>
+        </button>
+        <button id="export">
+            <span>Export</span>
+            <img src="assets/icons/arrow_down.svg" alt="arrow_down_icon">
+        </button>
+        <button id="add">
+            <span>Add {{ title }}</span>
+            <img src="assets/icons/plus.svg" alt="arrow_down_icon">
+        </button>
+    </header>
+    <hr>
+    <main>
+        <table>
+            <tr>
+                <ng-container *ngFor="let column of columns; let i = index">
+                    <th *ngIf="i < columns.length - 1" (click)="onSort(column)">
+                        <div class="th-content" >
+                            <div class="left">
+                                <img [src]="column.iconUrl" />
+                                <span>{{ column.title }}</span>
+                            </div>
+                            
+    
+                            <img
+                            *ngIf="column.canBeSorted"
+                            [src]="'assets/icons/sort' + (column.direction?'-asc':'') + '.svg'"
+                            [class.asc] = "column.direction === 'asc'"
+                            [class.desc] = "column.direction === 'desc'"
+                            />
+                        </div>
+                    </th>
+                </ng-container>
+                <th class="actions-th">
+                    <div class="th-content">    
+                        <div class="left">
+                            <img [src]="columns[columns.length - 1].iconUrl" />
+                            <span>{{ columns[columns.length - 1].title }}</span>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            <tr *ngFor="let row of paginatedData">
+                <ng-container *ngFor="let column of columns; let i = index">
+                    <td *ngIf="i < columns.length - 1">
+                        {{ row[column.key]??'N/A' }}
+                    </td>
+                </ng-container>
+                <td>
+                    <button>Details</button>
+                    <button>Delete</button>
+                </td>
+            </tr>
+
+        </table>
+    </main>
+    <footer>
+        <div class="rows-per-page">
+            <span>Rows per page:</span>
+
+            <select
+            [value]="pageSize"
+            (change)="onPageSizeChange(+$any($event.target).value)"
+            >
+            <option *ngFor="let size of pageSizeOptions" [value]="size">
+                {{ size }}
+            </option>
+            </select>
+        </div>
+
+
+        <div class="pagination-controls">
+            <button
+                (click)="currentPage = 1"
+                [disabled]="currentPage === 1"
+            >
+                <img src="assets/icons/double_left.svg" alt="double_left_icon">
+            </button>
+
+            <button
+            (click)="currentPage = currentPage - 1"
+            [disabled]="currentPage === 1"
+            >
+                <img src="assets/icons/left.svg" alt="left_icon">
+            </button>
+
+            <span>Page {{ currentPage }} of {{ totalPages }}</span>
+
+            <button
+            (click)="currentPage = currentPage + 1"
+            [disabled]="currentPage === totalPages"
+            >
+                <img src="assets/icons/right.svg" alt="right_icon">
+            </button>
+            <button
+                (click)="currentPage = totalPages"
+                [disabled]="currentPage === totalPages"
+            >
+                <img src="assets/icons/double_right.svg" alt="double_right_icon">
+            </button>
+
+        </div>
+    </footer>
+</div>

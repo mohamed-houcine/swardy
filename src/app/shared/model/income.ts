@@ -4,18 +4,19 @@ export enum ScanType {
 }
 export enum IncomeType{
   SOURCE='source',
-  Product='product'
+  PRODUCT='product'
 }
 
-export interface Income {
+export interface IncomeModel {
   id: string;
   name:string;
   amount: number;
-  quantity?: number;        
+  quantity?: number | null;
   date: string;             
-  scan_type?: ScanType;     
+  scan_type?: ScanType;
   notes?: string;
   productId?: string;       
-  userId: string; 
+  employeeName?: string; 
+  paymentMethod?: string;
   type:IncomeType;          
 }

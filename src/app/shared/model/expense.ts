@@ -5,6 +5,6 @@ export interface Expense {
   notes?: string;
   receipt?: string;
   userId: string;
-  categoryId: string;
-  productId?: string;
+  categoryName: string;
+  productName?: string;
 }

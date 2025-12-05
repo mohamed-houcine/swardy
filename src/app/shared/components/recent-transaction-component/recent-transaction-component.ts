@@ -19,7 +19,7 @@ export class RecentTransactionComponent {
       date: "12 Nov. 2025",
       name: "Product - Monitor OLED",
       type: Type.INCOME,
-      incomeType: IncomeType.Product
+      incomeType: IncomeType.PRODUCT
     },
     {
       amount: 800,
@@ -32,7 +32,7 @@ export class RecentTransactionComponent {
       date: "12 Nov. 2025",
       name: "Product - Laptop Lenovo Ideapad",
       type: Type.INCOME,
-      incomeType: IncomeType.Product
+      incomeType: IncomeType.PRODUCT
     }
   ];
 
