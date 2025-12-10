@@ -1,0 +1,16 @@
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.charts-container {
+    width: 100%;
+    display: flex;
+    gap: 20px;
+}
+
+app-pie-chart {
+    flex: 1;
+}

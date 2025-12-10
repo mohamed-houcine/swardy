@@ -1,1 +1,23 @@
-<p>expenses works!</p>
+<main>
+  <app-overview-chart
+    title="Expenses Overview"
+    type="expense"
+    [data]="overview"
+    (modeChange)="onModeChange($event)">
+  </app-overview-chart>
+
+  <app-data-table
+    title="Normal Expense"
+    [columns]="NormalExpensesColumnsNames"
+    [data]="NormalExpensesData"
+    [SearchFactors]="NormalExpensesSearchFactors"
+  ></app-data-table>
+  
+  <app-data-table
+    title="Product Expense"
+    [columns]="ProductExpensesColumnsNames"
+    [data]="ProductExpensesData"
+    [SearchFactors]="ProductExpensesSearchFactors"
+  ></app-data-table>
+
+</main>

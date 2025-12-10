@@ -7,9 +7,16 @@
   </app-overview-chart>
 
   <app-data-table
-    title="Income"
-    [columns]="IcomeColumnsNames"
-    [data]="IncomeData"
-    [SearchFactors]="IncomeSearchFactors"
+    title="Income Source"
+    [columns]="IncomeSourceColumnsNames"
+    [data]="IncomeSourceData"
+    [SearchFactors]="IncomeSourceSearchFactors"
+  ></app-data-table>
+
+  <app-data-table
+    title="Income From Product"
+    [columns]="IncomeProductColumnsNames"
+    [data]="IncomeProductData"
+    [SearchFactors]="IncomeProductSearchFactors"
   ></app-data-table>
 </main>

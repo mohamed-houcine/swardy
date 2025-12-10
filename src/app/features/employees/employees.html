@@ -1,1 +1,51 @@
-<p>employees works!</p>
+<main>
+    <div class="header">
+        <div class="cards-container">
+            <app-total-component
+                color="#ff0066"
+                title="Total Employees"
+                [value]="totalEmployees"
+                imagePath="/assets/icons/employees_1.svg"
+                [withCurrency]="false"
+            ></app-total-component>
+            
+            <app-total-component *ngIf="EOMname && EOMimg"
+                title="Employee of the month"
+                [value]="EOMname"
+                [imagePath]="EOMimg"
+                [withCurrency]="false"
+                [bigPicture]="true"
+            ></app-total-component>
+    
+        </div>
+        <div class="cards-container">
+            <app-total-component
+                color="#ff0066"
+                title="Avg. Sales/Employee"
+                [value]="avgSalePerEmployee"
+                imagePath="/assets/icons/employees_1.svg"
+            ></app-total-component>
+            
+            <app-total-component
+                color="#ff0066"
+                title="Active Today"
+                [value]="activeEmployees"
+                imagePath="/assets/icons/employees_1.svg"
+                [withCurrency]="false"
+            ></app-total-component>
+        </div>
+        <app-pie-chart
+            title="Gender Distribution"
+            [labels]="GenderLabels"
+            [data]="GenderData"
+            [colors]="GenderColors"
+            legentPosition="right"
+        ></app-pie-chart>
+    </div>
+    <app-data-table
+        title="Employee"
+        [columns]="EmployeesColumnsNames"
+        [data]="EmployeesData"
+        [SearchFactors]="EmployeesSearchFactors"
+    ></app-data-table>
+</main>

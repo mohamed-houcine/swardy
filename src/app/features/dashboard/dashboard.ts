@@ -6,7 +6,6 @@ import { PieChartComponent } from "../../shared/components/pie-chart/pie-chart";
 import { RecentTransactionComponent } from "../../shared/components/recent-transaction-component/recent-transaction-component";
 import { DashboardService } from '../../services/dashboard.service';
 import { Transaction, Type } from '../../shared/model/transaction';
-import { IncomeType } from '../../shared/model/income';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,7 +44,7 @@ export class Dashboard implements OnInit {
   transactions: Transaction[] = [];
 
   // GOAL (example: user sets 40K goal)
-  goalAmount = 40000;
+  goalAmount!: number | null;
 
   async getCurrentUserProfile() {
     const { data: auth } = await this.dash.supabase.client.auth.getUser();
@@ -54,7 +53,7 @@ export class Dashboard implements OnInit {
 
     const { data, error } = await this.dash.supabase.client
       .from("users")
-      .select("username, first_name, last_name")
+      .select("first_name, last_name")
       .eq("id", uid)
       .single();
 
@@ -71,40 +70,49 @@ export class Dashboard implements OnInit {
     // 1️⃣ Load user name
     const profile = await this.getCurrentUserProfile();
 
-    if (profile?.username) {
-      this.name = profile.username;
-    } else if (profile?.first_name) {
-      this.name = profile.first_name;
-    } else {
-      const auth = await this.dash.supabase.client.auth.getUser();
-      this.name = auth.data.user?.email?.split("@")[0] ?? "User";
-    }
+    this.name = profile?.first_name + ' ' + profile?.last_name;
 
     // 2️⃣ Load everything from Supabase in parallel
-    const [incomes, expenses, categories, products] = await Promise.all([
+    const [incomes, expenses, categories, goal] = await Promise.all([
       this.dash.fetchIncomes(),
       this.dash.fetchExpenses(),
       this.dash.fetchCategories(),
-      this.dash.fetchProducts()
+      this.dash.fetchGoal()
     ]);
 
+    // Get this month
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+    const monthlyIncomes = incomes.filter(income => {
+      const incomeDate = new Date(income.date);
+      return incomeDate >= startOfMonth && incomeDate <= endOfMonth;
+    });
+
+    const monthlyExpenses = expenses.filter(expense => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate >= startOfMonth && expenseDate <= endOfMonth;
+    });
+
     // 3️⃣ Totals
-    this.totalIncome = incomes.reduce((a, b) => a + b.amount, 0);
-    this.totalExpense = expenses.reduce((a, b) => a + b.amount, 0);
+    this.totalIncome = monthlyIncomes.reduce((a, b) => a + b.amount, 0);
+    this.totalExpense = monthlyExpenses.reduce((a, b) => a + b.amount, 0);
     this.totalBalance = this.totalIncome - this.totalExpense;
+    this.goalAmount = goal;
 
     // 4️⃣ Income Distribution (PRODUCT -> CATEGORY)
-    const incomeDist = await this.dash.categoryDistributionForIncomes(
+    const incomeDist = await this.dash.categoryDistribution(
       incomes,
-      products,
       categories
     );
+    
     this.incomeLabels = incomeDist.map(x => x.label);
     this.incomeData   = incomeDist.map(x => x.value);
     this.incomeColors = incomeDist.map(x => x.color || "#ccc");
 
     // 5️⃣ Expense Distribution
-    const expenseDist = await this.dash.categoryDistributionForExpenses(
+    const expenseDist = await this.dash.categoryDistribution(
       expenses,
       categories
     );
@@ -117,9 +125,9 @@ export class Dashboard implements OnInit {
       ...incomes.map(i => ({
         amount: i.amount,
         date: new Date(i.date).toLocaleDateString(),
-        name: i.name,
+        name: 'product' in i ? i.product : i.name,
         type: Type.INCOME,
-        incomeType: i.type === "product" ? IncomeType.PRODUCT : IncomeType.SOURCE
+        incomeType: "product" in i ? "product" : "source"
       })),
       ...expenses.map(e => {
         const catId =

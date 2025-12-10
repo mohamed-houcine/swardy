@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Transaction, Type } from '../../model/transaction';
-import { IncomeType } from '../../model/income';
 import { Input } from '@angular/core';
 import { NgFor } from '@angular/common';
 
@@ -13,28 +12,7 @@ import { NgFor } from '@angular/common';
 })
 export class RecentTransactionComponent {
 
-  @Input() arr : Transaction[] = [
-    {
-      amount: 500,
-      date: "12 Nov. 2025",
-      name: "Product - Monitor OLED",
-      type: Type.INCOME,
-      incomeType: IncomeType.PRODUCT
-    },
-    {
-      amount: 800,
-      date: "10 Nov. 2025",
-      name: "Electricity Bill",
-      type: Type.EXPENSE
-    },
-    {
-      amount: 750,
-      date: "12 Nov. 2025",
-      name: "Product - Laptop Lenovo Ideapad",
-      type: Type.INCOME,
-      incomeType: IncomeType.PRODUCT
-    }
-  ];
+  @Input() arr! : Transaction[];
 
   getIcon(t: Transaction) {
     if (t.type === Type.EXPENSE) return "/assets/icons/expense_1.svg  ";

@@ -5,13 +5,13 @@
     <div class="dropdown">
       <button class="range-btn" (click)="toggleMenu()">
         {{ modeLabel }}
-        <img src="assets/icons/arrow-down-white.png" />
+        <img src="assets/icons/arrow_down.svg" />
       </button>
 
       <div class="menu" *ngIf="menuOpen" #sortMenu>
-        <div (click)="changeMode('weekly')">Hebdomadaire</div>
-        <div (click)="changeMode('monthly')">Mensuel</div>
-        <div (click)="changeMode('yearly')">Annuel</div>
+        <div (click)="changeMode('weekly')">7 Days</div>
+        <div (click)="changeMode('monthly')">28 Days</div>
+        <div (click)="changeMode('yearly')">12 Months</div>
       </div>
     </div>
   </div>

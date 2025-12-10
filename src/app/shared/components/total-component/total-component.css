@@ -48,3 +48,9 @@ img{
     align-items: center;
     justify-content: center;
 }
+
+.bigPic {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+}

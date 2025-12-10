@@ -5,11 +5,11 @@
 
 <div class="container">
     <div class="img_container"  [style.background]="color">
-        <img [src]="imagePath" alt="component_img">
+        <img [class.bigPic]="bigPicture" [src]="imagePath" alt="component_img">
     </div>
     <div class="mini_container">
         <span class="title">{{title}}</span>
-        <span class="amount">${{value}}</span>
+        <span class="amount">{{withCurrency?'$':''}}{{value}}</span>
     </div>
 
 </div>

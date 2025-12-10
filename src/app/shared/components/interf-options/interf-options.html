@@ -4,7 +4,6 @@
     <span class="title">Swardy</span>
   </div>
 
-
   <div class="interfOptions">
     <a *ngFor="let f of interfOptions"
        (click)="setActiveinterfOptionsKey(f.key)"
@@ -22,5 +21,10 @@
     <img src="/assets/images/hama.png" alt="avatar">
     <span>Profile</span>
   </div>
+
+  <li (click)="logout()" class="logout-btn">
+  <span>Logout</span>
+</li>
+
 
 </div>

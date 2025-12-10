@@ -14,19 +14,24 @@ import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
+// ★ Improved Label Plugin ★
 const drawValuesPlugin = {
   id: 'drawValuesPlugin',
   afterDatasetsDraw(chart: any) {
     const ctx = chart.ctx;
-    const ds = chart.data.datasets[0];
+    const dataset = chart.data.datasets[0];
+    const meta = chart.getDatasetMeta(0);
+    const maxValue = Math.max(...dataset.data);
 
-    chart.getDatasetMeta(0).data.forEach((bar: any, i: number) => {
-      const value = ds.data[i];
+    meta.data.forEach((bar: any, i: number) => {
+      const value = dataset.data[i];
+      const isMax = value === maxValue;
+
       ctx.save();
-      ctx.fillStyle = '#111827';
       ctx.font = '600 12px Poppins';
       ctx.textAlign = 'center';
-      ctx.fillText(`$${value.toLocaleString()}`, bar.x, bar.y - 6);
+      ctx.fillStyle = isMax ? dataset.backgroundColor[i] : '#374151';
+      ctx.fillText(`$${value.toLocaleString()}`, bar.x, bar.y - 10);
       ctx.restore();
     });
   }
@@ -63,10 +68,10 @@ export class OverviewChartComponent implements AfterViewInit, OnChanges {
 
   get modeLabel() {
     return this.mode === 'weekly'
-      ? 'Weekly'
+      ? 'Last 7 Days'
       : this.mode === 'yearly'
-      ? 'Yearly'
-      : 'Monthly';
+      ? 'Last 12 Months'
+      : 'Last 28 Days';
   }
 
   toggleMenu() {
@@ -99,8 +104,8 @@ export class OverviewChartComponent implements AfterViewInit, OnChanges {
 
     const colorSoft =
       this.type === 'income'
-        ? 'rgba(16,185,129,0.45)'
-        : 'rgba(239,68,68,0.45)';
+        ? 'rgba(16,185,129,0.35)'
+        : 'rgba(239,68,68,0.35)';
 
     const colorBold =
       this.type === 'income'
@@ -125,20 +130,31 @@ export class OverviewChartComponent implements AfterViewInit, OnChanges {
             data: values,
             backgroundColor: backgroundColors,
             borderRadius: 14,
-            borderSkipped: false
+            borderSkipped: false,
+            barPercentage: 0.55,
+            categoryPercentage: 0.45
           }
         ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+
+        layout: {
+          padding: { top: 30 }
+        },
+
         plugins: { legend: { display: false } },
+
         scales: {
           x: {
             grid: { display: false },
             ticks: {
               color: '#6B7280',
-              font: { family: 'Poppins', size: 12 }
+              font: { family: 'Poppins', size: 12 },
+              maxRotation: 0,
+              minRotation: 0,
+              padding: 8
             }
           },
           y: { display: false }

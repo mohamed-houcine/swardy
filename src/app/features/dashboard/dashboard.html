@@ -7,31 +7,33 @@
 
         <div class="dashboard">
            <app-total-component
-            color="#6558BF"
-            title="Total Balance"
-            [value]="totalBalance"
-            imagePath="/assets/icons/balance_1.svg"
+                color="#6558BF"
+                title="Total Balance"
+                [value]="totalBalance"
+                imagePath="/assets/icons/balance_1.svg"
             ></app-total-component>
 
             <app-total-component
-            color="#67C090"
-            title="Total Income"
-            [value]="totalIncome"
-            imagePath="/assets/icons/income_1.svg"
+                color="#67C090"
+                title="Total Income"
+                [value]="totalIncome"
+                imagePath="/assets/icons/income_1.svg"
             ></app-total-component>
 
             <app-total-component
-            color="#FF5555"
-            title="Total Expenses"
-            [value]="totalExpense"
-            imagePath="/assets/icons/expense_1.svg"
+                color="#FF5555"
+                title="Total Expenses"
+                [value]="totalExpense"
+                imagePath="/assets/icons/expense_1.svg"
             ></app-total-component>
 
 
 
             <div class="left">
                 <app-net-balance></app-net-balance>
-                <app-recent-transaction-component [arr]="transactions"></app-recent-transaction-component>
+                <app-recent-transaction-component
+                    [arr]="transactions"
+                ></app-recent-transaction-component>
 
             </div>
             
@@ -39,17 +41,19 @@
             <div class="right">
                 <app-goal-component [title]="'Goal'" [goal]="40000" [current]="21000" [currency]="'$'"></app-goal-component>
                 
-                <app-pie-chart [title]="'Product income Distribution'"
+                <app-pie-chart [title]="'Income Distribution'"
                     [labels]="incomeLabels"
                     [data]="incomeData"
                     [colors]="incomeColors"
-                    [legendPosition]="'right'"></app-pie-chart>
+                    [legendPosition]="'right'"
+                ></app-pie-chart>
             
                 <app-pie-chart [title]="'Expenses Distribution'"
                     [labels]="expenseLabels"
                     [data]="expenseData"
                     [colors]="expenseColors"
-                    [legendPosition]="'right'"></app-pie-chart>
+                    [legendPosition]="'right'"
+                ></app-pie-chart>
             </div>
 
         </div>

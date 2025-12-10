@@ -1,1 +1,25 @@
-<p>products works!</p>
+<main>
+    <div class="charts-container">
+        <app-pie-chart
+            title="Best Selling Products"
+            [labels]="BSProductLabels"
+            [data]="BSProductData"
+            [colors]="BSProductColors"
+            legentPosition="right"
+        ></app-pie-chart>
+        
+        <app-pie-chart
+            title="Product Income Distribution"
+            [labels]="productIncomeLabels"
+            [data]="productIncomeData"
+            [colors]="productIncomeColors"
+            legentPosition="right"
+        ></app-pie-chart>
+    </div>
+    <app-data-table
+        title="Products"
+        [columns]="ProductColumnsNames"
+        [data]="ProductData"
+        [SearchFactors]="ProductSearchFactors"
+    ></app-data-table>
+</main>

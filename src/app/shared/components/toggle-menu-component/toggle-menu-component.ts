@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostListener, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-toggle-menu-component',
@@ -19,7 +19,7 @@ export class ToggleMenuComponent {
       this.sortingPostsMethodOpen = false;
     }
   }
-  years = [2023, 2024, 2025, 2026, 2027];
+  @Input() years!: number[];
   selectedYear = 2025;
 
   sortingPostsMethodOpen = false;

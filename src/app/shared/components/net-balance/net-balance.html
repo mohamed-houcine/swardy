@@ -13,6 +13,7 @@
     <div style="display:flex;align-items:center;gap:12px">
       <!-- listen to the event emitted by ToggleMenuComponent -->
       <app-toggle-menu-component
+        [years]="years"
         (yearSelected)="onYearSelected($event)">
       </app-toggle-menu-component>
 

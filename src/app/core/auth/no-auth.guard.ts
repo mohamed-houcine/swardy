@@ -14,6 +14,7 @@ export class NoAuthGuard {
       this.router.navigate(['/']);
       return false;
     }
+
     return true;
   }
 }

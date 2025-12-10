@@ -59,7 +59,7 @@ export class NetBalanceComponent implements AfterViewInit, OnDestroy {
   constructor() {
     // build recent years (current and 4 previous)
     const now = new Date().getFullYear();
-    this.years = Array.from({ length: 6 }, (_, i) => now - i);
+    this.years = Array.from({ length: 5 }, (_, i) => now - i);
     this.selectedYear = now;
   }
 

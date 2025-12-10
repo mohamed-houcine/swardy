@@ -241,3 +241,18 @@ footer {
 .openMenu {
   transform: rotate(180deg);
 }
+
+.no-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    text-align: center;
+    color: #666;
+}
+
+.no-data p {
+    margin: 0;
+    font-size: 1em;
+}

@@ -36,7 +36,7 @@
     
                             <img
                             *ngIf="column.canBeSorted"
-                            [src]="'assets/icons/sort' + (column.direction?'-asc':'') + '.svg'"
+                            [src]="'assets/icons/data-table/sort' + (column.direction?'-asc':'') + '.svg'"
                             [class.asc] = "column.direction === 'asc'"
                             [class.desc] = "column.direction === 'desc'"
                             />
@@ -67,6 +67,9 @@
             </tr>
 
         </table>
+        <div class="no-data" *ngIf="paginatedData.length === 0">
+            <p>No data available</p>
+        </div>
     </main>
     <footer>
         <div class="rows-per-page">
@@ -88,14 +91,14 @@
                 (click)="currentPage = 1"
                 [disabled]="currentPage === 1"
             >
-                <img src="assets/icons/double_left.svg" alt="double_left_icon">
+                <img src="assets/icons/data-table/double_left.svg" alt="double_left_icon">
             </button>
 
             <button
             (click)="currentPage = currentPage - 1"
             [disabled]="currentPage === 1"
             >
-                <img src="assets/icons/left.svg" alt="left_icon">
+                <img src="assets/icons/data-table/left.svg" alt="left_icon">
             </button>
 
             <span>Page {{ currentPage }} of {{ totalPages }}</span>
@@ -104,13 +107,13 @@
             (click)="currentPage = currentPage + 1"
             [disabled]="currentPage === totalPages"
             >
-                <img src="assets/icons/right.svg" alt="right_icon">
+                <img src="assets/icons/data-table/right.svg" alt="right_icon">
             </button>
             <button
                 (click)="currentPage = totalPages"
                 [disabled]="currentPage === totalPages"
             >
-                <img src="assets/icons/double_right.svg" alt="double_right_icon">
+                <img src="assets/icons/data-table/double_right.svg" alt="double_right_icon">
             </button>
 
         </div>
