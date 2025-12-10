@@ -16,7 +16,7 @@
                 <div (click)="exportData('png')">PNG (Image)</div>
             </div>
         </button>
-        <button id="add">
+        <button id="add" (click)="handleAddClick()">
             <span>Add {{ title }}</span>
             <img src="assets/icons/plus.svg" alt="arrow_down_icon">
         </button>

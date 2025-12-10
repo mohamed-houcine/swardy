@@ -1,18 +1,17 @@
-import { NgStyle } from '@angular/common';
+import { NgIf, NgStyle } from '@angular/common';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-goal-component',
   templateUrl: './goal-component.html',
-  imports:[NgStyle],
+  imports:[NgStyle, NgIf],
   styleUrls: ['./goal-component.css']
 })
 export class GoalComponent implements OnChanges {
-  @Input() title: string = 'Goal';          
-  @Input() goal: number = 40000;            
-  @Input() current: number = 31200;         
-  @Input() currency: string = '$';          
-  @Input() accent: string = '#A78BFA';     
+  @Input() goal!: number | null;
+  @Input() current!: number;
+  @Input() currency: string = '$';
+  @Input() accent: string = '#A78BFA';
 
   // computed
   public percent: number = 0;

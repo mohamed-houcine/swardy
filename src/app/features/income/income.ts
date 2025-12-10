@@ -6,6 +6,8 @@ import { DataTable } from "../../shared/components/data-table/data-table";
 import { TableColumn } from '../../shared/model/data-table/table-column.type';
 import { IncomeSource } from '../../shared/model/income_source';
 import { IncomeProduct } from '../../shared/model/income_product';
+import { MatDialog } from '@angular/material/dialog';
+import { addIncomeSourcePopup } from '../../shared/components/income/add-income-popup/add-income-source-popup';
 
 @Component({
   selector: 'app-income',
@@ -23,7 +25,10 @@ export class Income implements OnInit {
   IncomeSourceData: IncomeSource[] = [];
   IncomeProductData: IncomeProduct[] = [];
 
-  constructor(private dash: DashboardService) {}
+  constructor(
+    private dash: DashboardService,
+    private dialog: MatDialog
+  ) {}
 
   // ---------------------------------------------------
   //  INIT: load overview + income table from Supabase
@@ -66,4 +71,16 @@ export class Income implements OnInit {
 
   IncomeSourceSearchFactors: string[] = ["name", "category"];
   IncomeProductSearchFactors: string[] = ["name", "category", "employeeName"];
+
+  // Methods
+  onAddIncomeSource() {
+    this.dialog.open(addIncomeSourcePopup, {
+      width: '100vw',
+      maxWidth: '700px',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'add-income-source-dialog',
+      autoFocus: false
+    });
+  }
 }

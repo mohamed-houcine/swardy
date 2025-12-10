@@ -953,4 +953,74 @@ export class DashboardService {
     return data.goal ? Number(data.goal) : null;
   }
 
+  async addIncomeSource(source: any) {
+    const userId = await this.getUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    const { data, error } = await this.supabase.client
+      .from('income_source')
+      .insert([{
+        name: source.name,
+        id_category: source.category,
+        amount: source.amount,
+        date: source.date,
+        notes: source.notes ?? null,
+        user_id: userId
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.log(error);
+    }
+
+    return data;
+  }
+
+  async fetchCategoriesByType(
+    type: 'income' | 'expense'
+  ): Promise<{ id: string; name: string }[]> {
+
+    const { data, error } = await this.supabase.client
+      .from('category')
+      .select('id, name, type')
+      .or(`type.eq.${type},type.eq.both`)
+      .order('name', { ascending: true });
+
+    if (error) {
+      console.error('fetchCategoriesByType error:', error);
+      return [];
+    }
+
+    return data ?? [];
+  }
+
+  async addCategory(category: Category, type: 'income' | 'expense' | 'both') {
+    const userId = await this.getUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    const { data, error } = await this.supabase.client
+      .from('category')
+      .insert([{
+        name: category.name,
+        color: category.color ?? null,
+        user_id: userId,
+        type: type
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
+
+
+
 }

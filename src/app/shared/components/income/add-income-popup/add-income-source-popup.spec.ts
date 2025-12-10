@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { EditProfilePopup } from './add-income-popup';
+import { addIncomeSourcePopup } from './add-income-source-popup';
 
 describe('EditProfilePopup', () => {
-  let component: EditProfilePopup;
-  let fixture: ComponentFixture<EditProfilePopup>;
+  let component: addIncomeSourcePopup;
+  let fixture: ComponentFixture<addIncomeSourcePopup>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditProfilePopup]
+      imports: [addIncomeSourcePopup]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(EditProfilePopup);
+    fixture = TestBed.createComponent(addIncomeSourcePopup);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
