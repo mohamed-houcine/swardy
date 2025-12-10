@@ -32,10 +32,10 @@
           </div>
           
           <div class="input-form">
-            <label for="name">Color</label>
+            <label for="color">Color</label>
 
             <div class="input-box"
-                [class.invalid]="name.invalid && (name.touched || f.submitted) || errorMessage">
+                [class.invalid]="color.invalid && (color.touched || f.submitted) || errorMessage">
 
               <input 
                 type="color"
@@ -46,13 +46,21 @@
                 required
               >
             </div>
+
+            <div class="error"
+                *ngIf="color.invalid && (color.touched || f.submitted)">
+              <span *ngIf="color.errors?.['required']">Color is required.</span>
+            </div>
           </div>
 
-          <span class="error flx-spcbtwn w-100" *ngIf="errorMessage">{{ errorMessage }}</span>
+          <div class="error-message" *ngIf="errorMessage">
+            <span class="error-icon">⚠</span>
+            {{ errorMessage }}
+          </div>
       </form>
     </main>
     <footer>
-        <button class="btn add" [class.clicked]="addClicked" (click)="onSubmit(f)">
+        <button [disabled]="!checkValidity(f)" class="btn add" [class.clicked]="addClicked" (click)="onSubmit(f)">
             {{addClicked? 'Added': 'Add'}}
         </button>
         <button class="btn discard" (click)="closeDialog()">Discard</button>

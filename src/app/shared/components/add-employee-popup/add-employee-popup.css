@@ -1,0 +1,320 @@
+#main-container {
+    width: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    border-radius: 20px;
+}
+
+#main-container header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 10px 5px 10px;
+}
+
+#main-container main {
+  max-height: calc(100% - 68px - 60px);
+  overflow: scroll;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px 0px 20px;
+}
+
+hr {
+  border-top: .5px solid rgb(166, 166, 166);
+}
+
+.title {
+    font-size: 1.8em;
+    font-weight: 500;
+    padding-left: 20px;
+}
+
+footer {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 10px;
+  padding: 10px 20px;
+}
+
+.btn {
+  padding: .7em 1em .7em .9em;
+  cursor: pointer;
+  border: none;
+  border-radius: 15px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  min-width: 100px;
+  text-align: center;
+}
+
+.add span {
+  display: block;
+  margin-left: 0.3em;
+  transition: all 0.3s ease-in-out;
+}
+
+.add svg {
+  display: block;
+  transform-origin: center center;
+  transition: transform 0.4s ease-in-out;
+}
+
+.add .svg-wrapper {
+  transform: scale(1.25);
+  transition: 0.5s linear;
+}
+
+.clicked svg {
+  transform: translateX(1.2em) scale(1.1);
+  fill: #fff;
+}
+
+.clicked span {
+  opacity: 0;
+  transition: 0.5s linear;
+}
+
+.btn.discard {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.btn.discard:hover {
+  background-color: #f3f3f3;
+}
+
+.add {
+  background-color: #6558bf;  
+  color: #fff;
+  border: 1px solid #6558bf;
+}
+
+.add:hover {
+  background-color: rgba(101, 88, 191, .8);
+}
+
+.close-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color .3s ease;
+  border-radius: 7px;
+}
+
+.close-btn:hover {
+  background-color: rgba(101, 88, 191, 0.5); 
+}
+
+.close-btn img {
+  width: 30px;
+  height: 30px;
+}
+
+/* Form */
+
+.input-form {
+  width: 100%;
+}
+
+.input-form label {
+  font-weight: bold;
+}
+
+.flx-spcbtwn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gp-5 {
+  gap: 5px;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.input-box {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#categories {
+  width: auto;
+  flex: 1;
+  position: relative;
+}
+
+.custom-select {
+  position: relative;
+  display: flex;
+  flex: 1;
+}
+
+.custom-arrow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: block;
+  width: 40px;
+  height: 100%;
+  pointer-events: none;
+}
+
+.custom-arrow::before,
+.custom-arrow::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.custom-arrow::before {
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid #000;
+}
+
+.input-box :is(input, select, textarea) {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: #eff3f9;
+  color: #000;
+  backdrop-filter: blur(10px);
+}
+
+
+select {
+  appearance: none;
+}
+
+.flx-1 {
+  flex: 1;
+}
+
+.input-box:has(.right-icon) input {
+  padding-right: 44px;
+}
+
+.input-box:has(.left-icon) input {
+  padding-left: 44px;
+}
+
+.input-box input::placeholder {
+  color: #818487;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.left-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+.right-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.input-box.invalid :is(input, select, textarea) {
+  border: 2px solid #e53935;
+  background: #fff5f5;
+}
+
+.error {
+  color: #e53935;
+  font-size: 13px;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+
+.reg-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+
+::ng-deep .mat-mdc-dialog-container.responsive-dialog {
+  width: 90vw !important;
+  max-width: 700px !important;
+  height: auto !important;
+  max-height: 90vh !important;
+  border-radius: 15px !important;
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+}
+
+::ng-deep .mat-mdc-dialog-surface {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: 90vh !important;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: none;
+}
+
+.add:disabled {
+  background-color: rgba(101, 88, 191, .5);
+  border: rgba(101, 88, 191, .5);
+}
+
+@media (max-width: 700px) {
+  .row {
+    gap: 10px;
+  }
+  .inputs {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 450px) {
+  
+  header .title {
+    font-size: 1.5em;
+  }
+  .close-btn {
+    width: 30px; 
+    height: 30px;
+  }
+}

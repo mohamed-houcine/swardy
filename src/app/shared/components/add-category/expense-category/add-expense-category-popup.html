@@ -1,0 +1,68 @@
+<div id="main-container">
+    <header>
+        <h1 class="title">Add Expense Category</h1>
+        <button class="close-btn" (click)="this.closeDialog()">
+            <img src="assets/icons/close.svg" alt="">
+        </button>
+    </header>
+    <hr>
+    <main>
+        <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
+
+          <div class="input-form">
+            <label for="name">Name</label>
+
+            <div class="input-box"
+                [class.invalid]="name.invalid && (name.touched || f.submitted) || errorMessage">
+
+              <input 
+                placeholder="Sponsoring, Salary, etc.."
+                id="name"
+                name="name"
+                [(ngModel)]="model.name"
+                #name="ngModel"
+                required
+              >
+            </div>
+
+            <div class="error"
+                *ngIf="name.invalid && (name.touched || f.submitted)">
+              <span *ngIf="name.errors?.['required']">Name is required.</span>
+            </div>
+          </div>
+          
+          <div class="input-form">
+            <label for="color">Color</label>
+
+            <div class="input-box"
+                [class.invalid]="color.invalid && (color.touched || f.submitted) || errorMessage">
+
+              <input 
+                type="color"
+                id="color"
+                name="color"
+                [(ngModel)]="model.color"
+                #color="ngModel"
+                required
+              >
+            </div>
+
+            <div class="error"
+                *ngIf="color.invalid && (color.touched || f.submitted)">
+              <span *ngIf="color.errors?.['required']">Color is required.</span>
+            </div>
+          </div>
+
+          <div class="error-message" *ngIf="errorMessage">
+            <span class="error-icon">⚠</span>
+            {{ errorMessage }}
+          </div>
+      </form>
+    </main>
+    <footer>
+        <button [disabled]="!checkValidity(f)" class="btn add" [class.clicked]="addClicked" (click)="onSubmit(f)">
+            {{addClicked? 'Added': 'Add'}}
+        </button>
+        <button class="btn discard" (click)="closeDialog()">Discard</button>
+    </footer>
+</div>

@@ -6,6 +6,9 @@ import { TableColumn } from '../../shared/model/data-table/table-column.type';
 import { DataTable } from '../../shared/components/data-table/data-table';
 import { NormalExpense } from '../../shared/model/normal_expense';
 import { ProductExpense } from '../../shared/model/product_expense';
+import { MatDialog } from '@angular/material/dialog';
+import { addExpenseNormalPopup } from '../../shared/components/expenses/add-expense-normal-popup/add-expense-normal-popup';
+import { addExpenseProductPopup } from '../../shared/components/expenses/add-expense-product-popup/add-expense-product-popup';
 
 @Component({
   selector: 'app-expense',
@@ -22,7 +25,10 @@ export class Expenses implements OnInit {
   NormalExpensesData: NormalExpense[] = [];
   ProductExpensesData: ProductExpense[] = [];
 
-  constructor(private dash: DashboardService) {}
+  constructor(
+    private dash: DashboardService,
+    private dialog: MatDialog
+  ) {}
 
   async ngOnInit() {
     this.overview = await this.dash.getExpenseOverview(this.mode);
@@ -54,4 +60,26 @@ export class Expenses implements OnInit {
 
   NormalExpensesSearchFactors: string[] = ["name", "category"];
   ProductExpensesSearchFactors: string[] = ["productName", "category"];
+
+  onAddNormalExpense() {
+    this.dialog.open(addExpenseNormalPopup, {
+      width: '100vw',
+      maxWidth: '700px',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'popup',
+      autoFocus: false
+    });
+  }
+
+  onAddProductExpense() {
+    this.dialog.open(addExpenseProductPopup, {
+      width: '100vw',
+      maxWidth: '700px',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'popup',
+      autoFocus: false
+    });
+  }
 }

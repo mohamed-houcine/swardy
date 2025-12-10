@@ -199,7 +199,7 @@ export class DashboardService {
     }
 
     // Only admins can fetch income products
-    if (currentUser.role !== 'admin') {
+    if (currentUser.role !== 'Admin') {
       console.warn('Access denied: Only admins can fetch income products');
       return [];
     }
@@ -344,6 +344,46 @@ export class DashboardService {
       } as Product;
     });
   }
+
+  async fetchProductsByCategory(categoryId: string): Promise<Product[]> {
+    const userId = await this.getUserId();
+    if (!userId) return [];
+
+    const { data, error } = await this.supabase.client
+      .from('product')
+      .select(`
+        id,
+        name,
+        price,
+        barcode,
+        description,
+        category:id_category (
+          id,
+          name
+        )
+      `)
+      .eq('user_id', userId)
+      .eq('id_category', categoryId); // ✅ filter by FK column
+
+    if (error) {
+      console.error('fetchProductsByCategory error:', error);
+      return [];
+    }
+
+    return (data || []).map(item => {
+      const category = item.category as any;
+
+      return {
+        id: item.id,
+        name: item.name,
+        category: category?.name ?? 'Uncategorized',
+        price: item.price,
+        barcode: item.barcode,
+        description: item.description
+      } as Product;
+    });
+  }
+
 
   // ---------------------------------------------------
   //  MONTHLY TOTALS (unchanged)
@@ -980,13 +1020,13 @@ export class DashboardService {
   }
 
   async fetchCategoriesByType(
-    type: 'income' | 'expense'
+    type: 'income' | 'expense' | 'product'
   ): Promise<{ id: string; name: string }[]> {
 
     const { data, error } = await this.supabase.client
       .from('category')
       .select('id, name, type')
-      .or(`type.eq.${type},type.eq.both`)
+      .or(`type.eq.${type},type.eq.all`)
       .order('name', { ascending: true });
 
     if (error) {
@@ -997,12 +1037,36 @@ export class DashboardService {
     return data ?? [];
   }
 
-  async addCategory(category: Category, type: 'income' | 'expense' | 'both') {
+  async addCategory(category: Category, type: 'income' | 'expense' | 'product') {
     const userId = await this.getUserId();
     if (!userId) {
       throw new Error('User not authenticated');
     }
 
+    // Check if a category with the same name and type 'all' already exists
+    const { data: existingCategory, error: checkError } = await this.supabase.client
+      .from('category')
+      .select('id, name, type')
+      .eq('name', category.name)
+      .or(`user_id.eq.${userId},user_id.is.null`) // Check both user's categories and global ones
+      .or(`type.eq.all,type.eq.${type}`) // Check if type is 'all' or matches the new type
+      .single();
+
+    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows found
+      console.error('Error checking existing category:', checkError);
+    }
+
+    // If a category with type 'all' or same type exists, don't insert
+    if (existingCategory) {
+      if (existingCategory.type === 'all') {
+        throw new Error(`Category "${category.name}" already exists with type "all"`);
+      }
+      if (existingCategory.type === type) {
+        throw new Error(`Category "${category.name}" already exists with type "${type}"`);
+      }
+    }
+
+    // Insert new category
     const { data, error } = await this.supabase.client
       .from('category')
       .insert([{
@@ -1020,4 +1084,89 @@ export class DashboardService {
 
     return data;
   }
+
+  async addNormalExpense(expense: any, file: File | null) {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error("User not logged in");
+
+    let receiptUrl: string | null = null;
+
+    // Optional: upload receipt file to Supabase Storage
+    if (file) {
+      // Create unique filename to avoid conflicts
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      const { data: uploadData, error: uploadError } = await this.supabase.client
+        .storage
+        .from('expense-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: urlData } = this.supabase.client.storage
+        .from('expense-images')
+        .getPublicUrl(fileName);
+
+      receiptUrl = urlData.publicUrl;
+    }
+
+    const { data, error } = await this.supabase.client
+      .from('normal_expenses')
+      .insert([{
+        amount: expense.amount,
+        date: expense.date,
+        notes: expense.notes ?? null,
+        receipt: receiptUrl,
+        category_id: expense.category,
+        name: expense.name,
+        user_id: userId
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Insert error:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  async addProduct(product: {name: string, category: string, price: number, description: string}) {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error("User not logged in");
+
+    const barcode = Date.now().toString();
+
+    const { data, error } = await this.supabase.client
+      .from('product')
+      .insert([{
+        name: product.name,
+        id_category: product.category,
+        price: product.price,
+        barcode: barcode ?? null,
+        description: product.description ?? null,
+        user_id: userId
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data;
+  }
+
+
+
+
+
+
 }

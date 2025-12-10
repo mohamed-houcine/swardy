@@ -51,6 +51,7 @@ header button {
     color: white;
     background: #6558bf;
     min-width: 100px;
+    height: 40px;
 }
 
 header button img {

@@ -7,7 +7,8 @@ import { TableColumn } from '../../shared/model/data-table/table-column.type';
 import { IncomeSource } from '../../shared/model/income_source';
 import { IncomeProduct } from '../../shared/model/income_product';
 import { MatDialog } from '@angular/material/dialog';
-import { addIncomeSourcePopup } from '../../shared/components/income/add-income-popup/add-income-source-popup';
+import { addIncomeSourcePopup } from '../../shared/components/income/add-income-source-popup/add-income-source-popup';
+import { addIncomeProductPopup } from '../../shared/components/income/add-income-product-popup/add-income-product-popup';
 
 @Component({
   selector: 'app-income',
@@ -79,8 +80,21 @@ export class Income implements OnInit {
       maxWidth: '700px',
       height: 'auto',
       maxHeight: '90vh',
-      panelClass: 'add-income-source-dialog',
+      panelClass: 'popup',
       autoFocus: false
     });
   }
+
+  onAddIncomeProduct() {
+    this.dialog.open(addIncomeProductPopup, {
+      width: '100vw',
+      maxWidth: '700px',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'popup',
+      autoFocus: false
+    });
+  }
+
+
 }

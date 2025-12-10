@@ -4,6 +4,8 @@ import { DataTable } from "../../shared/components/data-table/data-table";
 import { TableColumn } from '../../shared/model/data-table/table-column.type';
 import { Product } from '../../shared/model/product';
 import { DashboardService } from '../../services/dashboard.service';
+import { MatDialog } from '@angular/material/dialog';
+import { addProductPopup } from '../../shared/components/add-product-popup/add-product-popup';
 
 @Component({
   selector: 'app-products',
@@ -12,7 +14,10 @@ import { DashboardService } from '../../services/dashboard.service';
   styleUrl: './products.css',
 })
 export class Products {
-  constructor(private dash: DashboardService) {}
+  constructor(
+    private dash: DashboardService,
+    private dialog: MatDialog
+  ) {}
 
   // Pie Charts
   BSProductLabels: string[] = [];
@@ -58,5 +63,15 @@ export class Products {
     console.log(products);
   }
 
+  onAddProduct() {
+    this.dialog.open(addProductPopup, {
+      width: '100vw',
+      maxWidth: '700px',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'popup',
+      autoFocus: false
+    });
+  }
 
 }

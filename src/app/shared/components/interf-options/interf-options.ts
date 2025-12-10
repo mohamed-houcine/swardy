@@ -1,7 +1,8 @@
 import { NgFor } from '@angular/common';
 import { Component, EventEmitter, Output} from '@angular/core';
-import { RouterLink } from "@angular/router";
+import { NavigationEnd, Router, RouterLink } from "@angular/router";
 import { AuthService } from '../../../core/auth/auth.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-interf-options',
@@ -22,17 +23,36 @@ export class InterfOptions {
 
   activeinterfOptionsKey = 0;
 
+  constructor(private auth: AuthService, private router: Router) {}
+
+  ngOnInit() {
+    this.setActiveByUrl(this.router.url);
+
+    // Update active option on navigation
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      this.setActiveByUrl(event.urlAfterRedirects);
+    });
+  }
+
+  setActiveByUrl(url: string) {
+    const activeOption = this.interfOptions.find(f => f.path === url);
+    if (activeOption) {
+      this.activeinterfOptionsKey = activeOption.key;
+      this.selectedOption.emit(activeOption);
+    } else {
+      this.activeinterfOptionsKey = 0; // default
+    }
+  }
+
   setActiveinterfOptionsKey(key: number) {
     this.activeinterfOptionsKey = key;
     const selected = this.interfOptions.find(f => f.key === key);
     if (selected) this.selectedOption.emit(selected);
   }
 
-  constructor(private auth: AuthService) {}
-
-logout() {
-  this.auth.logout();
-}
-
-
+  logout() {
+    this.auth.logout();
+  }
 }

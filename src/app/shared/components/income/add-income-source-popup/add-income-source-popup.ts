@@ -3,7 +3,7 @@ import { MatDialog, MatDialogRef} from '@angular/material/dialog';
 import { FormsModule, NgForm} from '@angular/forms';
 import { DashboardService } from '../../../../services/dashboard.service';
 import { NgFor, NgIf } from '@angular/common';
-import { addIncomeCategoryPopup } from '../../add-category/add-income-category-popup';
+import { addIncomeCategoryPopup } from '../../add-category/income-category/add-income-category-popup';
 
 @Component({
   selector: 'app-add-income-source-popup',
@@ -28,7 +28,6 @@ export class addIncomeSourcePopup {
 
   async ngOnInit() {
     this.categories = await this.dash.fetchCategoriesByType('income');
-    this.model.category = this.categories[0].id;
   }
 
   animateAdd() {
@@ -41,14 +40,14 @@ export class addIncomeSourcePopup {
   }
 
   async onSubmit(f: NgForm): Promise<void> {
-    if (f.invalid) return;
-
-    console.log(this.model);
+    if (!this.checkValidity(f)) return;
 
     try {
       await this.dash.addIncomeSource(this.model);
-      f.reset();
+      f.reset(this.resetModel());
+      this.model = this.resetModel();
       this.errorMessage = "";
+      this.animateAdd();
     } catch(err) {
       this.errorMessage = "An Error occured while adding income source";
     }
@@ -68,7 +67,7 @@ export class addIncomeSourcePopup {
   openAddCategoryPopup() {
     const dialogRef = this.catDiagRef.open(addIncomeCategoryPopup, {
       width: '800px',
-      panelClass: 'add-income-category-dialog'
+      panelClass: 'popup'
     });
 
     dialogRef.afterClosed().subscribe(result => this.updateCategories());
@@ -76,5 +75,13 @@ export class addIncomeSourcePopup {
 
   async updateCategories() {
     this.categories = await this.dash.fetchCategoriesByType('income');
+  }
+
+  resetModel() {
+    return {name: "", category: "", amount: 0, notes: '', date: new Date().toISOString().split('T')[0]};
+  }
+
+  checkValidity(f: NgForm) {
+    return f.valid && this.model.amount != 0 && this.model.name != '' && !this.isDateInFuture() && this.model.category != '';
   }
 }
