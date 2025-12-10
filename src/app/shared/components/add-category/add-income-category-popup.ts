@@ -37,6 +37,8 @@ export class addIncomeCategoryPopup {
     try {
       await this.dash.addCategory(this.model, 'income');
       f.reset({color: "#6558bf"});
+      this.model.name = "";
+      this.model.color = "#6558bf";
       this.errorMessage = "";
       this.animateAdd();
     } catch(err) {
