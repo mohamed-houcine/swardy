@@ -1,4 +1,4 @@
-<main>
+<main *ngIf="!loading">
   <app-overview-chart
     title="Income Overview"
     type="income"
@@ -7,16 +7,27 @@
   </app-overview-chart>
 
   <app-data-table
-    title="Income Source"
+    title="{{title}}"
     [columns]="IncomeSourceColumnsNames"
     [data]="IncomeSourceData"
     [SearchFactors]="IncomeSourceSearchFactors"
-  ></app-data-table>
+    [entityName]="msg"
+    >
 
-  <app-data-table
-    title="Income From Product"
-    [columns]="IncomeProductColumnsNames"
-    [data]="IncomeProductData"
-    [SearchFactors]="IncomeProductSearchFactors"
-  ></app-data-table>
+  </app-data-table>
+
+  <div *ngIf="showProductTable">
+    <app-data-table
+      title="Income From Product"
+      [columns]="IncomeProductColumnsNames"
+      [data]="IncomeProductData"
+      [SearchFactors]="IncomeProductSearchFactors"
+      [entityName]="msg"
+      >
+    </app-data-table>
+  </div>
 </main>
+
+<div *ngIf="loading" class="loading-placeholder">
+  Loading income...
+</div>

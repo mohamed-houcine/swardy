@@ -19,14 +19,30 @@ export class Login {
   constructor(private auth: AuthService, private router: Router) {}
 
   async submit(event: Event) {
-    event.preventDefault();
-    this.error = '';
+  event.preventDefault();
+  this.error = '';
 
-    try {
-      await this.auth.login(this.email, this.password);
-      this.router.navigate(['/']);
-    } catch (err: any) {
-      this.error = err.message;
+  try {
+    const user = await this.auth.login(this.email, this.password);
+
+    // Get full profile (role)
+    const profile = await this.auth.getProfile();
+
+    if (!profile) {
+      this.error = 'Profile not found';
+      return;
     }
+
+    // Redirect based on role
+    if (profile.role === 'Employee') {
+      this.router.navigate(['/employee']);
+    } else {
+      this.router.navigate(['/']); // Admin or other roles
+    }
+
+  } catch (err: any) {
+    this.error = err.message;
   }
+}
+
 }

@@ -1,0 +1,14 @@
+<form (ngSubmit)="addTransaction()">
+  <label>Product</label>
+  <select [(ngModel)]="productId" name="productId" required>
+    <option *ngFor="let p of products" [value]="p.id">{{p.name}} (${{p.price}})</option>
+  </select>
+
+  <label>Quantity</label>
+  <input type="number" [(ngModel)]="quantity" name="quantity" min="1" required />
+
+  <label>Notes</label>
+  <textarea [(ngModel)]="notes" name="notes"></textarea>
+
+  <button type="submit">Add Transaction</button>
+</form>

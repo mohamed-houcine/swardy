@@ -22,12 +22,30 @@ export class Expenses implements OnInit {
   NormalExpensesData: NormalExpense[] = [];
   ProductExpensesData: ProductExpense[] = [];
 
+  showProductExpenses = false; // better name
+  title = "Expense";
+
+  loading = true; // flag to prevent flicker
+
   constructor(private dash: DashboardService) {}
 
   async ngOnInit() {
-    this.overview = await this.dash.getExpenseOverview(this.mode);
-    this.NormalExpensesData = await this.dash.fetchNormalExpenses();
-    this.ProductExpensesData = await this.dash.fetchProductExpenses();
+    // load all data in parallel
+    const [overview, normalExpenses, productExpenses, isBusiness] = await Promise.all([
+      this.dash.getExpenseOverview(this.mode),
+      this.dash.fetchNormalExpenses(),
+      this.dash.fetchProductExpenses(),
+      this.dash.isBusinessAccountSmart()
+    ]);
+
+    this.overview = overview;
+    this.NormalExpensesData = normalExpenses;
+    this.ProductExpensesData = productExpenses;
+
+    this.showProductExpenses = isBusiness;
+    if(this.showProductExpenses) this.title = "Normal Expense";
+
+    this.loading = false; // done loading
   }
 
   async onModeChange(m: 'weekly' | 'monthly' | 'yearly') {
@@ -54,4 +72,6 @@ export class Expenses implements OnInit {
 
   NormalExpensesSearchFactors: string[] = ["name", "category"];
   ProductExpensesSearchFactors: string[] = ["productName", "category"];
+
+  msg = 'Expenses'
 }

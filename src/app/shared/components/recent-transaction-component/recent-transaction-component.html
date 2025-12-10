@@ -2,6 +2,11 @@
     <span class="title">Recent Transactions</span>
 
     <div class="content">
+
+        <div *ngIf="!arr || arr.length === 0" class="no-transactions">
+            No transactions available.
+        </div>
+
         <div class="row" *ngFor="let t of arr">
             
             <div class="left">

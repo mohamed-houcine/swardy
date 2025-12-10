@@ -1,5 +1,5 @@
 import { NgFor } from '@angular/common';
-import { Component, EventEmitter, Output} from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnInit } from '@angular/core';
 import { RouterLink } from "@angular/router";
 import { AuthService } from '../../../core/auth/auth.service';
 
@@ -7,20 +7,31 @@ import { AuthService } from '../../../core/auth/auth.service';
   selector: 'app-interf-options',
   imports: [NgFor, RouterLink],
   templateUrl: './interf-options.html',
-  styleUrl: './interf-options.css',
+  styleUrls: ['./interf-options.css'], // corrected
 })
-export class InterfOptions {
+export class InterfOptions implements OnInit {
+
+  @Input() showini!: boolean;
   @Output() selectedOption = new EventEmitter<{ key: number; name: string }>();
 
   interfOptions = [
-    { key: 0, name: 'Dashboard', iconUrl: '/assets/icons/dashboard_0.svg', activeIconUrl: '/assets/icons/dashboard_1.svg' ,path:""},
-    { key: 1, name: 'Income', iconUrl: '/assets/icons/income_0.svg', activeIconUrl: '/assets/icons/income_1.svg' ,path:"/income"},
-    { key: 2, name: 'Expenses', iconUrl: '/assets/icons/expense_0.svg', activeIconUrl: '/assets/icons/expense_1.svg' ,path:"/expenses"},
-    { key: 4, name: 'Products', iconUrl: '/assets/icons/products_0.svg', activeIconUrl: '/assets/icons/products_1.svg' ,path:"/products"},
-    { key: 3, name: 'Employees', iconUrl: '/assets/icons/employees_0.svg', activeIconUrl: '/assets/icons/employees_1.svg' ,path:"/employees"}
+    { key: 0, name: 'Dashboard', iconUrl: '/assets/icons/dashboard_0.svg', activeIconUrl: '/assets/icons/dashboard_1.svg', path: "" },
+    { key: 1, name: 'Income', iconUrl: '/assets/icons/income_0.svg', activeIconUrl: '/assets/icons/income_1.svg', path: "/income" },
+    { key: 2, name: 'Expenses', iconUrl: '/assets/icons/expense_0.svg', activeIconUrl: '/assets/icons/expense_1.svg', path: "/expenses" },
+    { key: 3, name: 'Employees', iconUrl: '/assets/icons/employees_0.svg', activeIconUrl: '/assets/icons/employees_1.svg', path: "/employees" },
+    { key: 4, name: 'Products', iconUrl: '/assets/icons/products_0.svg', activeIconUrl: '/assets/icons/products_1.svg', path: "/products" }
   ];
 
   activeinterfOptionsKey = 0;
+
+  constructor(private auth: AuthService) {}
+
+  ngOnInit() {
+    // Adjust options based on showini input
+    if (!this.showini) {
+      this.interfOptions = this.interfOptions.filter(opt => [0, 1, 2].includes(opt.key));
+    }
+  }
 
   setActiveinterfOptionsKey(key: number) {
     this.activeinterfOptionsKey = key;
@@ -28,11 +39,7 @@ export class InterfOptions {
     if (selected) this.selectedOption.emit(selected);
   }
 
-  constructor(private auth: AuthService) {}
-
-logout() {
-  this.auth.logout();
-}
-
-
+  logout() {
+    this.auth.logout();
+  }
 }

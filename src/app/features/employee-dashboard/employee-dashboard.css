@@ -1,0 +1,15 @@
+
+
+.employee-dashboard-container{
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+
+.title{
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 48px;
+    line-height: 16px;   
+}

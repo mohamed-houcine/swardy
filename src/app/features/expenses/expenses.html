@@ -1,4 +1,5 @@
-<main>
+<main *ngIf="!loading">
+
   <app-overview-chart
     title="Expenses Overview"
     type="expense"
@@ -7,17 +8,25 @@
   </app-overview-chart>
 
   <app-data-table
-    title="Normal Expense"
+    title="{{title}}"
     [columns]="NormalExpensesColumnsNames"
     [data]="NormalExpensesData"
     [SearchFactors]="NormalExpensesSearchFactors"
+    [entityName]="msg"
   ></app-data-table>
   
-  <app-data-table
-    title="Product Expense"
-    [columns]="ProductExpensesColumnsNames"
-    [data]="ProductExpensesData"
-    [SearchFactors]="ProductExpensesSearchFactors"
-  ></app-data-table>
+  <div *ngIf="showProductExpenses">
+    <app-data-table
+      title="Product Expense"
+      [columns]="ProductExpensesColumnsNames"
+      [data]="ProductExpensesData"
+      [SearchFactors]="ProductExpensesSearchFactors"
+      [entityName]="msg"
+    ></app-data-table>
+  </div>
 
 </main>
+
+<div *ngIf="loading" class="loading-placeholder">
+  Loading expenses...
+</div>

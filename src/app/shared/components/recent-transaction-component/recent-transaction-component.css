@@ -68,3 +68,12 @@
 .arrow{
   width: 16px;
 }
+
+
+
+.no-transactions {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  margin: 20px 0;
+}

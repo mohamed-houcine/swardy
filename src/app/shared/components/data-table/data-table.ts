@@ -18,7 +18,7 @@ export class DataTable {
   @Input() columns!: TableColumn[];
   @Input() data!: any[];
   @Input() SearchFactors!: string[];
-
+  @Input() entityName:string="Data"
   // Pagination
   pageSizeOptions = [5, 10, 20, 50];
   pageSize = 5;

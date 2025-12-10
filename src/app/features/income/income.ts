@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OverviewChartComponent } from '../../shared/components/overview-chart/overview-chart';
 import { DashboardService } from '../../services/dashboard.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { DataTable } from "../../shared/components/data-table/data-table";
 import { TableColumn } from '../../shared/model/data-table/table-column.type';
 import { IncomeSource } from '../../shared/model/income_source';
@@ -10,7 +10,7 @@ import { IncomeProduct } from '../../shared/model/income_product';
 @Component({
   selector: 'app-income',
   standalone: true,
-  imports: [CommonModule, OverviewChartComponent, DataTable],
+  imports: [CommonModule, OverviewChartComponent, DataTable, NgIf],
   templateUrl: './income.html',
   styleUrls: ['./income.css']
 })
@@ -19,32 +19,49 @@ export class Income implements OnInit {
   overview: { date: string; amount: number }[] = [];
   mode: 'weekly' | 'monthly' | 'yearly' = 'monthly';
 
-  // Income table
   IncomeSourceData: IncomeSource[] = [];
   IncomeProductData: IncomeProduct[] = [];
 
+  isBusiness = false;
+  loading = true; // show placeholder until ready
+  showProductTable = false;
+  title = "Income";
+
   constructor(private dash: DashboardService) {}
 
-  // ---------------------------------------------------
-  //  INIT: load overview + income table from Supabase
-  // ---------------------------------------------------
   async ngOnInit() {
-    this.overview = await this.dash.getIncomeOverview(this.mode);
-    this.IncomeSourceData = await this.dash.fetchIncomeSources();
-    this.IncomeProductData = await this.dash.fetchIncomeProducts();
+    try {
+      // 1) Load user first
+      await this.dash.loadCurrentUser();
+      this.isBusiness = this.dash.isBusinessCached();
+
+      // Decide which table to show immediately
+      this.showProductTable = await this.dash.isBusinessAccountSmart();
+      if(!this.showProductTable) this.title = "Income Source";
+
+      // 2) Fetch all data in parallel for faster loading
+      const [overview, sources, products] = await Promise.all([
+        this.dash.getIncomeOverview(this.mode),
+        this.dash.fetchIncomeSources(),
+        this.dash.fetchIncomeProducts()
+      ]);
+
+      this.overview = overview;
+      this.IncomeSourceData = sources;
+      this.IncomeProductData = products;
+
+    } catch(err) {
+      console.error("Failed to load income data:", err);
+    } finally {
+      this.loading = false; // hide loading placeholder
+    }
   }
 
-  // ---------------------------------------------------
-  //  When dropdown mode changes
-  // ---------------------------------------------------
   async onModeChange(m: 'weekly' | 'monthly' | 'yearly') {
     this.mode = m;
     this.overview = await this.dash.getIncomeOverview(m);
   }
 
-  // ---------------------------------------------------
-  //  DataTable configuration
-  // ---------------------------------------------------
   IncomeSourceColumnsNames: TableColumn[] = [
     {title: "Name", iconUrl: "assets/icons/data-table/name.svg", canBeSorted: true, key: "name"},
     {title: "Category", iconUrl: "assets/icons/data-table/name.svg", canBeSorted: true, key: "category"},
@@ -66,4 +83,7 @@ export class Income implements OnInit {
 
   IncomeSourceSearchFactors: string[] = ["name", "category"];
   IncomeProductSearchFactors: string[] = ["name", "category", "employeeName"];
+
+
+  msg="Income";
 }

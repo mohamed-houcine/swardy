@@ -1,17 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { EditProfilePopup } from './add-income-popup';
 
-describe('EditProfilePopup', () => {
-  let component: EditProfilePopup;
-  let fixture: ComponentFixture<EditProfilePopup>;
+import { EmployeeProductForm } from './employee-product-form';
+
+describe('EmployeeProductForm', () => {
+  let component: EmployeeProductForm;
+  let fixture: ComponentFixture<EmployeeProductForm>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditProfilePopup]
+      imports: [EmployeeProductForm]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(EditProfilePopup);
+    fixture = TestBed.createComponent(EmployeeProductForm);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

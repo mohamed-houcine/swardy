@@ -59,4 +59,6 @@ export class Employees {
     this.GenderColors = GenderDist.map(x => x.color);
     this.EmployeesData = employees;
   }
+
+  msg ="Employees"
 }

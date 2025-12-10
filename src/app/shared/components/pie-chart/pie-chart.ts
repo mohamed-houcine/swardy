@@ -51,6 +51,8 @@ export class PieChartComponent implements AfterViewInit, OnChanges {
   @Input() legendPosition: 'top' | 'left' | 'right' | 'bottom' = 'right';
   @Input() doughnut = true;
 
+  @Input() entityName: string = 'data'; // New input for empty message
+
   private chart?: Chart<'doughnut' | 'pie'>;
 
   ngAfterViewInit() {
@@ -128,5 +130,10 @@ export class PieChartComponent implements AfterViewInit, OnChanges {
     a.href = url;
     a.download = filename;
     a.click();
+  }
+
+  // -------------------- CHECK IF DATA EXISTS --------------------
+  hasData(): boolean {
+    return Array.isArray(this.data) && this.data.some(val => val > 0);
   }
 }

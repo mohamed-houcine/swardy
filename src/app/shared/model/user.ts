@@ -6,6 +6,7 @@ export enum UserType {
 export enum UserRole {
   ADMIN = 'Admin',
   EMPLOYEE = 'Employee'
+
 }
 
 export enum ThemeMode {

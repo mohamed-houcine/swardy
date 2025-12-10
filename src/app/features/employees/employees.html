@@ -40,6 +40,7 @@
             [data]="GenderData"
             [colors]="GenderColors"
             legentPosition="right"
+            [entityName]="msg"
         ></app-pie-chart>
     </div>
     <app-data-table
@@ -47,5 +48,6 @@
         [columns]="EmployeesColumnsNames"
         [data]="EmployeesData"
         [SearchFactors]="EmployeesSearchFactors"
+        [entityName]="msg"
     ></app-data-table>
 </main>
