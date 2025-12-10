@@ -6,6 +6,8 @@ import { DataTable } from "../../shared/components/data-table/data-table";
 import { TableColumn } from '../../shared/model/data-table/table-column.type';
 import { IncomeSource } from '../../shared/model/income_source';
 import { IncomeProduct } from '../../shared/model/income_product';
+import { MatDialog } from '@angular/material/dialog';
+import { addIncomeSourcePopup } from '../../shared/components/income/add-income-popup/add-income-source-popup';
 
 @Component({
   selector: 'app-income',
@@ -22,12 +24,19 @@ export class Income implements OnInit {
   IncomeSourceData: IncomeSource[] = [];
   IncomeProductData: IncomeProduct[] = [];
 
+<<<<<<< HEAD
   isBusiness = false;
   loading = true; // show placeholder until ready
   showProductTable = false;
   title = "Income";
 
   constructor(private dash: DashboardService) {}
+=======
+  constructor(
+    private dash: DashboardService,
+    private dialog: MatDialog
+  ) {}
+>>>>>>> c7d935c32a3f8d116b0bea2852a1396649bdb9a5
 
   async ngOnInit() {
     try {
@@ -84,6 +93,20 @@ export class Income implements OnInit {
   IncomeSourceSearchFactors: string[] = ["name", "category"];
   IncomeProductSearchFactors: string[] = ["name", "category", "employeeName"];
 
+<<<<<<< HEAD
 
   msg="Income";
+=======
+  // Methods
+  onAddIncomeSource() {
+    this.dialog.open(addIncomeSourcePopup, {
+      width: '100vw',
+      maxWidth: '700px',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'add-income-source-dialog',
+      autoFocus: false
+    });
+  }
+>>>>>>> c7d935c32a3f8d116b0bea2852a1396649bdb9a5
 }

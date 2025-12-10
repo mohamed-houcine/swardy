@@ -4,6 +4,7 @@ import { NgFor, NgIf } from '@angular/common';
 import html2canvas from 'html2canvas';
 import { FormsModule } from '@angular/forms';
 import { TableColumn } from '../../model/data-table/table-column.type';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-data-table',
@@ -12,8 +13,11 @@ import { TableColumn } from '../../model/data-table/table-column.type';
   styleUrls: ['./data-table.css'],
 })
 export class DataTable {
+  constructor (private dialog: MatDialog) {}
+  
   Math = Math;
 
+  // Inputs
   @Input() title!: string;
   @Input() columns!: TableColumn[];
   @Input() data!: any[];

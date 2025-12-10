@@ -60,3 +60,9 @@ body{
 button:active {
   transform: scale(0.96);
 }
+
+.add-income-source-dialog .mat-mdc-dialog-surface,
+.add-income-category-dialog .mat-mdc-dialog-surface
+{
+  border-radius: 20px;
+}

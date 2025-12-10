@@ -1,9 +1,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <div class="container" role="region" aria-label="Goal card">
-  <div class="mini_container">
+  <div *ngIf="goal !== null">
     <div class="title-row">
-      <span class="title">{{ title }}:</span>
+      <span class="title">Goal :</span>
       <span class="amount">Reach {{ currency }}{{ formattedGoal }}</span>
     </div>
 
@@ -12,7 +12,7 @@
            [attr.aria-valuemin]="0"
            [attr.aria-valuemax]="100"
            [attr.aria-valuenow]="percent"
-           [attr.aria-label]="'Progress to ' + title">
+           [attr.aria-label]="'Progress to Goal'">
         <div class="progress-fill" [ngStyle]="{ 'width': fillWidth(), 'background-color': accent }"></div>
       </div>
 
@@ -21,4 +21,13 @@
       </div>
     </div>
   </div>
+  <div class="" *ngIf="goal === null">
+    <div class="flx-spcbtwn">
+      <span class="title">Add a <span class="prpl">Goal</span> to see your progress</span>
+      <button class="btn">Add Goal</button>
+    </div>
+
+    
+  </div>
+
 </div>

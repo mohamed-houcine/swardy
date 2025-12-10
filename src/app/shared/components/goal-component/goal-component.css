@@ -61,8 +61,29 @@
   min-width:48px;
   text-align:right;
   font-weight:700;
-  color: #4C1D95; /* deep purple - you can also compute contrasting color from accent */
+  color: #6558bf; /* deep purple - you can also compute contrasting color from accent */
   font-size: 1rem;
+}
+
+.prpl {
+  color: #6558bf;
+}
+
+.btn {
+  border: none;
+  background-color: #6558bf;
+  color: #fff;
+  padding: 7px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: .9em;
+  font-weight: 500;
+}
+.flx-spcbtwn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
 }
 
 /* small screens */
