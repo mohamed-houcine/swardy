@@ -1020,7 +1020,4 @@ export class DashboardService {
 
     return data;
   }
-
-
-
 }

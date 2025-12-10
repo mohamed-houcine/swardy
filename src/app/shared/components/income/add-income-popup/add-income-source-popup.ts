@@ -1,7 +1,6 @@
-import { Component, Inject, input, signal } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
+import { Component } from '@angular/core';
+import { MatDialog, MatDialogRef} from '@angular/material/dialog';
 import { FormsModule, NgForm} from '@angular/forms';
-import { IncomeSource } from '../../../model/income_source';
 import { DashboardService } from '../../../../services/dashboard.service';
 import { NgFor, NgIf } from '@angular/common';
 import { addIncomeCategoryPopup } from '../../add-category/add-income-category-popup';
@@ -68,7 +67,7 @@ export class addIncomeSourcePopup {
 
   openAddCategoryPopup() {
     const dialogRef = this.catDiagRef.open(addIncomeCategoryPopup, {
-      width: '400px',
+      width: '800px',
       panelClass: 'add-income-category-dialog'
     });
 
