@@ -1,15 +1,259 @@
-
-
-.employee-dashboard-container{
+.employee-dashboard-container {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 30px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
+/* Header Section */
+.dashboard-header {
+    background: linear-gradient(135deg, #6558bf 0%, #8b7fd9 100%);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    box-shadow: 0 4px 20px rgba(101, 88, 191, 0.2);
+}
 
-.title{
+.welcome-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.title {
     font-weight: 700;
-    font-style: Bold;
-    font-size: 48px;
-    line-height: 16px;   
+    font-size: 32px;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.subtitle {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Statistics Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border-left: 4px solid;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card.today {
+    border-left-color: #6558bf;
+}
+
+.stat-card.week {
+    border-left-color: #0db665;
+}
+
+.stat-card.month {
+    border-left-color: #3B82F6;
+}
+
+.stat-card.total {
+    border-left-color: #ff6b6b;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-card.today .stat-icon {
+    background: rgba(101, 88, 191, 0.1);
+}
+
+.stat-card.week .stat-icon {
+    background: rgba(13, 182, 101, 0.1);
+}
+
+.stat-card.month .stat-icon {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.stat-card.total .stat-icon {
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.stat-icon img {
+    width: 28px;
+    height: 28px;
+}
+
+.stat-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+/* Section Styling */
+.form-section,
+.transactions-section {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.section-header {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.title-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* Loading State */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #6558bf;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+    color: #666;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .employee-dashboard-container {
+        padding: 16px;
+        gap: 24px;
+    }
+
+    .dashboard-header {
+        padding: 24px;
+    }
+
+    .title {
+        font-size: 24px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .stat-card {
+        padding: 20px;
+    }
+
+    .stat-value {
+        font-size: 20px;
+    }
+
+    .form-section,
+    .transactions-section {
+        padding: 20px;
+        border-radius: 16px;
+    }
+
+    .section-title {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 450px) {
+    .title {
+        font-size: 20px;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .stat-icon img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .stat-label {
+        font-size: 13px;
+    }
+
+    .stat-value {
+        font-size: 18px;
+    }
 }

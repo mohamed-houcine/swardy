@@ -58,7 +58,5 @@ export class Products {
     console.log(products);
   }
 
-  msg="Products"
-
 
 }

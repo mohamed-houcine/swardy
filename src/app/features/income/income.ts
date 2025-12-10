@@ -7,7 +7,8 @@ import { TableColumn } from '../../shared/model/data-table/table-column.type';
 import { IncomeSource } from '../../shared/model/income_source';
 import { IncomeProduct } from '../../shared/model/income_product';
 import { MatDialog } from '@angular/material/dialog';
-import { addIncomeSourcePopup } from '../../shared/components/income/add-income-popup/add-income-source-popup';
+import { addIncomeSourcePopup } from '../../shared/components/income/add-income-source-popup/add-income-source-popup';
+import { addIncomeProductPopup } from '../../shared/components/income/add-income-product-popup/add-income-product-popup';
 
 @Component({
   selector: 'app-income',
@@ -21,34 +22,32 @@ export class Income implements OnInit {
   overview: { date: string; amount: number }[] = [];
   mode: 'weekly' | 'monthly' | 'yearly' = 'monthly';
 
+  // Income table
   IncomeSourceData: IncomeSource[] = [];
   IncomeProductData: IncomeProduct[] = [];
 
-<<<<<<< HEAD
+
+  // ---------------------------------------------------
+  //  INIT: load overview + income table from Supabase
+  // ---------------------------------------------------
+
+
   isBusiness = false;
-  loading = true; // show placeholder until ready
+  loading = true;
   showProductTable = false;
   title = "Income";
 
-  constructor(private dash: DashboardService) {}
-=======
-  constructor(
-    private dash: DashboardService,
-    private dialog: MatDialog
-  ) {}
->>>>>>> c7d935c32a3f8d116b0bea2852a1396649bdb9a5
+  // inject MatDialog + DashboardService
+  constructor(private dash: DashboardService, private dialog: MatDialog) {}
 
   async ngOnInit() {
     try {
-      // 1) Load user first
       await this.dash.loadCurrentUser();
       this.isBusiness = this.dash.isBusinessCached();
 
-      // Decide which table to show immediately
       this.showProductTable = await this.dash.isBusinessAccountSmart();
-      if(!this.showProductTable) this.title = "Income Source";
+      if (!this.showProductTable) this.title = "Income Source";
 
-      // 2) Fetch all data in parallel for faster loading
       const [overview, sources, products] = await Promise.all([
         this.dash.getIncomeOverview(this.mode),
         this.dash.fetchIncomeSources(),
@@ -58,11 +57,10 @@ export class Income implements OnInit {
       this.overview = overview;
       this.IncomeSourceData = sources;
       this.IncomeProductData = products;
-
-    } catch(err) {
+    } catch (err) {
       console.error("Failed to load income data:", err);
     } finally {
-      this.loading = false; // hide loading placeholder
+      this.loading = false;
     }
   }
 
@@ -71,6 +69,9 @@ export class Income implements OnInit {
     this.overview = await this.dash.getIncomeOverview(m);
   }
 
+  // ---------------------------------------------------
+  //  DataTable configuration
+  // ---------------------------------------------------
   IncomeSourceColumnsNames: TableColumn[] = [
     {title: "Name", iconUrl: "assets/icons/data-table/name.svg", canBeSorted: true, key: "name"},
     {title: "Category", iconUrl: "assets/icons/data-table/name.svg", canBeSorted: true, key: "category"},
@@ -93,10 +94,6 @@ export class Income implements OnInit {
   IncomeSourceSearchFactors: string[] = ["name", "category"];
   IncomeProductSearchFactors: string[] = ["name", "category", "employeeName"];
 
-<<<<<<< HEAD
-
-  msg="Income";
-=======
   // Methods
   onAddIncomeSource() {
     this.dialog.open(addIncomeSourcePopup, {
@@ -108,5 +105,18 @@ export class Income implements OnInit {
       autoFocus: false
     });
   }
->>>>>>> c7d935c32a3f8d116b0bea2852a1396649bdb9a5
+
+  onAddIncomeProduct() {
+    this.dialog.open(addIncomeProductPopup, {
+      width: '100vw',
+      maxWidth: '700px',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'add-income-source-dialog',
+      autoFocus: false
+    });
+  }
+  msg="Income"
+
+
 }

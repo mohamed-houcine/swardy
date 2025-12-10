@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-<<<<<<<< HEAD:src/app/features/employee-dashboard/employee-dashboard.spec.ts
-
 import { EmployeeDashboard } from './employee-dashboard';
+import { addIncomeSourcePopup } from './add-income-source-popup';
 
 describe('EmployeeDashboard', () => {
   let component: EmployeeDashboard;
@@ -14,8 +13,6 @@ describe('EmployeeDashboard', () => {
     .compileComponents();
 
     fixture = TestBed.createComponent(EmployeeDashboard);
-========
-import { addIncomeSourcePopup } from './add-income-source-popup';
 
 describe('EditProfilePopup', () => {
   let component: addIncomeSourcePopup;
@@ -28,7 +25,6 @@ describe('EditProfilePopup', () => {
     .compileComponents();
 
     fixture = TestBed.createComponent(addIncomeSourcePopup);
->>>>>>>> c7d935c32a3f8d116b0bea2852a1396649bdb9a5:src/app/features/employee-dashboard/add-income-source-popup.spec.ts
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -6,7 +6,6 @@ export enum UserType {
 export enum UserRole {
   ADMIN = 'Admin',
   EMPLOYEE = 'Employee'
-
 }
 
 export enum ThemeMode {
@@ -27,4 +26,6 @@ export interface User {
   currency: string;
   language: string;
   theme: ThemeMode;
+  id_manager?:string;
 }
+

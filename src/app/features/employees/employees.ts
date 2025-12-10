@@ -60,5 +60,7 @@ export class Employees {
     this.EmployeesData = employees;
   }
 
-  msg ="Employees"
+
+    msg ="Employees"
+
 }

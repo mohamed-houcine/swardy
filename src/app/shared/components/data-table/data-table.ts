@@ -23,6 +23,14 @@ export class DataTable {
   @Input() data!: any[];
   @Input() SearchFactors!: string[];
   @Input() entityName:string="Data"
+
+  // Outputs
+  @Output() onAdd = new EventEmitter<void>();
+
+  handleAddClick() {
+    this.onAdd.emit();
+  }
+
   // Pagination
   pageSizeOptions = [5, 10, 20, 50];
   pageSize = 5;

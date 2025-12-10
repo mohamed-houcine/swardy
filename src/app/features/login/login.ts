@@ -44,5 +44,4 @@ export class Login {
     this.error = err.message;
   }
 }
-
 }

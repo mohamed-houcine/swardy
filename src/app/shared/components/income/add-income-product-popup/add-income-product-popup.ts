@@ -1,7 +1,6 @@
-import { Component, Inject, input, signal } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
+import { Component } from '@angular/core';
+import { MatDialog, MatDialogRef} from '@angular/material/dialog';
 import { FormsModule, NgForm} from '@angular/forms';
-import { IncomeSource } from '../../../model/income_source';
 import { DashboardService } from '../../../../services/dashboard.service';
 import { NgFor, NgIf } from '@angular/common';
 import { addIncomeCategoryPopup } from '../../add-category/add-income-category-popup';
@@ -9,13 +8,13 @@ import { addIncomeCategoryPopup } from '../../add-category/add-income-category-p
 @Component({
   selector: 'app-add-income-source-popup',
   imports: [FormsModule, NgIf, NgFor],
-  templateUrl: './add-income-source-popup.html',
-  styleUrl: './add-income-source-popup.css'
+  templateUrl: './add-income-product-popup.html',
+  styleUrl: './add-income-product-popup.css'
 })
-export class addIncomeSourcePopup {
+export class addIncomeProductPopup {
   addClicked: boolean = false;
   model = {
-    name: "",
+    product: "",
     category: "",
     amount: 0,
     notes: '',
@@ -24,8 +23,9 @@ export class addIncomeSourcePopup {
   errorMessage: string = "";
 
   categories!: {id: string, name: string}[];
+  products!: {id: string, name: string}[];
 
-  constructor(private dialogRef: MatDialogRef<addIncomeSourcePopup>, private catDiagRef: MatDialog, private dash: DashboardService) {}
+  constructor(private dialogRef: MatDialogRef<addIncomeProductPopup>, private catDiagRef: MatDialog, private dash: DashboardService) {}
 
   async ngOnInit() {
     this.categories = await this.dash.fetchCategoriesByType('income');
@@ -44,12 +44,11 @@ export class addIncomeSourcePopup {
   async onSubmit(f: NgForm): Promise<void> {
     if (f.invalid) return;
 
-    console.log(this.model);
-
     try {
       await this.dash.addIncomeSource(this.model);
       f.reset();
       this.errorMessage = "";
+      this.animateAdd();
     } catch(err) {
       this.errorMessage = "An Error occured while adding income source";
     }
@@ -68,7 +67,7 @@ export class addIncomeSourcePopup {
 
   openAddCategoryPopup() {
     const dialogRef = this.catDiagRef.open(addIncomeCategoryPopup, {
-      width: '400px',
+      width: '800px',
       panelClass: 'add-income-category-dialog'
     });
 
@@ -77,5 +76,14 @@ export class addIncomeSourcePopup {
 
   async updateCategories() {
     this.categories = await this.dash.fetchCategoriesByType('income');
+  }
+
+  async onCategoryChange(category: string) {
+
+    try {
+      this.products = await this.dash.fetchProductsByCategory(category);
+    } catch(err) {
+      console.log(err);
+    }
   }
 }

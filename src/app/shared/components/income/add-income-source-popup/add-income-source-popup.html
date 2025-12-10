@@ -1,0 +1,132 @@
+<div id="main-container">
+    <header>
+        <h1 class="title">Add Income Source</h1>
+        <button class="close-btn" (click)="this.closeDialog()">
+            <img src="assets/icons/close.svg" alt="">
+        </button>
+    </header>
+    <hr>
+    <main>
+        <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
+
+        <div class="input-form">
+          <label for="name">Name</label>
+
+          <div class="input-box"
+              [class.invalid]="name.invalid && (name.touched || f.submitted) || errorMessage || model.name === null">
+
+            <input 
+              placeholder="Sponsoring, Salary, etc.."
+              id="name"
+              name="name"
+              [(ngModel)]="model.name"
+              #name="ngModel"
+              required
+            >
+          </div>
+
+          <div class="error"
+              *ngIf="name.invalid && (name.touched || f.submitted)">
+            <span *ngIf="name.errors?.['required']">Name is required.</span>
+          </div>
+        </div>
+        
+        <div class="input-form">
+          <label for="categories">Category</label>
+
+          <div class="input-box"
+              [class.invalid]="(categoriesRef.invalid || model.category == '') && (categoriesRef.touched || f.submitted)">
+
+            <div class="custom-select">
+                <select name="categories" id="categories" #categoriesRef="ngModel" [(ngModel)]="model.category" required>
+                    <option value="" disabled selected>Select Category</option>
+                    <option *ngFor="let category of categories" [value]="category.id">
+                        {{category.name}}
+                    </option>
+                </select>
+                <span class="custom-arrow"></span>
+            </div>
+            <button type="button" class="btn add" (click)="openAddCategoryPopup()">Add Category</button>
+          </div>
+          <div class="error"
+              *ngIf="(categoriesRef.invalid || model.category == '') && (categoriesRef.touched || f.submitted)">
+            <span *ngIf="categoriesRef.errors?.['required']">Category is required.</span>
+          </div>
+
+        </div>
+
+        <div class="input-form">
+          <label for="amount">Amount</label>
+
+          <div class="input-box"
+              [class.invalid]="amount.invalid && (amount.touched || f.submitted) || errorMessage || (model.amount == 0 && (amount.touched || f.submitted))">
+
+            <input 
+                type="number"
+                placeholder="1, 2, 3..."
+                id="amount"
+                name="amount"
+                [(ngModel)]="model.amount"
+                #amount="ngModel"
+                required
+                value=""
+            >
+          </div>
+
+          <div class="error"
+              *ngIf="amount.invalid && (amount.touched || f.submitted) || amount.value < 0 || (amount.value == 0 && (amount.touched || f.submitted))">
+            <span *ngIf="amount.errors?.['required'] || model.amount == 0">Amount is required.</span>
+            <span *ngIf="amount.value < 0">Amount should be positive.</span>
+          </div>
+        </div>
+
+        <div class="input-form">
+          <label for="date">Date</label>
+
+          <div class="input-box"
+              [class.invalid]="date.invalid && (date.touched || f.submitted) || errorMessage || isDateInFuture()">
+
+            <input 
+                type="date"
+                id="date"
+                name="date"
+                [(ngModel)]="model.date"
+                #date="ngModel"
+            >
+          </div>
+
+          <div class="error"
+              *ngIf="isDateInFuture()">
+            <span>The given date is invalid.</span>
+          </div>
+        </div>
+
+        <div class="input-form">
+          <label for="notes">Notes</label>
+
+          <div class="input-box"
+              [class.invalid]="notes.invalid && (notes.touched || f.submitted) || errorMessage">
+
+            <textarea
+              placeholder="Want to add something ?"
+              id="notes"
+              name="notes"
+              [(ngModel)]="model.notes"
+              #notes="ngModel"
+              rows="4"
+            >
+            </textarea>
+          </div>
+        </div>
+
+
+        
+      </form>
+    </main>
+    <footer>
+        <button type="submit" class="btn add" [class.clicked]="addClicked" (click)="onSubmit(f)">
+            {{addClicked? 'Added': 'Add'}}
+        </button>
+        <button class="btn discard" (click)="closeDialog()">Discard</button>
+    </footer>
+</div>

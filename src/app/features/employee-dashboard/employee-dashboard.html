@@ -1,12 +1,40 @@
 <div class="employee-dashboard-container">
-  <h1 class="title">Welcome {{name}}</h1>
+  <header class="dashboard-header">
+    <div class="welcome-section">
+      <h1 class="title">Welcome Back, {{name}}! 👋</h1>
+      <p class="subtitle">Track your sales and performance</p>
+    </div>
+  </header>
 
-  <div class="employee-actions">
+
+  <!-- Add Product Form Section -->
+  <div class="form-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <img src="assets/icons/add.svg" alt="Add" class="title-icon">
+        Record New Sale
+      </h2>
+    </div>
     <app-employee-product-form></app-employee-product-form>
   </div>
 
-  <div class="recent-transactions">
-<app-recent-transaction-component></app-recent-transaction-component>  
+  <!-- Recent Transactions Section -->
+  <div class="transactions-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <img src="assets/icons/trending.svg" alt="Recent" class="title-icon">
+        Recent Activity
+      </h2>
+    </div>
+    
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading transactions...</p>
+    </div>
 
-</div>
+    <app-recent-transaction-component 
+      *ngIf="!loading" 
+      [arr]="transactions">
+    </app-recent-transaction-component>
+  </div>
 </div>

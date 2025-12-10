@@ -9,36 +9,22 @@
     <main>
         <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
 
-        <div class="input-form">
-          <label for="name">Name</label>
-
-          <div class="input-box"
-              [class.invalid]="name.invalid && (name.touched || f.submitted) || errorMessage">
-
-            <input 
-              placeholder="Sponsoring, Salary, etc.."
-              id="name"
-              name="name"
-              [(ngModel)]="model.name"
-              #name="ngModel"
-              required
-            >
-          </div>
-
-          <div class="error"
-              *ngIf="name.invalid && (name.touched || f.submitted)">
-            <span *ngIf="name.errors?.['required']">Name is required.</span>
-          </div>
-        </div>
+        
         
         <div class="input-form">
           <label for="category">Category</label>
 
           <div class="input-box"
-              [class.invalid]="name.invalid && (name.touched || f.submitted) || errorMessage">
+              [class.invalid]="errorMessage">
 
             <div class="custom-select">
-                <select name="categories" id="categories" #categoriesRef [(ngModel)]="model.category">
+                <select
+                  name="categories"
+                  id="categories"
+                  #categoriesRef
+                  [(ngModel)]="model.category"
+                  (ngModelChange)="onCategoryChange($event.target.value)"
+                  >
                     <option *ngFor="let category of categories" [value]="category.id">
                         {{category.name}}
                     </option>
@@ -47,6 +33,23 @@
             </div>
 
             <button type="button" class="btn add" (click)="openAddCategoryPopup()">Add Category</button>
+          </div>
+        </div>
+
+        <div class="input-form">
+          <label for="products">Product</label>
+
+          <div class="input-box"
+              [class.invalid]="errorMessage">
+
+            <div class="custom-select">
+                <select name="products" id="products" #categoriesRef [(ngModel)]="model.product">
+                    <option *ngFor="let product of products" [value]="product.id">
+                        {{product.name}}
+                    </option>
+                </select>
+                <span class="custom-arrow"></span>
+            </div>
           </div>
         </div>
 

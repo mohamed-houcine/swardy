@@ -32,10 +32,10 @@
           </div>
           
           <div class="input-form">
-            <label for="name">Color</label>
+            <label for="color">Color</label>
 
             <div class="input-box"
-                [class.invalid]="name.invalid && (name.touched || f.submitted) || errorMessage">
+                [class.invalid]="color.invalid && (color.touched || f.submitted) || errorMessage">
 
               <input 
                 type="color"
@@ -45,6 +45,11 @@
                 #color="ngModel"
                 required
               >
+            </div>
+
+            <div class="error"
+                *ngIf="color.invalid && (color.touched || f.submitted)">
+              <span *ngIf="color.errors?.['required']">Color is required.</span>
             </div>
           </div>
 

@@ -36,8 +36,9 @@ export class addIncomeCategoryPopup {
 
     try {
       await this.dash.addCategory(this.model, 'income');
-      f.reset();
+      f.reset({color: "#6558bf"});
       this.errorMessage = "";
+      this.animateAdd();
     } catch(err) {
       this.errorMessage = "This category already exist on income";
     }

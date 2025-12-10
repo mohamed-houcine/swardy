@@ -22,10 +22,12 @@ export class DefaultLayout implements OnInit {
 
   async ngOnInit() {
     const user = await this.dash.loadCurrentUser();
-
+    console.log("hamma user",user)
     if (user) {
-      this.showBusinessOptions = user.type === 'Business';
+      this.showBusinessOptions = user.role === UserRole.ADMIN;
       this.showEmployeeDashboard = user.role === UserRole.EMPLOYEE;
+      console.log("business",this.showBusinessOptions)
+      console.log("employee",this.showEmployeeDashboard)
     }
 
     this.loaded = true;

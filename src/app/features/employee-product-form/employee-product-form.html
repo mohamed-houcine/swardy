@@ -1,14 +1,261 @@
-<form (ngSubmit)="addTransaction()">
-  <label>Product</label>
-  <select [(ngModel)]="productId" name="productId" required>
-    <option *ngFor="let p of products" [value]="p.id">{{p.name}} (${{p.price}})</option>
-  </select>
+<div id="main-container">
+    <header>
+        <h1 class="title">Record Sale</h1>
+        <p class="subtitle" *ngIf="managerName">Manager: {{ managerName }}</p>
+    </header>
+    <hr>
+    
+    <!-- Error message if no manager -->
+    <div class="error-container" *ngIf="!managerId && errorMessage">
+        <p class="error-text">{{ errorMessage }}</p>
+    </div>
 
-  <label>Quantity</label>
-  <input type="number" [(ngModel)]="quantity" name="quantity" min="1" required />
+    <main *ngIf="managerId">
+        <form #f="ngForm" novalidate>
+        
+        <!-- Scan Mode Toggle -->
+        <div class="scan-mode-toggle">
+          <button 
+            type="button"
+            class="toggle-btn"
+            [class.active]="scanMode === 'manual'"
+            (click)="toggleScanMode('manual')">
+            <span class="icon">📋</span>
+            Manual Selection
+          </button>
+          <button 
+            type="button"
+            class="toggle-btn"
+            [class.active]="scanMode === 'barcode'"
+            (click)="toggleScanMode('barcode')">
+            <span class="icon">📷</span>
+            Barcode Scan
+          </button>
+        </div>
 
-  <label>Notes</label>
-  <textarea [(ngModel)]="notes" name="notes"></textarea>
+        <!-- BARCODE MODE -->
+        <div *ngIf="scanMode === 'barcode'" class="barcode-section">
+          <div class="input-form">
+            <label for="barcode">Scan or Enter Barcode</label>
+            
+            <div class="barcode-input-wrapper">
+              <input 
+                #barcodeInput
+                type="text"
+                id="barcode"
+                name="barcode"
+                [(ngModel)]="barcodeValue"
+                (input)="onBarcodeInput($event)"
+                (keyup)="onBarcodeKeyup($event)"
+                placeholder="Scan barcode or type manually..."
+                class="barcode-input"
+                autocomplete="off"
+              >
+              <button 
+                type="button" 
+                class="clear-btn" 
+                (click)="clearBarcode()"
+                *ngIf="barcodeValue">
+                ✕
+              </button>
+            </div>
 
-  <button type="submit">Add Transaction</button>
-</form>
+            <div class="barcode-hint" *ngIf="!model.product && !errorMessage">
+              <span class="hint-icon">💡</span>
+              Use a barcode scanner or type the barcode manually
+            </div>
+
+            <!-- Product Info Display -->
+            <div class="product-found" *ngIf="model.product && getSelectedProductName()">
+              <div class="product-info">
+                <span class="check-icon">✓</span>
+                <div class="product-details">
+                  <span class="product-name">{{ getSelectedProductName() }}</span>
+                  <span class="product-price">${{ getProductPrice().toFixed(2) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MANUAL MODE -->
+        <div *ngIf="scanMode === 'manual'">
+          <!-- Category Selection -->
+          <div class="input-form">
+            <label for="category">Category</label>
+
+            <div class="input-box" [class.invalid]="errorMessage">
+              <div class="custom-select">
+                  <select
+                    name="category"
+                    id="category"
+                    [(ngModel)]="model.category"
+                    (ngModelChange)="onCategoryChange($event)"
+                    required
+                    >
+                      <option *ngFor="let category of categories" [value]="category.id">
+                          {{ category.name }}
+                      </option>
+                  </select>
+                  <span class="custom-arrow"></span>
+              </div>
+
+              <button type="button" class="btn add-category" (click)="openAddCategoryPopup()">
+                Add Category
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Selection -->
+          <div class="input-form">
+            <label for="product">Product</label>
+
+            <div class="input-box" [class.invalid]="errorMessage">
+              <div class="custom-select">
+                  <select 
+                    name="product" 
+                    id="product" 
+                    [(ngModel)]="model.product"
+                    required
+                    #productField="ngModel"
+                    >
+                      <option value="">-- Select a product --</option>
+                      <option *ngFor="let product of products" [value]="product.id">
+                          {{ product.name }} - ${{ product.price.toFixed(2) }}
+                      </option>
+                  </select>
+                  <span class="custom-arrow"></span>
+              </div>
+            </div>
+
+            <div class="info-text" *ngIf="model.product && getProductPrice() > 0">
+              <br>
+              <span>Unit Price: ${{ getProductPrice().toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quantity (shown in both modes) -->
+        <div class="input-form">
+          <label for="quantity">Quantity</label>
+
+          <div class="input-box"
+              [class.invalid]="quantity.invalid && (quantity.touched || f.submitted)">
+
+            <input 
+                type="number"
+                placeholder="1, 2, 3..."
+                id="quantity"
+                name="quantity"
+                [(ngModel)]="model.quantity"
+                #quantity="ngModel"
+                required
+                min="1"
+            >
+          </div>
+
+          <div class="error"
+              *ngIf="quantity.invalid && (quantity.touched || f.submitted)">
+            <span *ngIf="quantity.errors?.['required']">Quantity is required.</span>
+            <span *ngIf="model.quantity < 1">Quantity must be at least 1.</span>
+          </div>
+        </div>
+
+        <!-- Total Amount Display -->
+        <div class="total-amount" *ngIf="model.product && model.quantity > 0">
+          <span class="total-label">Total Amount:</span>
+          <span class="total-value">${{ getTotalAmount().toFixed(2) }}</span>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="input-form">
+          <label for="paymentMethod">Payment Method</label>
+
+          <div class="input-box" [class.invalid]="paymentMethod.invalid && (paymentMethod.touched || f.submitted)">
+            <div class="custom-select">
+                <select 
+                  name="paymentMethod" 
+                  id="paymentMethod" 
+                  [(ngModel)]="model.paymentMethod"
+                  required
+                  #paymentMethod="ngModel"
+                  >
+                    <option *ngFor="let method of paymentMethods" [value]="method.value">
+                        {{ method.label }}
+                    </option>
+                </select>
+                <span class="custom-arrow"></span>
+            </div>
+          </div>
+
+          <div class="error"
+              *ngIf="paymentMethod.invalid && (paymentMethod.touched || f.submitted)">
+            <span *ngIf="paymentMethod.errors?.['required']">Payment method is required.</span>
+          </div>
+        </div>
+
+        <!-- Date -->
+        <div class="input-form">
+          <label for="date">Date</label>
+
+          <div class="input-box"
+              [class.invalid]="date.invalid && (date.touched || f.submitted) || errorMessage || isDateInFuture()">
+
+            <input 
+                type="date"
+                id="date"
+                name="date"
+                [(ngModel)]="model.date"
+                #date="ngModel"
+            >
+          </div>
+
+          <div class="error" *ngIf="isDateInFuture()">
+            <span>The given date is invalid.</span>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="input-form">
+          <label for="notes">Notes (Optional)</label>
+
+          <div class="input-box">
+            <textarea
+              placeholder="Add any notes about this sale..."
+              id="notes"
+              name="notes"
+              [(ngModel)]="model.notes"
+              #notes="ngModel"
+              rows="3"
+            >
+            </textarea>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" *ngIf="errorMessage && !successMessage">
+          <span class="error-icon">⚠</span>
+          {{ errorMessage }}
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-message" *ngIf="successMessage">
+          <span class="success-icon">✓</span>
+          {{ successMessage }}
+        </div>
+
+        <!-- Footer buttons -->
+        <footer>
+            <button 
+              type="button"
+              class="btn add" 
+              [class.clicked]="addClicked" 
+              [disabled]="!model.product || model.quantity < 1 || isDateInFuture() || !model.paymentMethod"
+              (click)="onSubmit(f)">
+                {{ addClicked ? 'Recorded ✓' : 'Record Sale' }}
+            </button>
+            <button type="button" class="btn discard" (click)="resetForm(f)">Reset</button>
+        </footer>
+      </form>
+    </main>
+</div>

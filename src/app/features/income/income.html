@@ -3,7 +3,9 @@
     title="Income Overview"
     type="income"
     [data]="overview"
-    (modeChange)="onModeChange($event)">
+    (modeChange)="onModeChange($event)"
+    >
+    
   </app-overview-chart>
 
   <app-data-table
@@ -11,13 +13,9 @@
     [columns]="IncomeSourceColumnsNames"
     [data]="IncomeSourceData"
     [SearchFactors]="IncomeSourceSearchFactors"
-<<<<<<< HEAD
     [entityName]="msg"
-    >
-=======
     (onAdd)="onAddIncomeSource()"
-  ></app-data-table>
->>>>>>> c7d935c32a3f8d116b0bea2852a1396649bdb9a5
+    >
 
   </app-data-table>
 
@@ -28,6 +26,7 @@
       [data]="IncomeProductData"
       [SearchFactors]="IncomeProductSearchFactors"
       [entityName]="msg"
+      (onAdd)="onAddIncomeProduct()"
       >
     </app-data-table>
   </div>
