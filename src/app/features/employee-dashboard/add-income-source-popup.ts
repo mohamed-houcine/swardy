@@ -69,7 +69,7 @@ export class addIncomeSourcePopup {
   openAddCategoryPopup() {
     const dialogRef = this.catDiagRef.open(addIncomeCategoryPopup, {
       width: '400px',
-      panelClass: 'add-income-category-popup'
+      panelClass: 'add-income-category-dialog'
     });
 
     dialogRef.afterClosed().subscribe(result => this.updateCategories());
