@@ -1,9 +1,33 @@
 <div class="employee-dashboard-container">
   <header class="dashboard-header">
     <div class="welcome-section">
-      <h1 class="title">Welcome Back, {{name}}! 👋</h1>
+      <h1 class="title">Welcome Back, {{name}}!</h1>
       <p class="subtitle">Track your sales and performance</p>
     </div>
+
+    <div class="divi">
+    <a class="profile"
+   routerLink="/profile"
+   (click)="onProfileClick()"
+   [class.active]="isProfileActive()">
+  <div class="profile-avatar" [class.has-image]="hasAvatar()">
+    <img *ngIf="hasAvatar()"
+         [src]="getAvatarUrl()"
+         alt="Profile avatar"
+         class="avatar-image">
+    <span *ngIf="!hasAvatar()" class="avatar-initials">
+      {{ getInitials() }}
+    </span>
+  </div>
+  <span>Profile</span>
+</a>
+  <li class="logout-btn" (click)="logout()" role="button" tabindex="0">
+  <span>Logout</span>
+</li>
+
+</div>
+
+
   </header>
 
 
@@ -11,7 +35,6 @@
   <div class="form-section">
     <div class="section-header">
       <h2 class="section-title">
-        <img src="assets/icons/add.svg" alt="Add" class="title-icon">
         Record New Sale
       </h2>
     </div>

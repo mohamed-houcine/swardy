@@ -1,0 +1,268 @@
+<a class="return" *ngIf="user?.role === UserRole.EMPLOYEE" routerLink="/employee">
+  <img src="assets/icons/return.svg" alt="return">
+  <span>Return</span>
+</a>
+
+
+<div class="profile-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading profile...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && error && !user" class="error-container">
+    <div class="error-icon">⚠️</div>
+    <p class="error-text">{{ error }}</p>
+    <button class="btn-retry" (click)="loadUserProfile()">Retry</button>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!loading && user" class="profile-content">
+    
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      ✓ {{ successMessage }}
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="alert alert-error">
+      ⚠️ {{ error }}
+    </div>
+
+    <!-- Profile Header Card -->
+    <div class="profile-header-card">
+      <div class="header-background"></div>
+      
+      <div class="header-content">
+        <div class="avatar-section">
+          <div class="avatar-wrapper">
+            <!-- Avatar with image or initials -->
+            <div class="avatar" [class.has-image]="hasAvatar()">
+              <img 
+                *ngIf="hasAvatar()" 
+                [src]="getAvatarUrl()" 
+                alt="Profile picture"
+                class="avatar-image">
+              <span *ngIf="!hasAvatar()" class="avatar-initials">
+                {{ getInitials() }}
+              </span>
+            </div>
+            
+            <!-- Hidden file input -->
+            <input 
+              type="file" 
+              id="avatar-input" 
+              accept="image/*"
+              (change)="onAvatarChange($event)"
+              style="display: none;">
+            
+            <!-- Upload button -->
+            <button 
+              class="avatar-edit-btn" 
+              title="Change photo"
+              (click)="triggerAvatarUpload()"
+              [disabled]="uploadingAvatar">
+              <span class="camera-icon" *ngIf="!uploadingAvatar">📷</span>
+              <span class="uploading-spinner" *ngIf="uploadingAvatar">⏳</span>
+            </button>
+          </div>
+
+          <div class="user-info">
+            <h1 class="user-name">{{ user.first_name }} {{ user.last_name }}</h1>
+            <div class="badges">
+              <span class="badge" [ngClass]="getRoleBadgeClass(user.role)">
+                <span class="badge-icon">{{ user.role === UserRole.ADMIN ? '🛡️' : '👤' }}</span>
+                {{ user.role }}
+              </span>
+              <span class="badge" [ngClass]="getTypeBadgeClass(user.type)">
+                <span class="badge-icon">💼</span>
+                {{ user.type }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button *ngIf="user?.role != UserRole.EMPLOYEE && !editing" 
+            class="btn btn-primary"
+            (click)="startEditing()">
+            Edit Profile
+          </button>
+          <div *ngIf="editing" class="action-buttons">
+            <button 
+              class="btn btn-success"
+              (click)="saveProfile()"
+              [disabled]="saving">
+              {{ saving ? 'Saving...' : 'Save' }}
+            </button>
+            <button 
+              class="btn btn-secondary"
+              (click)="cancelEditing()"
+              [disabled]="saving">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Information Card -->
+    <div class="profile-info-card">
+      <h2 class="section-title">Profile Information</h2>
+
+      <div class="form-grid">
+        
+        <!-- First Name -->
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <div *ngIf="!editing" class="info-display">
+            <span class="info-icon">👤</span>
+            <span class="info-text">{{ user.first_name }}</span>
+          </div>
+          <input 
+            *ngIf="editing"
+            type="text"
+            class="form-input"
+            [(ngModel)]="formData.first_name"
+            placeholder="Enter first name">
+        </div>
+
+        <!-- Last Name -->
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <div *ngIf="!editing" class="info-display">
+            <span class="info-icon">👤</span>
+            <span class="info-text">{{ user.last_name }}</span>
+          </div>
+          <input 
+            *ngIf="editing"
+            type="text"
+            class="form-input"
+            [(ngModel)]="formData.last_name"
+            placeholder="Enter last name">
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <div *ngIf="!editing" class="info-display">
+            <span class="info-icon">✉️</span>
+            <span class="info-text">{{ user.email }}</span>
+          </div>
+          <input 
+            *ngIf="editing"
+            type="email"
+            class="form-input"
+            [(ngModel)]="formData.email"
+            placeholder="Enter email">
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <div *ngIf="!editing" class="info-display">
+            <span class="info-icon">📞</span>
+            <span class="info-text">{{ user.tel_number || 'Not provided' }}</span>
+          </div>
+          <input 
+            *ngIf="editing"
+            type="tel"
+            class="form-input"
+            [(ngModel)]="formData.tel_number"
+            placeholder="Enter phone number">
+        </div>
+
+        <!-- Gender -->
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <div *ngIf="!editing" class="info-display">
+            <span class="info-icon">{{ user.gender === 'Male' ? '♂️' : '♀️' }}</span>
+            <span class="info-text">{{ user.gender }}</span>
+          </div>
+          <select 
+            *ngIf="editing"
+            class="form-input"
+            [(ngModel)]="formData.gender">
+            <option *ngFor="let gender of genders" [value]="gender">
+              {{ gender }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Country -->
+        <div class="form-group">
+          <label class="form-label">Country</label>
+          <div *ngIf="!editing" class="info-display">
+            <span class="info-icon">🌍</span>
+            <span class="info-text">{{ user.country }}</span>
+          </div>
+          <input 
+            *ngIf="editing"
+            type="text"
+            class="form-input"
+            [(ngModel)]="formData.country"
+            placeholder="Enter country"
+            readonly
+            title="Country cannot be changed">
+        </div>
+
+        <!-- Currency -->
+        <div class="form-group">
+          <label class="form-label">Currency</label>
+          <div *ngIf="!editing" class="info-display">
+            <span class="info-icon">💰</span>
+            <span class="info-text">{{ user.currency }}</span>
+          </div>
+          <input 
+            *ngIf="editing"
+            type="text"
+            class="form-input"
+            [(ngModel)]="formData.currency"
+            placeholder="Enter currency"
+            readonly
+            title="Currency cannot be changed">
+        </div>
+
+        <!-- Language -->
+        <div class="form-group">
+          <label class="form-label">Language</label>
+          <div *ngIf="!editing" class="info-display">
+            <span class="info-icon">🌐</span>
+            <span class="info-text">{{ getLanguageLabel(user.language) }}</span>
+          </div>
+          <select 
+            *ngIf="editing"
+            class="form-input"
+            [(ngModel)]="formData.language">
+            <option *ngFor="let lang of languages" [value]="lang.value">
+              {{ lang.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Theme -->
+        <div class="form-group">
+          <label class="form-label">Theme</label>
+          <div *ngIf="!editing" class="info-display">
+            <span class="info-icon">{{ getThemeIcon() }}</span>
+            <span class="info-text">{{ user.theme }}</span>
+          </div>
+          <select 
+            *ngIf="editing"
+            class="form-input"
+            [(ngModel)]="formData.theme">
+            <option [value]="ThemeMode.LIGHT">Light</option>
+            <option [value]="ThemeMode.DARK">Dark</option>
+          </select>
+        </div>
+
+      </div>
+      
+    </div>
+
+  </div>
+
+
+</div>

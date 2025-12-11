@@ -27,5 +27,8 @@ export interface User {
   language: string;
   theme: ThemeMode;
   id_manager?:string;
+  avatar_url?: string| null;
+  goal?: number;
+
 }
 

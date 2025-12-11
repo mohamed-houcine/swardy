@@ -1258,65 +1258,69 @@ async fetchCategoriesByType(
     return v;
   }
 
-  async loadCurrentUser(forceRefresh = false): Promise<User | null> {
-    if (!forceRefresh && this._cachedUser !== undefined) return this._cachedUser;
+// dashboard.service.ts - Fixed loadCurrentUser method
 
-    const userId = await this.getUserId();
-    if (!userId) {
-      this._cachedUser = null;
-      return null;
-    }
+async loadCurrentUser(forceRefresh = false): Promise<User | null> {
+  if (!forceRefresh && this._cachedUser !== undefined) return this._cachedUser;
 
-    const { data, error } = await this.supabase.client
-      .from('users')
-      .select(`
-        id,
-        type,
-        role,
-        first_name,
-        last_name,
-        avatar_url,
-        language,
-        theme,
-        gender,
-        email,
-        tel_number,
-        id_manager,
-        currency:id_currency ( name ),
-        country:id_country ( name ),
-        goal
-      `)
-      .eq('id', userId)
-      .single();
-
-    if (error || !data) {
-      console.error('loadCurrentUser error:', error);
-      this._cachedUser = null;
-      return null;
-    }
-
-    const country = (data as any).country as any;
-    const currency = (data as any).currency as any;
-
-    const user: User = {
-      id: data.id,
-      type: (this.normalizeType(data.type) || data.type) as UserType,
-      role: data.role as UserRole,
-      first_name: data.first_name,
-      last_name: data.last_name,
-      gender: data.gender,
-      tel_number: data.tel_number,
-      email: data.email,
-      country: country?.name || 'N/A',
-      currency: currency?.name || 'N/A',
-      language: data.language || 'en',
-      theme: data.theme as ThemeMode
-      // avoid sensitive fields
-    } as User;
-
-    this._cachedUser = user;
-    return user;
+  const userId = await this.getUserId();
+  if (!userId) {
+    this._cachedUser = null;
+    return null;
   }
+
+  const { data, error } = await this.supabase.client
+    .from('users')
+    .select(`
+      id,
+      type,
+      role,
+      first_name,
+      last_name,
+      avatar_url,
+      language,
+      theme,
+      gender,
+      email,
+      tel_number,
+      id_manager,
+      currency:id_currency ( name ),
+      country:id_country ( name ),
+      goal
+    `)
+    .eq('id', userId)
+    .single();
+
+  if (error || !data) {
+    console.error('loadCurrentUser error:', error);
+    this._cachedUser = null;
+    return null;
+  }
+
+  const country = (data as any).country as any;
+  const currency = (data as any).currency as any;
+
+  const user: User = {
+    id: data.id,
+    type: (this.normalizeType(data.type) || data.type) as UserType,
+    role: data.role as UserRole,
+    first_name: data.first_name,
+    last_name: data.last_name,
+    gender: data.gender,
+    tel_number: data.tel_number,
+    email: data.email,
+    country: country?.name || 'N/A',
+    currency: currency?.name || 'N/A',
+    language: data.language || 'en',
+    theme: data.theme as ThemeMode,
+    id_manager: data.id_manager,
+    avatar_url: data.avatar_url,  // ✅ ADDED: Include avatar_url from database
+    goal: data.goal ? Number(data.goal) : undefined  // ✅ ADDED: Include goal
+  };
+
+  this._cachedUser = user;
+  return user;
+}
 
   get cachedUser(): User | null | undefined {
     return this._cachedUser;
@@ -1590,6 +1594,320 @@ async getManagerInfo(): Promise<{
   return data;
 }
 
+// Add this method to your dashboard.service.ts
 
+/**
+ * Updates user profile information
+ * @param userData Partial user data to update
+ * @returns Updated user data
+ */
+async updateUserProfile(userData: Partial<User>): Promise<User | null> {
+  const userId = await this.getUserId();
+  if (!userId) {
+    throw new Error('User not authenticated');
+  }
+
+  // Prepare update object (only include fields that can be updated)
+  const updateData: any = {};
+  
+  if (userData.first_name !== undefined) updateData.first_name = userData.first_name;
+  if (userData.last_name !== undefined) updateData.last_name = userData.last_name;
+  if (userData.email !== undefined) updateData.email = userData.email;
+  if (userData.tel_number !== undefined) updateData.tel_number = userData.tel_number;
+  if (userData.gender !== undefined) updateData.gender = userData.gender;
+  if (userData.language !== undefined) updateData.language = userData.language;
+  if (userData.theme !== undefined) updateData.theme = userData.theme;
+  // Handle avatar_url explicitly to allow null values
+  if (userData.avatar_url !== undefined) updateData.avatar_url = userData.avatar_url;
+
+  // Update in database
+  const { data, error } = await this.supabase.client
+    .from('users')
+    .update(updateData)
+    .eq('id', userId)
+    .select(`
+      id,
+      type,
+      role,
+      first_name,
+      last_name,
+      avatar_url,
+      language,
+      theme,
+      gender,
+      email,
+      tel_number,
+      id_manager,
+      currency:id_currency ( name ),
+      country:id_country ( name ),
+      goal
+    `)
+    .single();
+
+  if (error) {
+    console.error('updateUserProfile error:', error);
+    throw error;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  // Transform response to User model
+  const country = (data as any).country as any;
+  const currency = (data as any).currency as any;
+
+  const updatedUser: User = {
+    id: data.id,
+    type: (this.normalizeType(data.type) || data.type) as UserType,
+    role: data.role as UserRole,
+    first_name: data.first_name,
+    last_name: data.last_name,
+    gender: data.gender,
+    tel_number: data.tel_number,
+    email: data.email,
+    country: country?.name || 'N/A',
+    currency: currency?.name || 'N/A',
+    language: data.language || 'en',
+    theme: data.theme as ThemeMode,
+    id_manager: data.id_manager,
+    avatar_url: data.avatar_url,  // This can now be string, null, or undefined
+    goal: data.goal ? Number(data.goal) : undefined
+  };
+
+  // Update cache
+  this._cachedUser = updatedUser;
+
+  return updatedUser;
+}
+// dashboard.service.ts - Update these three methods to use 'user_images' instead of 'avatars'
+
+// dashboard.service.ts - Update these three methods to use 'user_images' instead of 'avatars'
+// dashboard.service.ts - Avatar upload with image resizing
+
+/**
+ * Resize image to specific dimensions
+ * @param file Original image file
+ * @param maxWidth Maximum width (default 300px)
+ * @param maxHeight Maximum height (default 300px)
+ * @returns Resized image as Blob
+ */
+private async resizeImage(file: File, maxWidth: number = 300, maxHeight: number = 300): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions while maintaining aspect ratio
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+        
+        // Create canvas and resize
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'));
+          return;
+        }
+        
+        // Draw resized image
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert to blob
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Failed to create blob'));
+            }
+          },
+          'image/jpeg',
+          0.85 // Quality (0.85 = 85%)
+        );
+      };
+      
+      img.onerror = () => {
+        reject(new Error('Failed to load image'));
+      };
+      
+      img.src = e.target?.result as string;
+    };
+    
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+    
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * Upload avatar to Supabase Storage with automatic resizing
+ * @param file Image file to upload
+ * @returns Public URL of uploaded avatar
+ */
+async uploadAvatar(file: File): Promise<string | null> {
+  const userId = await this.getUserId();
+  if (!userId) {
+    throw new Error('User not authenticated');
+  }
+
+  try {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      throw new Error(`Invalid file type: ${file.type}. Please select an image file.`);
+    }
+
+    // Validate file size (before resize - 10MB limit for original)
+    if (file.size > 10 * 1024 * 1024) {
+      throw new Error(`File too large: ${(file.size / 1024 / 1024).toFixed(2)}MB. Maximum size is 10MB.`);
+    }
+
+    console.log('Original file size:', (file.size / 1024).toFixed(2), 'KB');
+
+    // Resize image to 300x300 (or smaller while maintaining aspect ratio)
+    const resizedBlob = await this.resizeImage(file, 300, 300);
+    console.log('Resized file size:', (resizedBlob.size / 1024).toFixed(2), 'KB');
+
+    // Generate unique filename
+    const fileExt = 'jpg'; // Always save as JPG after resize
+    const fileName = `avatars/${userId}/avatar-${Date.now()}.${fileExt}`;
+    const filePath = fileName;
+
+    console.log('Uploading to:', filePath);
+
+    // Delete old avatar if exists
+    const currentUser = this._cachedUser || await this.loadCurrentUser();
+    if (currentUser?.avatar_url) {
+      const oldPath = this.extractPathFromUrl(currentUser.avatar_url);
+      if (oldPath) {
+        const { error: deleteError } = await this.supabase.client.storage
+          .from('user_images')
+          .remove([oldPath]);
+        
+        if (deleteError) {
+          console.warn('Failed to delete old avatar:', deleteError);
+        }
+      }
+    }
+
+    // Upload resized avatar
+    const { data, error } = await this.supabase.client.storage
+      .from('user_images')
+      .upload(filePath, resizedBlob, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: 'image/jpeg'
+      });
+
+    if (error) {
+      console.error('Upload error:', error);
+      throw new Error(`Upload failed: ${error.message}`);
+    }
+
+    console.log('Upload successful:', data);
+
+    // Get public URL
+    const { data: urlData } = this.supabase.client.storage
+      .from('user_images')
+      .getPublicUrl(filePath);
+
+    const publicUrl = urlData.publicUrl;
+    console.log('Public URL:', publicUrl);
+
+    // Update user profile with new avatar URL
+    await this.updateUserProfile({ avatar_url: publicUrl });
+
+    return publicUrl;
+  } catch (error: any) {
+    console.error('uploadAvatar error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Extract storage path from Supabase URL
+ * @param url Full Supabase storage URL
+ * @returns Storage path or null
+ */
+private extractPathFromUrl(url: string): string | null {
+  try {
+    const urlObj = new URL(url);
+    const pathParts = urlObj.pathname.split('/');
+    const bucketIndex = pathParts.indexOf('user_images');
+    if (bucketIndex !== -1 && bucketIndex < pathParts.length - 1) {
+      return pathParts.slice(bucketIndex + 1).join('/');
+    }
+    return null;
+  } catch (e) {
+    console.error('Error extracting path from URL:', e);
+    return null;
+  }
+}
+
+/**
+ * Delete user avatar
+ * @returns true if successful
+ */
+async deleteAvatar(): Promise<boolean> {
+  const userId = await this.getUserId();
+  if (!userId) {
+    throw new Error('User not authenticated');
+  }
+
+  try {
+    const currentUser = this._cachedUser || await this.loadCurrentUser();
+    if (!currentUser?.avatar_url) {
+      return true; // No avatar to delete
+    }
+
+    // Extract path from URL
+    const path = this.extractPathFromUrl(currentUser.avatar_url);
+    if (!path) {
+      return false;
+    }
+
+    // Delete from storage
+    const { error } = await this.supabase.client.storage
+      .from('user_images')
+      .remove([path]);
+
+    if (error) {
+      console.error('Delete avatar error:', error);
+      throw error;
+    }
+
+    // Update user record to set avatar_url to null
+    await this.updateUserProfile({ avatar_url: null });
+
+    return true;
+  } catch (error) {
+    console.error('deleteAvatar error:', error);
+    throw error;
+  }
+}
+
+public clearCache(): void {
+  this._cachedUser = undefined;
+  console.log('User cache cleared');
+}
 
 }

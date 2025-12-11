@@ -1,60 +1,69 @@
 import { Routes } from '@angular/router';
+import { Login } from './features/login/login';
 import { DefaultLayout } from './layouts/default-layout/default-layout';
-import { SimpleLayout } from './layouts/simple-layout/simple-layout';
-import { AuthGuard } from './core/auth/auth.guard';
-import { NoAuthGuard } from './core/auth/no-auth.guard';
+import { Dashboard } from './features/dashboard/dashboard';
+import { EmployeeDashboard } from './features/employee-dashboard/employee-dashboard';
+import { ProfilePage } from './features/profile-page/profile-page';
+import { adminGuard, employeeGuard, authGuard } from './core/auth/role.guard';
 
 export const routes: Routes = [
+  // ========== PUBLIC ROUTES (No Authentication Required) ==========
+  {
+    path: 'login',
+    component: Login
+  },
+  {
+    path: 'signup',
+    loadComponent: () => import('./features/signup/signup').then(m => m.Signup)
+  },
+  
+  // ========== PROTECTED ROUTES (Authentication Required) ==========
   {
     path: '',
-    component: DefaultLayout, // Layout with header
-    canActivate: [AuthGuard],   // <----- PROTECT EVERYTHING
+    component: DefaultLayout,
+    canActivate: [authGuard],
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard)
+        component: Dashboard,
+        canActivate: [adminGuard]
       },
       {
         path: 'income',
-        loadComponent: () => import('./features/income/income').then(m => m.Income)
+        loadComponent: () => import('./features/income/income').then(m => m.Income),
+        canActivate: [adminGuard]
       },
       {
         path: 'expenses',
-        loadComponent: () =>
-          import('./features/expenses/expenses').then(m => m.Expenses)
+        loadComponent: () => import('./features/expenses/expenses').then(m => m.Expenses),
+        canActivate: [adminGuard]
       },
       {
         path: 'employees',
-        loadComponent: () =>
-          import('./features/employees/employees').then(m => m.Employees)
+        loadComponent: () => import('./features/employees/employees').then(m => m.Employees),
+        canActivate: [adminGuard]
       },
       {
         path: 'products',
-        loadComponent: () =>
-          import('./features/products/products').then(m => m.Products)
+        loadComponent: () => import('./features/products/products').then(m => m.Products),
+        canActivate: [adminGuard]
       },
       {
         path: 'employee',
-        loadComponent: () =>
-          import('./features/employee-dashboard/employee-dashboard').then(m => m.EmployeeDashboard)
-      }, 
-    ]
-  },
-  {
-    path: '',
-    component: SimpleLayout, // Layout without header
-    children: [
-      {
-        path: 'login',
-        canActivate: [NoAuthGuard],
-        loadComponent: () => import('./features/login/login').then(m => m.Login)
+        component: EmployeeDashboard,
+        canActivate: [employeeGuard]
       },
       {
-        path: 'signup',
-        canActivate: [NoAuthGuard],
-        loadComponent: () => import('./features/signup/signup').then(m => m.Signup)
+        path: 'profile',
+        component: ProfilePage,
+        canActivate: [authGuard]
       }
     ]
   },
-  { path: '**', redirectTo: '' }
+  
+  // ========== WILDCARD ROUTE ==========
+  {
+    path: '**',
+    redirectTo: 'login' // Redirect to login instead of empty path
+  }
 ];
