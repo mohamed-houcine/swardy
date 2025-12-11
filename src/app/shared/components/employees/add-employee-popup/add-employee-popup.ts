@@ -52,21 +52,9 @@ export class addEmployeePopup {
       this.errorMessage = "";
       this.animateAdd();
     } catch(err) {
-      this.errorMessage = "This product already exist";
+      this.errorMessage = "This employee already exists";
     }
-  }
-
-  openAddCategoryPopup() {
-    const dialogRef = this.catDiagRef.open(addProductCategoryPopup, {
-      width: '800px',
-      panelClass: 'popup'
-    });
-
-    dialogRef.afterClosed().subscribe(result => this.updateCategories());
-  }
-
-  async updateCategories() {
-    this.categories = await this.dash.fetchCategoriesByType('product');
+    this.errorMessage = "";
   }
 
   resetModel() {

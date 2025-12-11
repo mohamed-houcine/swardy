@@ -56,7 +56,7 @@ export class addProductPopup {
       this.errorMessage = "";
       this.animateAdd();
     } catch(err) {
-      this.errorMessage = "This product already exist";
+      this.errorMessage = "";
     }
   }
 

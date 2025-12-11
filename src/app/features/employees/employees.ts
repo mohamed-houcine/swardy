@@ -70,7 +70,7 @@ export class Employees {
   }
 
   onAddEmployee() {
-    this.dialog.open(addEmployeePopup, {
+    const dialogRef = this.dialog.open(addEmployeePopup, {
       width: '100vw',
       maxWidth: '700px',
       height: 'auto',
@@ -78,6 +78,11 @@ export class Employees {
       panelClass: 'popup',
       autoFocus: false
     });
+    dialogRef.afterClosed().subscribe(r => this.updateEmployees());
+  }
+
+  async updateEmployees() {
+    this.EmployeesData = await this.dash.fetchEmployees();
   }
 
 

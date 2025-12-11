@@ -1286,6 +1286,26 @@ async fetchManagerCategoriesByType(
     return data;
   }
 
+  async addGoal(goal: number): Promise<void> {
+    const userId = await this.getUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    const { data, error } = await this.supabase.client
+      .from('users')
+      .update({ goal: goal })
+      .eq('id', userId)
+      .select('id, goal')
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to set goal: ${error.message}`);
+    }
+
+    console.log('✅ Goal set successfully:', data);
+  }
+
   async addNormalExpense(expense: any, file: File | null) {
     const userId = await this.getUserId();
     if (!userId) throw new Error("User not logged in");

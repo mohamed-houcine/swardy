@@ -74,7 +74,7 @@ export class Products {
   }
 
   onAddProduct() {
-    this.dialog.open(addProductPopup, {
+    const dialogRef = this.dialog.open(addProductPopup, {
       width: '100vw',
       maxWidth: '700px',
       height: 'auto',
@@ -82,6 +82,10 @@ export class Products {
       panelClass: 'popup',
       autoFocus: false
     });
+    dialogRef.afterClosed().subscribe(r => this.updateProducts());
+  }
+  async updateProducts() {
+    this.ProductData = await this.dash.fetchProducts();
   }
 
 }

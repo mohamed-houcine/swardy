@@ -103,7 +103,7 @@ export class Income implements OnInit {
 
   // Methods
   onAddIncomeSource() {
-    this.dialog.open(addIncomeSourcePopup, {
+    const dialogRef = this.dialog.open(addIncomeSourcePopup, {
       width: '100vw',
       maxWidth: '700px',
       height: 'auto',
@@ -111,10 +111,19 @@ export class Income implements OnInit {
       panelClass: 'popup',
       autoFocus: false
     });
+    dialogRef.afterClosed().subscribe(r => this.updateIncomeSources());
+  }
+
+  async updateIncomeSources() {
+    this.IncomeSourceData = await this.dash.fetchIncomeSources();
+  }
+
+  async updateIncomeProduct() {
+    this.IncomeProductData = await this.dash.fetchIncomeProducts();
   }
 
   onAddIncomeProduct() {
-    this.dialog.open(addIncomeProductPopup, {
+    const dialogRef = this.dialog.open(addIncomeProductPopup, {
       width: '100vw',
       maxWidth: '700px',
       height: 'auto',
@@ -122,6 +131,7 @@ export class Income implements OnInit {
       panelClass: 'popup',
       autoFocus: false
     });
+    dialogRef.afterClosed().subscribe(r => this.updateIncomeSources());
   }
   msg="Income"
 

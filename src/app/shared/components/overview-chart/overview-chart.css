@@ -45,3 +45,7 @@
 .dropdown {
   position: relative;
 }
+
+.header span {
+  font-size: 1.6em;
+}

@@ -1,5 +1,8 @@
 import { NgIf, NgStyle } from '@angular/common';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { addGoalPopup } from '../add-goal/add-goal-popup';
+import { DashboardService } from '../../../services/dashboard.service';
 
 @Component({
   selector: 'app-goal-component',
@@ -8,6 +11,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
   styleUrls: ['./goal-component.css']
 })
 export class GoalComponent implements OnChanges {
+  constructor(private dialog: MatDialog, private dash: DashboardService) {}
   @Input() goal!: number | null;
   @Input() current!: number;
   @Input() currency: string = '$';
@@ -40,5 +44,18 @@ export class GoalComponent implements OnChanges {
   // returns CSS width for the filled bar (string with %)
   public fillWidth(): string {
     return `${this.percent}%`;
+  }
+
+  addGoal() {
+    const dialogRef = this.dialog.open(addGoalPopup, {
+      width: '800px',
+      panelClass: 'popup'
+    });
+    dialogRef.afterClosed().subscribe(r => this.updateGoal());
+  }
+
+  async updateGoal() {
+    this.goal = await this.dash.fetchGoal();
+    this.updateValues();
   }
 }

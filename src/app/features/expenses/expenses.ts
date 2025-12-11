@@ -89,7 +89,7 @@ export class Expenses implements OnInit {
   ProductExpensesSearchFactors: string[] = ["productName", "category"];
 
   onAddNormalExpense() {
-    this.dialog.open(addExpenseNormalPopup, {
+    const dialogRef = this.dialog.open(addExpenseNormalPopup, {
       width: '100vw',
       maxWidth: '700px',
       height: 'auto',
@@ -97,10 +97,11 @@ export class Expenses implements OnInit {
       panelClass: 'popup',
       autoFocus: false
     });
+    dialogRef.afterClosed().subscribe(r => this.updateProductExpenses());
   }
 
   onAddProductExpense() {
-    this.dialog.open(addExpenseProductPopup, {
+    const dialogRef = this.dialog.open(addExpenseProductPopup, {
       width: '100vw',
       maxWidth: '700px',
       height: 'auto',
@@ -108,6 +109,15 @@ export class Expenses implements OnInit {
       panelClass: 'popup',
       autoFocus: false
     });
+    dialogRef.afterClosed().subscribe(r => this.updateNormalExpenses());
+  }
+
+  async updateNormalExpenses() {
+    this.NormalExpensesData = await this.dash.fetchNormalExpenses();
+  }
+
+  async updateProductExpenses() {
+    this.ProductExpensesData = await this.dash.fetchProductExpenses();
   }
   msg = 'Expenses'
 }
