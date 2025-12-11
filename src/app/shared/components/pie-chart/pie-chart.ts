@@ -1,5 +1,5 @@
-import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { CommonModule, NgIf } from '@angular/common';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 Chart.register(...registerables);
 
@@ -37,12 +37,12 @@ const piePercentPlugin = {
 @Component({
   selector: 'app-pie-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [NgIf, CommonModule],
   templateUrl: './pie-chart.html',
   styleUrls: ['./pie-chart.css']
 })
-export class PieChartComponent implements AfterViewInit, OnChanges {
-  @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
+export class PieChartComponent implements AfterViewInit, OnChanges, OnDestroy {
+  @ViewChild('canvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>;
 
   @Input() title = '';
   @Input() labels: string[] = [];
@@ -50,23 +50,51 @@ export class PieChartComponent implements AfterViewInit, OnChanges {
   @Input() colors: string[] = [];
   @Input() legendPosition: 'top' | 'left' | 'right' | 'bottom' = 'right';
   @Input() doughnut = true;
+  @Input() entityName: string = 'data';
 
   private chart?: Chart<'doughnut' | 'pie'>;
+  private viewInitialized = false;
 
   ngAfterViewInit() {
-    this.initChart();
+    this.viewInitialized = true;
+    
+    if (this.hasData() && this.canvasRef) {
+      this.initChart();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (this.chart && (changes['labels'] || changes['data'] || changes['colors'])) {
-      this.updateChart();
+    if (this.viewInitialized && (changes['labels'] || changes['data'] || changes['colors'])) {
+      if (this.hasData()) {
+        if (this.chart) {
+          this.updateChart();
+        } else {
+          // Wait for *ngIf to render the canvas
+          setTimeout(() => {
+            if (this.canvasRef) {
+              this.initChart();
+            }
+          }, 0);
+        }
+      } else {
+        if (this.chart) {
+          this.chart.destroy();
+          this.chart = undefined;
+        }
+      }
     }
   }
 
   // -------------------- INIT CHART --------------------
   private initChart() {
+    if (!this.canvasRef) return;
+    
     const ctx = this.canvasRef.nativeElement.getContext('2d');
     if (!ctx) return;
+
+    if (this.chart) {
+      this.chart.destroy();
+    }
 
     const config: ChartConfiguration<'doughnut' | 'pie'> = {
       type: this.doughnut ? 'doughnut' : 'pie',
@@ -97,6 +125,7 @@ export class PieChartComponent implements AfterViewInit, OnChanges {
   // -------------------- UPDATE CHART --------------------
   private updateChart() {
     if (!this.chart) return;
+    
     this.chart.data.labels = this.labels;
     (this.chart.data.datasets[0].data as number[]) = this.data;
     (this.chart.data.datasets[0].backgroundColor as string[]) =
@@ -122,11 +151,24 @@ export class PieChartComponent implements AfterViewInit, OnChanges {
 
   // -------------------- EXPORT PNG --------------------
   public exportPNG(filename = 'pie-chart.png') {
+    if (!this.chart || !this.canvasRef) return;
     const canvas = this.canvasRef.nativeElement;
     const url = canvas.toDataURL('image/png');
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     a.click();
+  }
+
+  // -------------------- CHECK IF DATA EXISTS --------------------
+  hasData(): boolean {
+    return Array.isArray(this.data) && this.data.length > 0 && this.data.some(val => val > 0);
+  }
+
+  // -------------------- CLEANUP --------------------
+  ngOnDestroy() {
+    if (this.chart) {
+      this.chart.destroy();
+    }
   }
 }

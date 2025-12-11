@@ -1,0 +1,22 @@
+<div id="main-container">
+    <header>
+    <h1 class="title">Delete Income</h1>
+    <button class="close-btn" (click)="closeDialog()">
+        <img src="assets/icons/close.svg" alt="">
+    </button>
+    </header>
+    <hr>
+    <main>
+    <p class="warning">⚠️ Are you sure you want to delete this income?</p>
+    <p class="detail"><strong>Name:</strong> {{ data.rowData.first_name + ' ' + data.rowData.last_name }}</p>
+    <p class="detail"><strong>Gender:</strong> {{ data.rowData.gender }}</p>
+    <p class="detail" *ngIf="data.rowData.tel_number"><strong>Telephone N°:</strong> {{ data.rowData.tel_number }}</p>
+    <p class="detail"><strong>Email:</strong> {{ data.rowData.email }}</p>
+
+    <p class="note">This action cannot be undone.</p>
+    </main>
+    <footer>
+    <button class="btn discard" (click)="closeDialog()">Cancel</button>
+    <button class="btn delete" (click)="confirmDelete()">Delete</button>
+    </footer>
+</div>

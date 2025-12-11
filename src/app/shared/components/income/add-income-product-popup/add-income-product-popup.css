@@ -253,7 +253,7 @@ select {
   opacity: 0.8;
 }
 
-.input-box.invalid input {
+.input-box.invalid :is(input, select) {
   border: 2px solid #e53935;
   background: #fff5f5;
 }
@@ -297,6 +297,11 @@ select {
 
 textarea {
   resize: none;
+}
+
+.add:disabled {
+  background-color: rgba(101, 88, 191, .5);
+  border: rgba(101, 88, 191, .5);
 }
 
 @media (max-width: 700px) {

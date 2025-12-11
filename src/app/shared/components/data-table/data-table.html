@@ -60,15 +60,15 @@
                 </ng-container>
                 <td>
                     <div class="actions-container">
-                        <button>Details</button>
-                        <button>Delete</button>
+                        <button (click)="openDetails(row)">Details</button>
+                        <button (click)="openDelete(row)">Delete</button>
                     </div>
                 </td>
             </tr>
 
         </table>
         <div class="no-data" *ngIf="paginatedData.length === 0">
-            <p>No data available</p>
+            <p>No {{entityName}} available</p>
         </div>
     </main>
     <footer>

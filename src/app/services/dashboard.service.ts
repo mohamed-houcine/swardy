@@ -39,7 +39,7 @@ export class DashboardService {
   // ---------------------------------------------------
   //  FETCHING FROM SUPABASE (unchanged)
   // ---------------------------------------------------
-  private async getUserId(): Promise<string | null> {
+  async getUserId(): Promise<string | null> {
     const { data } = await this.supabase.client.auth.getUser();
     return data.user?.id ?? null;
   }
@@ -61,7 +61,8 @@ export class DashboardService {
           name
         )
       `)
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .order('date', { ascending: false });
 
     if (error) {
       console.error('fetchNormalExpenses error:', error);
@@ -75,23 +76,29 @@ export class DashboardService {
     // Transform the data to match your NormalExpense model
     return data.map(item => {
       const category = item.category as any;
-      
+
+      const formattedDate = item.date
+        ? new Date(item.date).toISOString().split('T')[0]
+        : '';
+
       return {
         id: item.id,
         name: item.name,
         category: category?.name || 'Uncategorized',
         amount: item.amount,
-        date: item.date,
+        date: formattedDate,   // ✅ formatted here
         notes: item.notes,
         receipt: item.receipt
       } as NormalExpense;
     });
+
   }
 
   async fetchProductExpenses(): Promise<ProductExpense[]> {
     const userId = await this.getUserId();
     if (!userId) return [];
 
+    // Fetch product expenses with product and its category name
     const { data, error } = await this.supabase.client
       .from('product_expenses')
       .select(`
@@ -102,42 +109,47 @@ export class DashboardService {
         receipt,
         product:product_id (
           name,
-          price
-        ),
-        category:category_id (
-          name
+          price,
+          id_category (
+            name
+          )
         )
       `)
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .order('date', { ascending: false });
 
     if (error) {
       console.error('fetchProductExpenses error:', error);
       return [];
     }
 
-    if (!data || data.length === 0) {
-      return [];
-    }
+    if (!data || data.length === 0) return [];
 
-    // Transform the data to match your ProductExpense model
+    // Transform the data
     return data.map(item => {
       const product = item.product as any;
-      const category = item.category as any;
+      const category = product?.id_category as any;
       const price = product?.price || 0;
       const quantity = item.quantity || 0;
-      
+
+      const formattedDate = item.date
+        ? new Date(item.date).toISOString().split('T')[0]
+        : '';
+
       return {
         id: item.id,
         productName: product?.name,
-        category: category?.name || 'Uncategorized',
+        category: category?.name || 'Uncategorized', // ✅ category name
         quantity: item.quantity,
         amount: Number(price) * Number(quantity),
-        date: item.date,
+        date: formattedDate,
         notes: item.notes,
         receipt: item.receipt
       } as ProductExpense;
     });
   }
+
+
 
   async fetchIncomeSources(): Promise<IncomeSource[]> {
     const userId = await this.getUserId();
@@ -155,7 +167,8 @@ export class DashboardService {
           name
         )
       `)
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .order('date', { ascending: false });
 
     if (error) {
       console.error('fetchIncomeSources error:', error);
@@ -169,16 +182,21 @@ export class DashboardService {
     // Transform the data to match your IncomeSource model
     return data.map(item => {
       const category = item.category as any;
-      
+
+      const formattedDate = item.date
+        ? new Date(item.date).toISOString().split('T')[0]
+        : '';
+
       return {
         id: item.id,
         name: item.name,
         category: category?.name || 'Uncategorized',
         amount: item.amount,
-        date: item.date,
+        date: formattedDate,
         notes: item.notes
       } as IncomeSource;
     });
+
   }
 
   async fetchIncomeProducts(): Promise<IncomeProduct[]> {
@@ -238,7 +256,8 @@ export class DashboardService {
           last_name
         )
       `)
-      .in('user_id', allUserIds);
+      .in('user_id', allUserIds)
+      .order('date', { ascending: false });
 
     if (error) {
       console.error('fetchIncomeProducts error:', error);
@@ -256,14 +275,18 @@ export class DashboardService {
       const user = item.user as any;
       const price = product?.price || 0;
       const quantity = item.quantity || 0;
-      
+
+      const formattedDate = item.date
+        ? new Date(item.date).toISOString().split('T')[0]
+        : '';
+
       return {
         id: item.id,
         product: product?.name || 'Unknown',
         category: category?.name || 'Uncategorized',
         amount: Number(price) * Number(quantity),
         quantity: item.quantity,
-        date: item.date,
+        date: formattedDate,   // ✅ formatted here
         scan_type: item.scan_type,
         notes: item.notes,
         employeeName: user ? `${user.first_name} ${user.last_name}` : 'Unknown',
@@ -383,6 +406,183 @@ export class DashboardService {
       } as Product;
     });
   }
+
+  
+
+
+
+// Ajouter ces fonctions dans dashboard.service.ts
+
+/**
+ * Récupère l'ID du manager de l'utilisateur connecté
+ * @returns L'ID du manager (UUID) ou null si pas de manager
+ */
+async getManagerId(): Promise<string | null> {
+  const userId = await this.getUserId();
+  if (!userId) {
+    console.warn('getManagerId: No user logged in');
+    return null;
+  }
+
+  // Si l'utilisateur est déjà en cache et a un manager
+  if (this._cachedUser && this._cachedUser.id_manager) {
+    return this._cachedUser.id_manager;
+  }
+
+  // Sinon, fetch depuis la base de données
+  const { data, error } = await this.supabase.client
+    .from('users')
+    .select('id_manager')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error('getManagerId error:', error);
+    return null;
+  }
+
+  return data?.id_manager ?? null;
+}
+
+/**
+ * Récupère les produits par catégorie du MANAGER de l'employé
+ * Utile pour les employés qui doivent vendre les produits de leur manager
+ * @param categoryId L'ID de la catégorie
+ * @returns Liste des produits du manager dans cette catégorie
+ */
+async fetchManagerProductsByCategory(categoryId: string): Promise<Product[]> {
+  const managerId = await this.getManagerId();
+  
+  if (!managerId) {
+    console.warn('fetchManagerProductsByCategory: No manager found');
+    return [];
+  }
+
+  const { data, error } = await this.supabase.client
+    .from('product')
+    .select(`
+      id,
+      name,
+      price,
+      barcode,
+      description,
+      category:id_category (
+        id,
+        name
+      )
+    `)
+    .eq('user_id', managerId)  // Produits du MANAGER
+    .eq('id_category', categoryId);  // Filtrer par ID de catégorie
+
+  if (error) {
+    console.error('fetchManagerProductsByCategory error:', error);
+    return [];
+  }
+
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  return data.map(item => {
+    const categoryData = item.category as any;
+    return {
+      id: item.id,
+      name: item.name,
+      category: categoryData?.name || 'Uncategorized',
+      price: item.price,
+      barcode: item.barcode,
+      description: item.description
+    } as Product;
+  });
+}
+
+/**
+ * Récupère TOUS les produits du manager (sans filtre de catégorie)
+ * @returns Liste de tous les produits du manager
+ */
+async fetchAllManagerProducts(): Promise<Product[]> {
+  const managerId = await this.getManagerId();
+  
+  if (!managerId) {
+    console.warn('fetchAllManagerProducts: No manager found');
+    return [];
+  }
+
+  const { data, error } = await this.supabase.client
+    .from('product')
+    .select(`
+      id,
+      name,
+      price,
+      barcode,
+      description,
+      category:id_category (
+        id,
+        name
+      )
+    `)
+    .eq('user_id', managerId)  // Produits du MANAGER
+    .order('name', { ascending: true });
+
+  if (error) {
+    console.error('fetchAllManagerProducts error:', error);
+    return [];
+  }
+
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  return data.map(item => {
+    const categoryData = item.category as any;
+    return {
+      id: item.id,
+      name: item.name,
+      category: categoryData?.name || 'Uncategorized',
+      price: item.price,
+      barcode: item.barcode,
+      description: item.description
+    } as Product;
+  });
+}
+
+/**
+ * Récupère les catégories disponibles du manager
+ * Utile pour afficher les catégories dans un dropdown pour l'employé
+ * @returns Liste des catégories du manager
+ */
+async fetchManagerCategoriesByType(
+  type: 'income' | 'expense' | 'product'
+): Promise<{ id: string; name: string; color?: string }[]> {
+  const managerId = await this.getManagerId();
+  
+  if (!managerId) {
+    console.warn('fetchManagerCategoriesByType: No manager found');
+    return [];
+  }
+
+  const { data, error } = await this.supabase.client
+    .from('category')
+    .select('id, name, color, type, user_id')
+    .or(`user_id.eq.${managerId},user_id.is.null`)  // Catégories du manager + globales
+    .or(`type.eq.${type},type.eq.all`)  // Type spécifique ou 'all'
+    .order('name', { ascending: true });
+
+  if (error) {
+    console.error('fetchManagerCategoriesByType error:', error);
+    return [];
+  }
+
+  return (data || []).map(cat => ({
+    id: cat.id,
+    name: cat.name,
+    color: cat.color
+  }));
+}
+
+
+
+
 
 
   // ---------------------------------------------------
@@ -1140,6 +1340,62 @@ export class DashboardService {
     return data;
   }
 
+  async addExpenseProduct(product: any, file: File | null) {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error("User not logged in");
+
+    let receiptUrl: string | null = null;
+
+    // Optional: upload receipt file to Supabase Storage
+    if (file) {
+      // Create unique filename to avoid conflicts
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      const { data: uploadData, error: uploadError } = await this.supabase.client
+        .storage
+        .from('expense-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: urlData } = this.supabase.client.storage
+        .from('expense-images')
+        .getPublicUrl(fileName);
+
+      receiptUrl = urlData.publicUrl;
+    }
+
+    // Insert the new expense product into the table
+    const { data, error } = await this.supabase.client
+      .from('product_expenses') // <-- change table to your product table
+      .insert([{
+        product_id: product.product,
+        quantity: product.quantity,
+        date: product.date,
+        notes: product.notes ?? null,
+        receipt: receiptUrl,
+        user_id: userId
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Insert error:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+
   async addProduct(product: {name: string, category: string, price: number, description: string}) {
     const userId = await this.getUserId();
     if (!userId) throw new Error("User not logged in");
@@ -1166,6 +1422,844 @@ export class DashboardService {
 
 
 
+
+
+
+
+
+
+
+
+
+  private _cachedUser: User | null | undefined = undefined;
+
+
+  private normalizeType(raw?: string | null): string | null {
+    if (!raw) return null;
+    const v = raw.trim().toLowerCase();
+    if (v === 'personnel' || v === 'personal' || v === 'private') return 'personal';
+    if (v === 'business' || v === 'company' || v === 'commercial') return 'business';
+    return v;
+  }
+
+  async loadCurrentUser(forceRefresh = false): Promise<User | null> {
+    if (!forceRefresh && this._cachedUser !== undefined) return this._cachedUser;
+
+    const userId = await this.getUserId();
+    if (!userId) {
+      this._cachedUser = null;
+      return null;
+    }
+
+    const { data, error } = await this.supabase.client
+      .from('users')
+      .select(`
+        id,
+        type,
+        role,
+        first_name,
+        last_name,
+        avatar_url,
+        language,
+        theme,
+        gender,
+        email,
+        tel_number,
+        id_manager,
+        currency:id_currency ( name ),
+        country:id_country ( name ),
+        goal
+      `)
+      .eq('id', userId)
+      .single();
+
+    if (error || !data) {
+      console.error('loadCurrentUser error:', error);
+      this._cachedUser = null;
+      return null;
+    }
+
+    const country = (data as any).country as any;
+    const currency = (data as any).currency as any;
+
+    const user: User = {
+      id: data.id,
+      type: (this.normalizeType(data.type) || data.type) as UserType,
+      role: data.role as UserRole,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      gender: data.gender,
+      tel_number: data.tel_number,
+      email: data.email,
+      country: country?.name || 'N/A',
+      currency: currency?.name || 'N/A',
+      language: data.language || 'en',
+      theme: data.theme as ThemeMode
+      // avoid sensitive fields
+    } as User;
+
+    this._cachedUser = user;
+    return user;
+  }
+
+  get cachedUser(): User | null | undefined {
+    return this._cachedUser;
+  }
+
+
+// Ajouter une transaction pour un employé
+async addEmployeeTransaction(trx: { productId: string; quantity: number; notes?: string }) {
+  if (!this.cachedUser?.id) throw new Error('No user logged in');
+
+  // Récupérer le produit pour calculer le montant
+  const { data: product, error } = await this.supabase.client
+    .from('product')
+    .select('*')
+    .eq('id', trx.productId)
+    .single();
+  if (error || !product) throw new Error('Product not found');
+
+  const amount = product.price * trx.quantity;
+
+  const { data, error: insertError } = await this.supabase.client
+    .from('income')
+    .insert([{
+      name: `Sale: ${product.name}`,
+      amount,
+      quantity: trx.quantity,
+      date: new Date(),
+      product_id: trx.productId,
+      user_id: this.cachedUser.id,
+      type: 'product',
+      notes: trx.notes || ''
+    }]);
+  
+  if (insertError) throw insertError;
+  return data;
+}
+
+
+async fetchLastEmployeeTransactions(limit = 10) {
+  const userId = await this.getUserId();
+  if (!userId) return [];
+
+  // Vérifier que l'utilisateur est un employé
+  const user = await this.loadCurrentUser();
+  if (!user || user.role !== 'Employee') {
+    console.warn('Access denied: Only employees can fetch their own transactions');
+    return [];
+  }
+
+  // Fetch ONLY income products created by THIS employee (user_id = current user)
+  const { data, error } = await this.supabase.client
+    .from('income_product')
+    .select(`
+      id,
+      quantity,
+      date,
+      notes,
+      product:product_id (
+        name,
+        price
+      )
+    `)
+    .eq('user_id', userId)  // IMPORTANT: Only this employee's transactions
+    .order('date', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('fetchLastEmployeeTransactions error:', error);
+    return [];
+  }
+
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  // Transform to match expected format
+  return data.map(item => {
+    const product = item.product as any;
+    const price = Number(product?.price || 0);
+    const quantity = Number(item.quantity || 0);
+    
+    return {
+      id: item.id,
+      name: `Sale: ${product?.name || 'Unknown Product'}`,
+      amount: price * quantity,
+      quantity: item.quantity,
+      date: item.date,
+      notes: item.notes || '',
+      product_id: product?.id
+    };
+  });
+}
+
+async isEmployee(): Promise<boolean> {
+  const user = await this.loadCurrentUser();
+  return !!user && user.role === UserRole.EMPLOYEE;
+}
+
+isEmployeeCached(): boolean {
+  const u = this._cachedUser;
+  return !!u && u.role === UserRole.EMPLOYEE;
+}
+
+async isAdmin(): Promise<boolean> {
+  const user = await this.loadCurrentUser();
+  return !!user && user.role === UserRole.ADMIN;
+}
+
+isAdminCached(): boolean {
+  const u = this._cachedUser;
+  return !!u && u.role === UserRole.ADMIN;
+}
+
+
+
+
+
+  // -------------------------
+  // smart account type resolution (cache -> auth metadata -> DB)
+  // -------------------------
+
+  /** read type from Supabase auth user metadata (if present) */
+  private async getTypeFromAuthMetadata(): Promise<string | null> {
+    try {
+      const { data } = await this.supabase.client.auth.getUser();
+      const authUser = data.user;
+      const metaType = authUser?.user_metadata?.['type'];
+      return metaType ?? null;
+    } catch (e) {
+      console.debug('getTypeFromAuthMetadata failed', e);
+      return null;
+    }
+  }
+
+  /**
+   * Returns normalized effective account type:
+   *  - 'business' | 'personal' | null
+   * Strategy: cache -> auth metadata -> users table (cached loader)
+   */
+  async getEffectiveAccountType(): Promise<'business'|'personal'|null> {
+    // 1) cache
+    if (this._cachedUser !== undefined && this._cachedUser !== null) {
+      const t = String(this._cachedUser.type || '').trim().toLowerCase();
+      if (t) return (t === 'business' || t === 'company' || t === 'commercial') ? 'business' : 'personal';
+    }
+
+    // 2) auth metadata (cheap, no DB row)
+    const meta = await this.getTypeFromAuthMetadata();
+    if (meta) {
+      const norm = this.normalizeType(meta);
+      if (norm === 'business') return 'business';
+      if (norm === 'personal') return 'personal';
+      // if unknown, continue to DB fallback
+    }
+
+    // 3) fallback to users table (loads & caches)
+    const loaded = await this.loadCurrentUser();
+    if (!loaded || !loaded.type) return null;
+    const norm = this.normalizeType(String(loaded.type));
+    if (norm === 'business') return 'business';
+    if (norm === 'personal') return 'personal';
+    return null;
+  }
+
+  async isBusinessAccountSmart(): Promise<boolean> {
+    const t = await this.getEffectiveAccountType();
+    return t === 'business';
+  }
+
+  isBusinessCached(): boolean {
+    const u = this._cachedUser;
+    if (!u) return false;
+    const t = String(u.type || '').trim().toLowerCase();
+    return t === 'business' || t === 'company' || t === 'commercial';
+  }
+
+
+async addProductSale(sale: {
+  product_id: string;
+  quantity: number;
+  date: string;
+  notes?: string;
+}) {
+  const userId = await this.getUserId();
+  if (!userId) {
+    throw new Error('User not authenticated');
+  }
+
+  // Vérifier que l'utilisateur est un employé
+  const user = await this.loadCurrentUser();
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // Validation
+  if (!sale.product_id) {
+    throw new Error('Product ID is required');
+  }
+
+  if (sale.quantity < 1) {
+    throw new Error('Quantity must be at least 1');
+  }
+
+  // Vérifier que le produit existe et appartient au manager de l'employé
+  const managerId = await this.getManagerId();
+  if (!managerId) {
+    throw new Error('No manager found. Only employees with a manager can record sales.');
+  }
+
+  const { data: product, error: productError } = await this.supabase.client
+    .from('product')
+    .select('id, name, price, user_id')
+    .eq('id', sale.product_id)
+    .eq('user_id', managerId)  // Vérifier que le produit appartient au manager
+    .single();
+
+  if (productError || !product) {
+    throw new Error('Product not found or does not belong to your manager');
+  }
+
+  // Insérer la vente
+  const { data, error } = await this.supabase.client
+    .from('income_product')
+    .insert([{
+      product_id: sale.product_id,
+      quantity: sale.quantity,
+      date: sale.date,
+      notes: sale.notes || null,
+      user_id: userId  // ID de l'employé
+    }])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('addProductSale error:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+/**
+ * Récupère les informations complètes du manager
+ * @returns Les données du manager ou null
+ */
+  async getManagerInfo(): Promise<{
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    tel_number?: number;
+  } | null> {
+    const managerId = await this.getManagerId();
+    
+    if (!managerId) {
+      console.warn('getManagerInfo: No manager found for this user');
+      return null;
+    }
+
+    const { data, error } = await this.supabase.client
+      .from('users')
+      .select('id, first_name, last_name, email, tel_number')
+      .eq('id', managerId)
+      .single();
+
+    if (error) {
+      console.error('getManagerInfo error:', error);
+      return null;
+    }
+
+    return data;
+  }
+
+  async updateIncomeSource(model: any) {
+    const { error } = await this.supabase.client
+      .from('income_source')
+      .update({
+        name: model.name,
+        amount: model.amount,
+        notes: model.notes,
+        id_category: model.category,
+        date: model.date
+      })
+      .eq('id', model.id);
+
+    if (error) throw error;
+  }
+
+  async deleteIncomeSource(id: string): Promise<void> {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error("User not logged in");
+
+    const { error } = await this.supabase.client
+      .from('income_source')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error deleting income source:', error);
+      throw error;
+    }
+  }
+
+  
+
+  async updateIncomeProduct(model: any) {
+    if (!model.id || model.id === 'undefined') {
+      throw new Error('Invalid income product ID');
+    }
+
+    const userId = await this.getUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    // Check if current user is admin
+    const { data: currentUser, error: userError } = await this.supabase.client
+      .from('users')
+      .select('role')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !currentUser) {
+      throw new Error('Failed to verify user permissions');
+    }
+
+    // Use enum value instead of string
+    if (currentUser.role !== UserRole.ADMIN && currentUser.role !== 'Admin') {
+      throw new Error(`Only admins can update income products. Your role: ${currentUser.role}`);
+    }
+
+    // Prepare update data
+    const updateData: any = {
+      quantity: model.quantity,
+      date: model.date,
+      notes: model.notes ?? null,
+      paymentMethod: model.paymentMethod
+    };
+
+    if (model.product && model.product !== 'undefined') {
+      updateData.product_id = model.product;
+    }
+
+    // Update without user_id filter
+    const { data, error } = await this.supabase.client
+      .from('income_product')
+      .update(updateData)
+      .eq('id', model.id)
+      .select();
+
+    if (error) {
+      console.error('Update error:', error);
+      throw error;
+    }
+
+    if (!data || data.length === 0) {
+      throw new Error('Income product not found');
+    }
+
+    return data[0];
+  }
+
+  async deleteIncomeProduct(id: string): Promise<void> {
+    if (!id) throw new Error("Income product ID is required");
+    console.log('Deleting income product with id:', id);
+
+    const { error } = await this.supabase.client
+      .from('income_product')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting income product:', error);
+      throw error;
+    }
+  }
+
+  async updateNormalExpense(model: any, file: File | null): Promise<string | null> {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error("User not logged in");
+
+    let receiptUrl: string | null = model.receipt || null;
+
+    // If a new file is provided, delete the old one and upload the new one
+    if (file) {
+      // Delete old file if exists
+      if (model.receipt) {
+        try {
+          const oldFilePath = model.receipt.split('/storage/v1/object/public/expense-images/')[1];
+          if (oldFilePath) {
+            const { error: deleteError } = await this.supabase.client
+              .storage
+              .from('expense-images')
+              .remove([oldFilePath]);
+
+            if (deleteError) {
+              console.warn('Could not delete old receipt:', deleteError.message);
+            }
+          }
+        } catch (err) {
+          console.warn('Error deleting old receipt:', err);
+        }
+      }
+
+      // Upload new file
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      const { error: uploadError } = await this.supabase.client
+        .storage
+        .from('expense-images')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: urlData } = this.supabase.client
+        .storage
+        .from('expense-images')
+        .getPublicUrl(fileName);
+
+      receiptUrl = urlData.publicUrl;
+    }
+
+    // Update the expense row
+    const { data, error } = await this.supabase.client
+      .from('normal_expenses')
+      .update({
+        amount: model.amount,
+        date: model.date,
+        notes: model.notes ?? null,
+        receipt: receiptUrl,
+        category_id: model.category,
+        name: model.name,
+      })
+      .eq('id', model.id)
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Update error:', error);
+      throw error;
+    }
+
+    // Return the new receipt URL (or null if none)
+    return receiptUrl;
+  }
+  
+  async deleteNormalExpense(id: string, receiptUrl?: string): Promise<void> {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error("User not authenticated");
+
+    // Delete the file from storage if a receipt URL is provided
+    if (receiptUrl) {
+      // Extract the relative path inside the bucket from the URL
+      // Example: if receiptUrl = https://PROJECT.supabase.co/storage/v1/object/public/expense-images/1234/file.png
+      // then path = 1234/file.png
+      const urlParts = receiptUrl.split('/expense-images/');
+      const path = urlParts[1];
+      if (path) {
+        const { error: deleteError } = await this.supabase.client
+          .storage
+          .from('expense-images')
+          .remove([path]);
+
+        if (deleteError) {
+          console.error('Error deleting receipt file:', deleteError);
+          throw deleteError;
+        }
+      }
+    }
+
+    // Delete the row from the table
+    const { error } = await this.supabase.client
+      .from('normal_expenses')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error deleting expense:', error);
+      throw error;
+    }
+  }
+
+  async updateExpenseProduct(expense: any, file: File | null): Promise<string | null> {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error("User not logged in");
+
+    let receiptUrl: string | null = null;
+
+    // Optional: upload receipt file to Supabase Storage
+    if (file) {
+      // Create unique filename to avoid conflicts
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      const { error: uploadError } = await this.supabase.client
+        .storage
+        .from('expense-images')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: urlData } = this.supabase.client
+        .storage
+        .from('expense-images')
+        .getPublicUrl(fileName);
+
+      receiptUrl = urlData.publicUrl;
+    }
+
+    // Insert the new product expense row
+    const { data, error } = await this.supabase.client
+      .from('product_expenses')
+      .insert([{
+        product_id: expense.product,
+        quantity: expense.quantity,
+        date: expense.date,
+        notes: expense.notes ?? null,
+        receipt: receiptUrl,
+        user_id: userId
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Insert error:', error);
+      throw error;
+    }
+
+    // Return the public URL of the uploaded receipt (or null)
+    return receiptUrl;
+  }
+
+  async deleteExpenseProduct(id: string, receiptUrl?: string): Promise<void> {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error("User not authenticated");
+
+    // Delete the file from storage if a receipt URL is provided
+    if (receiptUrl) {
+      // Extract the relative path inside the bucket from the URL
+      // Example: if receiptUrl = https://PROJECT.supabase.co/storage/v1/object/public/expense-images/1234/file.png
+      // then path = 1234/file.png
+      const urlParts = receiptUrl.split('/expense-images/');
+      const path = urlParts[1];
+      if (path) {
+        const { error: deleteError } = await this.supabase.client
+          .storage
+          .from('expense-images')
+          .remove([path]);
+
+        if (deleteError) {
+          console.error('Error deleting receipt file:', deleteError);
+          throw deleteError;
+        }
+      }
+    }
+
+    // Delete the row from the table
+    const { error } = await this.supabase.client
+      .from('product_expenses')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error deleting product expense:', error);
+      throw error;
+    }
+  }
+
+  async updateProduct(model: any) {
+    const { error } = await this.supabase.client
+      .from('product')
+      .update({
+        name: model.name,
+        id_category: model.category,
+        price: model.price,
+        description: model.notes
+      })
+      .eq('id', model.id);
+
+    if (error) throw error;
+  }
+
+  async addEmployee(employee: {
+      email: string;
+      password: string;
+      first_name: string;
+      last_name: string;
+      gender: string;
+      tel_number?: number;
+      id_country?: string;
+      id_currency?: string;
+      avatar_url?: string;
+    }): Promise<any> {
+      const adminId = await this.getUserId();
+      if (!adminId) {
+        throw new Error('Admin not authenticated');
+      }
+
+      // Check if current user is admin
+      const { data: currentUser, error: userError } = await this.supabase.client
+        .from('users')
+        .select('role')
+        .eq('id', adminId)
+        .single();
+
+      if (userError || !currentUser || currentUser.role !== 'Admin') {
+        throw new Error('Only admins can add employees');
+      }
+
+      try {
+        // 1. Create auth user
+        const { data: authData, error: authError } = await this.supabase.client.auth.signUp({
+          email: employee.email,
+          password: employee.password
+        });
+
+        if (authError) {
+          console.error('Auth signup error:', authError);
+          throw new Error(`Failed to create authentication account: ${authError.message}`);
+        }
+
+        if (!authData.user) {
+          throw new Error('Failed to create user account');
+        }
+
+        const userId = authData.user.id;
+
+        // 2. Create user in public.users table
+        const { data: userData, error: userDbError } = await this.supabase.client
+          .from('users')
+          .insert({
+            id: userId,
+            email: employee.email,
+            first_name: employee.first_name,
+            last_name: employee.last_name,
+            gender: employee.gender,
+            tel_number: employee.tel_number ?? null,
+            id_country: employee.id_country ?? null,
+            id_currency: employee.id_currency ?? null,
+            role: 'Employee',
+            id_manager: adminId,
+            language: 'en',
+            theme: 'light',
+            avatar_url: employee.avatar_url || 'https://hgangjgiinkgrradsltn.supabase.co/storage/v1/object/public/user_images/default_avatar.jpg',
+            goal: null
+          })
+          .select()
+          .single();
+
+        if (userDbError) {
+          console.error('User DB insert error:', userDbError);
+          
+          // Rollback: Delete auth user if database insert fails
+          await this.supabase.client.auth.admin.deleteUser(userId);
+          
+          throw new Error(`Failed to create user profile: ${userDbError.message}`);
+        }
+
+        console.log('Employee created successfully:', userData);
+        return userData;
+
+      } catch (error: any) {
+        console.error('Error adding employee:', error);
+        throw error;
+      }
+    }
+
+    async deleteEmployee(id: string): Promise<void> {
+      const adminId = await this.getUserId();
+      if (!adminId) {
+        throw new Error("User not authenticated");
+      }
+
+      // 1. Check admin role
+      const { data: adminData, error: adminErr } = await this.supabase.client
+        .from("users")
+        .select("role")
+        .eq("id", adminId)
+        .single();
+
+      if (adminErr || !adminData || adminData.role !== "Admin") {
+        throw new Error("Only admins can delete employees");
+      }
+
+      try {
+        // 2. Fetch employee row (needed for avatar_url + validation)
+        const { data: employee, error: empErr } = await this.supabase.client
+          .from("users")
+          .select("id, avatar_url")
+          .eq("id", id)
+          .single();
+
+        if (empErr || !employee) {
+          throw new Error("Employee does not exist");
+        }
+
+        // Prevent admin deleting themselves
+        if (id === adminId) {
+          throw new Error("Admin cannot delete themselves");
+        }
+
+        // 3. Delete avatar from storage (if not default)
+        if (
+          employee.avatar_url &&
+          !employee.avatar_url.includes("default_avatar.jpg")
+        ) {
+          const parts = employee.avatar_url.split("/user_images/");
+          const avatarPath = parts[1];
+
+          if (avatarPath) {
+            await this.supabase.client.storage
+              .from("user_images")
+              .remove([avatarPath]);
+          }
+        }
+
+        // 4. Delete from public.users
+        const { error: dbErr } = await this.supabase.client
+          .from("users")
+          .delete()
+          .eq("id", id);
+
+        if (dbErr) {
+          console.error("Error deleting user row:", dbErr);
+          throw new Error("Failed to delete user from database");
+        }
+
+        // 5. Delete from auth (must be last)
+        const { error: authErr } =
+          await this.supabase.client.auth.admin.deleteUser(id);
+
+        if (authErr) {
+          console.error("Error deleting auth user:", authErr);
+
+          // Rollback: Restore row in public.users?
+          // (Optional — usually not needed unless you want strict consistency)
+
+          throw new Error("Failed to delete authentication user");
+        }
+
+        console.log("Employee deleted successfully:", id);
+      } catch (error) {
+        console.error("Error deleting employee:", error);
+        throw error;
+      }
+    }
 
 
 

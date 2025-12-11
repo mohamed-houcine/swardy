@@ -1,4 +1,5 @@
-<main>
+<main *ngIf="!loading">
+
   <app-overview-chart
     title="Expenses Overview"
     type="expense"
@@ -7,19 +8,34 @@
   </app-overview-chart>
 
   <app-data-table
-    title="Normal Expense"
+    title="{{title}}"
     [columns]="NormalExpensesColumnsNames"
     [data]="NormalExpensesData"
     [SearchFactors]="NormalExpensesSearchFactors"
+    [entityName]="msg"
     (onAdd)="onAddNormalExpense()"
+    [detailsDialogComponent]="NormalExpenseDetailsDialog"
+    [deleteDialogComponent]="NormalExpenseDeleteDialog"
   ></app-data-table>
   
-  <app-data-table
-    title="Product Expense"
-    [columns]="ProductExpensesColumnsNames"
-    [data]="ProductExpensesData"
-    [SearchFactors]="ProductExpensesSearchFactors"
-    (onAdd)="onAddProductExpense()"
-  ></app-data-table>
+  <div *ngIf="showProductExpenses">
+    <app-data-table
+      title="Product Expense"
+      [columns]="ProductExpensesColumnsNames"
+      [data]="ProductExpensesData"
+      [SearchFactors]="ProductExpensesSearchFactors"
+      [entityName]="msg"
+      (onAdd)="onAddProductExpense()"
+      [detailsDialogComponent]="expenseProductDetailsDialog"
+      [deleteDialogComponent]="expenseProductDeleteDialog"
+    ></app-data-table>
+  </div>
 
 </main>
+
+<div class="loading-screen" *ngIf="loading">
+  <span>
+    <img src="assets/logo.svg" alt="swardy_logo">
+    <h2>Swardy</h2>
+  </span>
+</div>

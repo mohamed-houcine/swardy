@@ -1,0 +1,153 @@
+<!-- income-details-popup.html -->
+<div id="main-container">
+  <header>
+    <h1 class="title">{{ isEditMode ? 'Edit' : 'Product Details' }}</h1>
+    <button class="close-btn" (click)="closeDialog()">
+      <img src="assets/icons/close.svg" alt="">
+    </button>
+  </header>
+  <hr>
+  
+  <main>
+    <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
+      
+      <!-- View Mode -->
+      <ng-container *ngIf="!isEditMode">
+        <div class="detail-row">
+          <span class="label">ID:</span>
+          <span class="value">{{ data.rowData.id }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Name:</span>
+          <span class="value">{{ data.rowData.name }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Category:</span>
+          <span class="value">{{ data.rowData.category }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Price:</span>
+          <span class="value">${{ data.rowData.price }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Barcode:</span>
+          <app-barcode [codeText]="data.rowData.barcode"></app-barcode>
+        </div>
+        <div class="detail-row" *ngIf="data.rowData.description">
+          <span class="label">Description:</span>
+          <span class="value">{{ data.rowData.description }}</span>
+        </div>
+      </ng-container>
+
+      <!-- Edit Mode -->
+      <ng-container *ngIf="isEditMode">
+        
+        <!-- Name -->
+        <div class="input-form">
+          <label for="name">Name</label>
+          <div class="input-box"
+               [class.invalid]="name.invalid && (name.touched || f.submitted)">
+            <input
+              placeholder="Product name"
+              id="name"
+              name="name"
+              [(ngModel)]="model.name"
+              #name="ngModel"
+              required
+            >
+          </div>
+          <div class="error" *ngIf="name.invalid && (name.touched || f.submitted)">
+            <span *ngIf="name.errors?.['required']">Name is required.</span>
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="input-form">
+          <label for="category">Category</label>
+          <div class="input-box"
+               [class.invalid]="category.invalid && (category.touched || f.submitted)">
+            <select 
+              id="category"
+              name="category"
+              [(ngModel)]="model.category"
+              #category="ngModel"
+              required
+            >
+              <option value="" disabled selected>Select a category</option>
+              <option *ngFor="let cat of categories" [value]="cat.id">
+                {{ cat.name }}
+              </option>
+            </select>
+          </div>
+          <div class="error" *ngIf="category.invalid && (category.touched || f.submitted)">
+            <span *ngIf="category.errors?.['required']">Category is required.</span>
+          </div>
+        </div>
+
+        <!-- Amount -->
+        <div class="input-form">
+          <label for="price">Price</label>
+          <div class="input-box"
+               [class.invalid]="price.invalid && (price.touched || f.submitted)">
+            <input 
+              type="number"
+              placeholder="0.00"
+              id="price"
+              name="price"
+              [(ngModel)]="model.price"
+              #price="ngModel"
+              required
+              min="0.01"
+            >
+          </div>
+          <div class="error" *ngIf="price.invalid && (price.touched || f.submitted)">
+            <span *ngIf="price.errors?.['required']">price is required.</span>
+            <span *ngIf="price.errors?.['min']">price must be greater than 0.</span>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="input-form">
+          <label for="description">Description (Optional)</label>
+          <div class="input-box">
+            <textarea 
+              placeholder="Additional description..."
+              id="description"
+              name="description"
+              [(ngModel)]="model.description"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+      </ng-container>
+
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="errorMessage">
+        <span class="error-icon">⚠</span>
+        {{ errorMessage }}
+      </div>
+
+    </form>
+  </main>
+
+  <footer>
+    <!-- View Mode Buttons -->
+    <ng-container *ngIf="!isEditMode">
+      <button class="btn edit" (click)="toggleEditMode()">Edit</button>
+    </ng-container>
+
+    <!-- Edit Mode Buttons -->
+    <ng-container *ngIf="isEditMode">
+        <button 
+            [disabled]="!checkValidity(f)" 
+            class="btn save" 
+            [class.clicked]="saveClicked" 
+            (click)="onSubmit(f)"
+        >
+        {{ saveClicked ? 'Saved' : 'Save' }}
+        </button>
+        <button class="btn discard" (click)="toggleEditMode()">Cancel</button>
+    </ng-container>
+  </footer>
+</div>

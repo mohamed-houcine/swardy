@@ -46,6 +46,7 @@
                     [data]="incomeData"
                     [colors]="incomeColors"
                     [legendPosition]="'right'"
+                    [entityName]="'Income'"
                 ></app-pie-chart>
             
                 <app-pie-chart [title]="'Expenses Distribution'"
@@ -53,9 +54,17 @@
                     [data]="expenseData"
                     [colors]="expenseColors"
                     [legendPosition]="'right'"
+                    [entityName]="'Expenses'"
                 ></app-pie-chart>
             </div>
 
         </div>
     </main>
+</div>
+
+<div class="loading-screen" *ngIf="loading">
+  <span>
+    <img src="assets/logo.svg" alt="swardy_logo">
+    <h2>Swardy</h2>
+  </span>
 </div>

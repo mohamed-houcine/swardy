@@ -54,27 +54,27 @@
         </div>
 
         <div class="input-form">
-          <label for="amount">Amount</label>
+          <label for="quantity">Quantity</label>
 
           <div class="input-box"
-              [class.invalid]="amount.invalid && (amount.touched || f.submitted) || errorMessage">
+              [class.invalid]="quantity.invalid && (quantity.touched || f.submitted) || errorMessage">
 
             <input 
                 type="number"
                 placeholder="1, 2, 3..."
-                id="amount"
-                name="amount"
-                [(ngModel)]="model.amount"
-                #amount="ngModel"
+                id="quantity"
+                name="quantity"
+                [(ngModel)]="model.quantity"
+                #quantity="ngModel"
                 required
                 value=""
             >
           </div>
 
           <div class="error"
-              *ngIf="amount.invalid && (amount.touched || f.submitted) || amount.value < 0">
-            <span *ngIf="amount.errors?.['required']">Amount is required.</span>
-            <span *ngIf="amount.value < 0">Amount should be positive.</span>
+              *ngIf="quantity.invalid && (quantity.touched || f.submitted) || quantity.value < 0">
+            <span *ngIf="quantity.errors?.['required']">quantity is required.</span>
+            <span *ngIf="quantity.value < 0">quantity should be positive.</span>
           </div>
         </div>
 
@@ -114,6 +114,27 @@
               rows="4"
             >
             </textarea>
+          </div>
+        </div>
+
+        <div class="input-form">
+          <label for="receipt">Receipt</label>
+
+          <div class="input-box" [class.invalid]="!isValidImage(selectedFile)">
+            <input
+              (change)="onFileSelected($event)"
+              type="file"
+              accept="image/*"
+              id="receipt"
+              name="receipt"
+              #fileInput
+              rows="4"
+            >
+          </div>
+
+          <div class="error"
+              *ngIf="!isValidImage(selectedFile)">
+            <span>The receipt file type should be either PNG or JPG.</span>
           </div>
         </div>
 

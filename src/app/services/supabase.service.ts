@@ -31,4 +31,6 @@ export class SupabaseService {
   get client() {
     return this.supabase;
   }
+
+  
 }

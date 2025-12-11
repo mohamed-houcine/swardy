@@ -5,11 +5,14 @@ import { TableColumn } from '../../shared/model/data-table/table-column.type';
 import { Product } from '../../shared/model/product';
 import { DashboardService } from '../../services/dashboard.service';
 import { MatDialog } from '@angular/material/dialog';
-import { addProductPopup } from '../../shared/components/add-product-popup/add-product-popup';
+import { addProductPopup } from '../../shared/components/product/add-product-popup/add-product-popup';
+import { ProductDetailsPopup } from '../../shared/components/product/product-details-popup/product-details-popup';
+import { ProductDeletePopup } from '../../shared/components/product/product-delete-popup/product-delete-popup';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-products',
-  imports: [PieChartComponent, DataTable],
+  imports: [PieChartComponent, DataTable, NgIf],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
@@ -19,6 +22,9 @@ export class Products {
     private dialog: MatDialog
   ) {}
 
+  productDetailsDialog = ProductDetailsPopup;
+  productDeleteDialog = ProductDeletePopup;
+
   // Pie Charts
   BSProductLabels: string[] = [];
   BSProductData: number[] = [];
@@ -27,6 +33,7 @@ export class Products {
   productIncomeLabels: string[] = [];
   productIncomeData: number[] = [];
   productIncomeColors: string[] = [];
+  loading: boolean = true;
 
   // Data Table
   ProductColumnsNames: TableColumn[] = [
@@ -46,6 +53,8 @@ export class Products {
       this.dash.fetchProducts()
     ]);
 
+    console.log(productDist);
+
     this.BSProductLabels = productDist.map(x => x.label);
     this.BSProductData = productDist.map(x => x.value);
     this.BSProductColors = productDist.map(x => x.color);
@@ -60,7 +69,8 @@ export class Products {
     this.productIncomeColors = productIncomeDist.map(x => x.color);
 
     this.ProductData = products;
-    console.log(products);
+    console.log(productIncomeDist);
+    this.loading = false;
   }
 
   onAddProduct() {

@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { Transaction, Type } from '../../model/transaction';
 import { Input } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 
 
 @Component({
   selector: 'app-recent-transaction-component',
-  imports: [NgFor],
+  imports: [NgFor,NgIf],
   templateUrl: './recent-transaction-component.html',
   styleUrl: './recent-transaction-component.css',
 })

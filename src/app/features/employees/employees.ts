@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import { PieChartComponent } from "../../shared/components/pie-chart/pie-chart";
 import { TotalComponent } from "../../shared/components/total-component/total-component";
-import { Dashboard } from "../dashboard/dashboard";
 import { DataTable } from "../../shared/components/data-table/data-table";
 import { TableColumn } from '../../shared/model/data-table/table-column.type';
 import { User } from '../../shared/model/user';
 import { DashboardService } from '../../services/dashboard.service';
 import { NgIf } from '@angular/common';
+import { addEmployeePopup } from '../../shared/components/employees/add-employee-popup/add-employee-popup';
+import { MatDialog } from '@angular/material/dialog';
+import { EmployeeDeletePopup } from '../../shared/components/employees/employee-delete-popup/employee-delete-popup';
 
 @Component({
   selector: 'app-employees',
@@ -15,8 +17,14 @@ import { NgIf } from '@angular/common';
   styleUrl: './employees.css',
 })
 export class Employees {
-  constructor(private dash: DashboardService) {}
+  constructor(
+    private dash: DashboardService,
+    private dialog: MatDialog
+  ) {}
 
+  deleteEmployeeDialog = EmployeeDeletePopup;
+
+  loading: boolean = true;
   totalEmployees!: number;
   EOMname!: string | undefined;
   EOMimg!: string | undefined;
@@ -58,5 +66,21 @@ export class Employees {
     this.GenderData = GenderDist.map(x => x.value);
     this.GenderColors = GenderDist.map(x => x.color);
     this.EmployeesData = employees;
+    this.loading = false;
   }
+
+  onAddEmployee() {
+    this.dialog.open(addEmployeePopup, {
+      width: '100vw',
+      maxWidth: '700px',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'popup',
+      autoFocus: false
+    });
+  }
+
+
+  msg ="Employees"
+
 }

@@ -100,7 +100,7 @@ export class addExpenseNormalPopup {
   }
 
   checkValidity(f: NgForm) {
-    return f.valid && this.model.amount != 0 && this.model.name != '' && !this.isDateInFuture() && this.model.category != '' && !this.isValidImage(this.selectedFile);
+    return f.valid && this.model.amount != 0 && this.model.name != '' && !this.isDateInFuture() && this.model.category != '' && this.isValidImage(this.selectedFile);
   }
   isValidImage(file: File | null): boolean {
     if(file === null) return true;

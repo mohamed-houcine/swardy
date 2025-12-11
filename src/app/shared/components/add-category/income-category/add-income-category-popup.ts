@@ -36,7 +36,8 @@ export class addIncomeCategoryPopup {
 
     try {
       await this.dash.addCategory(this.model, 'income');
-      f.reset({color: "#6558bf"});
+      f.reset(this.resetModel());
+      this.model = this.resetModel();
       this.errorMessage = "";
       this.animateAdd();
     } catch(err) {
@@ -46,5 +47,9 @@ export class addIncomeCategoryPopup {
 
   checkValidity(f: NgForm) {
     return f.valid && this.model.name != '';
+  }
+
+  resetModel() {
+    return {id: "", name: "", color: "#6558bf"}
   }
 }

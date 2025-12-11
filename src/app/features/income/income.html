@@ -1,24 +1,44 @@
-<main>
+<main *ngIf="!loading">
   <app-overview-chart
     title="Income Overview"
     type="income"
     [data]="overview"
-    (modeChange)="onModeChange($event)">
+    (modeChange)="onModeChange($event)"
+    >
+    
   </app-overview-chart>
 
   <app-data-table
-    title="Income Source"
+    title="{{title}}"
     [columns]="IncomeSourceColumnsNames"
     [data]="IncomeSourceData"
     [SearchFactors]="IncomeSourceSearchFactors"
+    [entityName]="msg"
     (onAdd)="onAddIncomeSource()"
-  ></app-data-table>
+    [detailsDialogComponent]="incomeSourceDetailsDialog"
+    [deleteDialogComponent]="incomeSourceDeleteDialog"
+    >
 
-  <app-data-table
-    title="Income From Product"
-    [columns]="IncomeProductColumnsNames"
-    [data]="IncomeProductData"
-    [SearchFactors]="IncomeProductSearchFactors"
-    (onAdd)="onAddIncomeProduct()"
-  ></app-data-table>
+  </app-data-table>
+
+  <div *ngIf="showProductTable">
+    <app-data-table
+      title="Income From Product"
+      [columns]="IncomeProductColumnsNames"
+      [data]="IncomeProductData"
+      [SearchFactors]="IncomeProductSearchFactors"
+      [entityName]="msg"
+      (onAdd)="onAddIncomeProduct()"
+      [detailsDialogComponent]="incomeProductDetailsDialog"
+      [deleteDialogComponent]="incomeProductDeleteDialog"
+      >
+    </app-data-table>
+  </div>
 </main>
+
+<div class="loading-screen" *ngIf="loading">
+  <span>
+    <img src="assets/logo.svg" alt="swardy_logo">
+    <h2>Swardy</h2>
+  </span>
+</div>

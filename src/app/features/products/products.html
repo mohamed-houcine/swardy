@@ -22,5 +22,14 @@
         [data]="ProductData"
         [SearchFactors]="ProductSearchFactors"
         (onAdd)="onAddProduct()"
+        [detailsDialogComponent]="productDetailsDialog"
+        [deleteDialogComponent]="productDeleteDialog"
     ></app-data-table>
 </main>
+
+<div class="loading-screen" *ngIf="loading">
+  <span>
+    <img src="assets/logo.svg" alt="swardy_logo">
+    <h2>Swardy</h2>
+  </span>
+</div>

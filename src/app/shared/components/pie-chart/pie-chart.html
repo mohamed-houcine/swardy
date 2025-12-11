@@ -1,16 +1,19 @@
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-
 <div class="container">
   <div class="header">
     <span>{{ title }}</span>
   </div>
 
-  <div class="chart">
+  <!-- Show chart if there is data -->
+  <div class="chart" *ngIf="hasData(); else noDataTemplate">
     <canvas #canvas></canvas>
   </div>
+
+  <!-- Placeholder when no data -->
+  <ng-template #noDataTemplate>
+    <div class="no-data">
+      No {{ entityName }} available
+    </div>
+  </ng-template>
 
   <div class="actions">
     <button (click)="exportPNG()">Export</button>

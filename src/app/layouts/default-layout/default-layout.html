@@ -1,6 +1,8 @@
 <div class="container">
-    <app-interf-options></app-interf-options>
-    <main>
-        <router-outlet></router-outlet>
-    </main>
+  <app-interf-options *ngIf="loaded && !showEmployeeDashboard" [showini]="showBusinessOptions"></app-interf-options>
+
+
+  <main>
+    <router-outlet></router-outlet>
+  </main>
 </div>

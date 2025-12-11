@@ -6,6 +6,7 @@ import { PieChartComponent } from "../../shared/components/pie-chart/pie-chart";
 import { RecentTransactionComponent } from "../../shared/components/recent-transaction-component/recent-transaction-component";
 import { DashboardService } from '../../services/dashboard.service';
 import { Transaction, Type } from '../../shared/model/transaction';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,7 +16,8 @@ import { Transaction, Type } from '../../shared/model/transaction';
     NetBalanceComponent,
     GoalComponent,
     PieChartComponent,
-    RecentTransactionComponent
+    RecentTransactionComponent,
+    NgIf
   ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
@@ -25,6 +27,7 @@ export class Dashboard implements OnInit {
   constructor(private dash: DashboardService) {}
 
   name: string = 'User';
+  loading: boolean = true;
 
   // TOTALS
   totalIncome = 0;
@@ -145,5 +148,6 @@ export class Dashboard implements OnInit {
     ]
     .sort((a, b) => +new Date(b.date) - +new Date(a.date))
     .slice(0, 5);
+    this.loading = false;
   }
 }

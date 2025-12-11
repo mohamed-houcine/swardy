@@ -9,6 +9,10 @@ import { ProductExpense } from '../../shared/model/product_expense';
 import { MatDialog } from '@angular/material/dialog';
 import { addExpenseNormalPopup } from '../../shared/components/expenses/add-expense-normal-popup/add-expense-normal-popup';
 import { addExpenseProductPopup } from '../../shared/components/expenses/add-expense-product-popup/add-expense-product-popup';
+import { ExpenseProductDetailsPopup } from '../../shared/components/expenses/expense-product-details-popup/expense-product-details-popup';
+import { ExpenseProductDeletePopup } from '../../shared/components/expenses/expense-product-delete-popup/expense-product-delete-popup';
+import { NormalExpenseDetailsPopup } from '../../shared/components/expenses/normal-expense-details-popup/normal-expense-details-popup';
+import { NormalExpenseDeletePopup } from '../../shared/components/expenses/normal-expense-delete-popup/normal-expense-delete-popup';
 
 @Component({
   selector: 'app-expense',
@@ -19,21 +23,44 @@ import { addExpenseProductPopup } from '../../shared/components/expenses/add-exp
 })
 export class Expenses implements OnInit {
 
+  expenseProductDetailsDialog = ExpenseProductDetailsPopup;
+  expenseProductDeleteDialog = ExpenseProductDeletePopup;
+  NormalExpenseDetailsDialog = NormalExpenseDetailsPopup;
+  NormalExpenseDeleteDialog = NormalExpenseDeletePopup;
+
   overview: { date: string; amount: number }[] = [];
   mode: 'weekly' | 'monthly' | 'yearly' = 'monthly';
 
   NormalExpensesData: NormalExpense[] = [];
   ProductExpensesData: ProductExpense[] = [];
+  loading: boolean = true;
+
 
   constructor(
     private dash: DashboardService,
     private dialog: MatDialog
   ) {}
+  showProductExpenses = false; // better name
+  title = "Expense";
 
   async ngOnInit() {
-    this.overview = await this.dash.getExpenseOverview(this.mode);
-    this.NormalExpensesData = await this.dash.fetchNormalExpenses();
-    this.ProductExpensesData = await this.dash.fetchProductExpenses();
+    // load all data in parallel
+    const [overview, normalExpenses, productExpenses, isBusiness] = await Promise.all([
+      this.dash.getExpenseOverview(this.mode),
+      this.dash.fetchNormalExpenses(),
+      this.dash.fetchProductExpenses(),
+      this.dash.isBusinessAccountSmart()
+    ]);
+
+    this.overview = overview;
+    this.NormalExpensesData = normalExpenses;
+    this.ProductExpensesData = productExpenses;
+
+    this.showProductExpenses = isBusiness;
+    this.loading = false;
+    if(this.showProductExpenses) this.title = "Normal Expense";
+
+    this.loading = false; // done loading
   }
 
   async onModeChange(m: 'weekly' | 'monthly' | 'yearly') {
@@ -82,4 +109,5 @@ export class Expenses implements OnInit {
       autoFocus: false
     });
   }
+  msg = 'Expenses'
 }

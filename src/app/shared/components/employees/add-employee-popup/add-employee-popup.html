@@ -1,0 +1,164 @@
+<div id="main-container">
+    <header>
+        <h1 class="title">Add Employee</h1>
+        <button class="close-btn" (click)="this.closeDialog()">
+            <img src="assets/icons/close.svg" alt="">
+        </button>
+    </header>
+    <hr>
+    <main>
+        <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
+
+        <div class="flx-spcbtwn gp-10">
+          <div class="input-form">
+            <label for="first_name">First Name</label>
+  
+            <div class="input-box"
+                [class.invalid]="first_name.invalid && (first_name.touched || f.submitted) || errorMessage || (model.first_name === null && (first_name.touched || f.submitted))">
+  
+              <input 
+                placeholder="Enter your first name"
+                id="first_name"
+                name="first_name"
+                [(ngModel)]="model.first_name"
+                #first_name="ngModel"
+                required
+              >
+            </div>
+  
+            <div class="error"
+                *ngIf="first_name.invalid && (first_name.touched || f.submitted)">
+              <span *ngIf="first_name.errors?.['required']">The First Name is required.</span>
+            </div>
+          </div>
+          
+          <div class="input-form">
+            <label for="last_name">Last Name</label>
+  
+            <div class="input-box"
+                [class.invalid]="last_name.invalid && (last_name.touched || f.submitted) || errorMessage || (model.last_name === null && (last_name.touched || f.submitted))">
+  
+              <input 
+                placeholder="Enter your last name"
+                id="last_name"
+                name="last_name"
+                [(ngModel)]="model.last_name"
+                #last_name="ngModel"
+                required
+              >
+            </div>
+  
+            <div class="error"
+                *ngIf="last_name.invalid && (last_name.touched || f.submitted)">
+              <span *ngIf="last_name.errors?.['required']">The Last Name is required.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flx-spcbtwn gp-10">
+          <div class="input-form">
+            <label for="Gender">Gender</label>
+
+            <div class="input-box"
+                [class.invalid]="(categoriesRef.invalid || model.gender == '') && (categoriesRef.touched || f.submitted) || errorMessage">
+
+              <div class="custom-select">
+                  <select name="categories" id="categories" #categoriesRef="ngModel" [(ngModel)]="model.gender" required>
+                      <option value="" disabled selected>Select the Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                  </select>
+                  <span class="custom-arrow"></span>
+              </div>
+            </div>
+            <div class="error"
+                *ngIf="(categoriesRef.invalid || model.gender == '') && (categoriesRef.touched || f.submitted)">
+              <span *ngIf="categoriesRef.errors?.['required']">Gender is required.</span>
+            </div>
+          </div>
+          <div class="input-form">
+            <label for="telephone">Telephone N°</label>
+  
+            <div class="input-box"
+                [class.invalid]="telephone.invalid && (telephone.touched || f.submitted) || errorMessage || (model.tel_number === null && (telephone.touched || f.submitted))">
+  
+              <input
+                type="tel"
+                placeholder="Enter your telephone number"
+                id="telephone"
+                name="telephone"
+                [(ngModel)]="model.tel_number"
+                #telephone="ngModel"
+                required
+              >
+            </div>
+  
+            <div class="error"
+                *ngIf="telephone.invalid && (telephone.touched || f.submitted)">
+              <span *ngIf="telephone.errors?.['required']">The Telephone N° is required.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-form">
+          <label for="email">Email</label>
+
+          <div class="input-box"
+              [class.invalid]="email.invalid && (email.touched || f.submitted) || errorMessage || (model.email === null && (email.touched || f.submitted))">
+
+            <input
+              type="email"
+              placeholder="Enter your email number"
+              id="email"
+              name="email"
+              [(ngModel)]="model.email"
+              #email="ngModel"
+              required
+              email
+            >
+          </div>
+
+          <div class="error"
+              *ngIf="email.invalid && (email.touched || f.submitted)">
+            <span *ngIf="email.errors?.['required']">The Email is required.</span>
+            <span *ngIf="email.errors?.['email']">Invalid email format.</span>
+
+          </div>
+        </div>
+
+        <div class="input-form">
+          <label for="password">Password</label>
+
+          <div class="input-box"
+              [class.invalid]="passwordRef.invalid && (passwordRef.touched || f.submitted) || errorMessage || (password === null && (passwordRef.touched || f.submitted))">
+
+            <input
+              type="password"
+              placeholder="Enter your password number"
+              id="password"
+              name="password"
+              [(ngModel)]="password"
+              #passwordRef="ngModel"
+              required
+              minlength="6"
+            >
+          </div>
+
+          <div class="error"
+              *ngIf="passwordRef.invalid && (passwordRef.touched || f.submitted)">
+            <span *ngIf="passwordRef.errors?.['required']">The Password is required.</span>
+            <span *ngIf="passwordRef.errors?.['invalid']">The password format is invalid.</span>
+
+          </div>
+        </div>
+
+        <span class="error flx-spcbtwn w-100" *ngIf="errorMessage">{{ errorMessage }}</span>
+      </form>
+    </main>
+    <footer>
+        <button [disabled]="!checkValidity(f)" type="submit" class="btn add" [class.clicked]="addClicked" (click)="onSubmit(f)">
+            {{addClicked? 'Added': 'Add'}}
+        </button>
+        <button class="btn discard" (click)="closeDialog()">Discard</button>
+    </footer>
+</div>

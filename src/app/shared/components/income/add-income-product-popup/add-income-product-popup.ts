@@ -79,9 +79,9 @@ export class addIncomeProductPopup {
   }
 
   async onCategoryChange(category: string) {
+
     try {
       this.products = await this.dash.fetchProductsByCategory(category);
-      console.log(this.products);
     } catch(err) {
       console.log(err);
     }

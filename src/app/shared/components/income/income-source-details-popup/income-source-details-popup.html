@@ -1,0 +1,172 @@
+<!-- income-details-popup.html -->
+<div id="main-container">
+  <header>
+    <h1 class="title">{{ isEditMode ? 'Edit' : 'Income Details' }}</h1>
+    <button class="close-btn" (click)="closeDialog()">
+      <img src="assets/icons/close.svg" alt="">
+    </button>
+  </header>
+  <hr>
+  
+  <main>
+    <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
+      
+      <!-- View Mode -->
+      <ng-container *ngIf="!isEditMode">
+        <div class="detail-row">
+          <span class="label">ID:</span>
+          <span class="value">{{ data.rowData.id }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Name:</span>
+          <span class="value">{{ data.rowData.name }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Category:</span>
+          <span class="value">{{ data.rowData.category }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Amount:</span>
+          <span class="value">${{ data.rowData.amount }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Date:</span>
+          <span class="value">{{ data.rowData.date }}</span>
+        </div>
+        <div class="detail-row" *ngIf="data.rowData.notes">
+          <span class="label">Notes:</span>
+          <span class="value">{{ data.rowData.notes }}</span>
+        </div>
+      </ng-container>
+
+      <!-- Edit Mode -->
+      <ng-container *ngIf="isEditMode">
+        
+        <!-- Name -->
+        <div class="input-form">
+          <label for="name">Name</label>
+          <div class="input-box"
+               [class.invalid]="name.invalid && (name.touched || f.submitted)">
+            <input 
+              placeholder="Income name"
+              id="name"
+              name="name"
+              [(ngModel)]="model.name"
+              #name="ngModel"
+              required
+            >
+          </div>
+          <div class="error" *ngIf="name.invalid && (name.touched || f.submitted)">
+            <span *ngIf="name.errors?.['required']">Name is required.</span>
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="input-form">
+          <label for="category">Category</label>
+          <div class="input-box"
+               [class.invalid]="category.invalid && (category.touched || f.submitted)">
+            <select 
+              id="category"
+              name="category"
+              [(ngModel)]="model.category"
+              #category="ngModel"
+              required
+            >
+              <option value="" disabled selected>Select a category</option>
+              <option *ngFor="let cat of categories" [value]="cat.id">
+                {{ cat.name }}
+              </option>
+            </select>
+          </div>
+          <div class="error" *ngIf="category.invalid && (category.touched || f.submitted)">
+            <span *ngIf="category.errors?.['required']">Category is required.</span>
+          </div>
+        </div>
+
+        <!-- Amount -->
+        <div class="input-form">
+          <label for="amount">Amount</label>
+          <div class="input-box"
+               [class.invalid]="amount.invalid && (amount.touched || f.submitted)">
+            <input 
+              type="number"
+              placeholder="0.00"
+              id="amount"
+              name="amount"
+              [(ngModel)]="model.amount"
+              #amount="ngModel"
+              required
+              min="0.01"
+            >
+          </div>
+          <div class="error" *ngIf="amount.invalid && (amount.touched || f.submitted)">
+            <span *ngIf="amount.errors?.['required']">Amount is required.</span>
+            <span *ngIf="amount.errors?.['min']">Amount must be greater than 0.</span>
+          </div>
+        </div>
+
+        <!-- Date -->
+        <div class="input-form">
+          <label for="date">Date</label>
+          <div class="input-box"
+               [class.invalid]="date.invalid && (date.touched || f.submitted)">
+            <input 
+              type="date"
+              id="date"
+              name="date"
+              [(ngModel)]="model.date"
+              #date="ngModel"
+              required
+            >
+          </div>
+          <div class="error" *ngIf="date.invalid && (date.touched || f.submitted)">
+            <span *ngIf="date.errors?.['required']">Date is required.</span>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="input-form">
+          <label for="notes">Notes (Optional)</label>
+          <div class="input-box">
+            <textarea 
+              placeholder="Additional notes..."
+              id="notes"
+              name="notes"
+              [(ngModel)]="model.notes"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+      </ng-container>
+
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="errorMessage">
+        <span class="error-icon">⚠</span>
+        {{ errorMessage }}
+      </div>
+
+    </form>
+  </main>
+
+  <footer>
+    <!-- View Mode Buttons -->
+    <ng-container *ngIf="!isEditMode">
+      <button class="btn edit" (click)="toggleEditMode()">Edit</button>
+    </ng-container>
+
+    <!-- Edit Mode Buttons -->
+    <ng-container *ngIf="isEditMode">
+        <button 
+            [disabled]="!checkValidity(f)" 
+            class="btn save" 
+            [class.clicked]="saveClicked" 
+            (click)="onSubmit(f)"
+        >
+        {{ saveClicked ? 'Saved' : 'Save' }}
+        </button>
+        <button class="btn discard" (click)="toggleEditMode()">Cancel</button>
+    </ng-container>
+  </footer>
+</div>

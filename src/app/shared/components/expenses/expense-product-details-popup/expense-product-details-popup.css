@@ -1,3 +1,97 @@
+
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+
+main {
+  padding: 20px 0;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* View Mode Styles */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.label {
+  font-weight: 600;
+  color: #666;
+}
+
+.value {
+  color: #333;
+  text-align: right;
+}
+
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn.edit {
+  background: #6558bf;
+  color: white;
+}
+
+.btn.edit:hover:not(:disabled) {
+  background: #5447a8;
+}
+
+.btn.close {
+  background: #f3f4f6;
+  color: #333;
+}
+
+.btn.close:hover {
+  background: #e5e7eb;
+}
+
+.btn.save {
+  background: #10b981;
+  color: white;
+}
+
+.btn.save:hover:not(:disabled) {
+  background: #059669;
+}
+
+.btn.save.clicked {
+  background: #059669;
+  animation: pulse 0.7s ease;
+}
+
+.btn.discard {
+  background: #f3f4f6;
+  color: #333;
+}
+
+.btn.discard:hover {
+  background: #e5e7eb;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
 #main-container {
     width: 100%;
     overflow-y: auto;
@@ -248,7 +342,7 @@ select {
   opacity: 0.8;
 }
 
-.input-box.invalid :is(input, select, textarea) {
+.input-box.invalid :is(input, select) {
   border: 2px solid #e53935;
   background: #fff5f5;
 }

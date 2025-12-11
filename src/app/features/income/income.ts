@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OverviewChartComponent } from '../../shared/components/overview-chart/overview-chart';
 import { DashboardService } from '../../services/dashboard.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { DataTable } from "../../shared/components/data-table/data-table";
 import { TableColumn } from '../../shared/model/data-table/table-column.type';
 import { IncomeSource } from '../../shared/model/income_source';
@@ -9,16 +9,23 @@ import { IncomeProduct } from '../../shared/model/income_product';
 import { MatDialog } from '@angular/material/dialog';
 import { addIncomeSourcePopup } from '../../shared/components/income/add-income-source-popup/add-income-source-popup';
 import { addIncomeProductPopup } from '../../shared/components/income/add-income-product-popup/add-income-product-popup';
+import { IncomeSourceDetailsPopup } from '../../shared/components/income/income-source-details-popup/income-source-details-popup';
+import { IncomeSourceDeletePopup } from '../../shared/components/income/income-source-delete-popup/income-source-delete-popup';
+import { IncomeProductDetailsPopup } from '../../shared/components/income/income-product-details-popup/income-product-details-popup';
+import { IncomeProductDeletePopup } from '../../shared/components/income/income-product-delete-popup/income-product-delete-popup';
 
 @Component({
   selector: 'app-income',
   standalone: true,
-  imports: [CommonModule, OverviewChartComponent, DataTable],
+  imports: [CommonModule, OverviewChartComponent, DataTable, NgIf],
   templateUrl: './income.html',
   styleUrls: ['./income.css']
 })
 export class Income implements OnInit {
-
+  incomeSourceDetailsDialog = IncomeSourceDetailsPopup;
+  incomeSourceDeleteDialog = IncomeSourceDeletePopup;
+  incomeProductDetailsDialog = IncomeProductDetailsPopup;
+  incomeProductDeleteDialog = IncomeProductDeletePopup;
   overview: { date: string; amount: number }[] = [];
   mode: 'weekly' | 'monthly' | 'yearly' = 'monthly';
 
@@ -26,23 +33,44 @@ export class Income implements OnInit {
   IncomeSourceData: IncomeSource[] = [];
   IncomeProductData: IncomeProduct[] = [];
 
-  constructor(
-    private dash: DashboardService,
-    private dialog: MatDialog
-  ) {}
 
   // ---------------------------------------------------
   //  INIT: load overview + income table from Supabase
   // ---------------------------------------------------
+
+  isBusiness = false;
+  loading: boolean = true;
+  showProductTable = false;
+  title = "Income";
+
+  // inject MatDialog + DashboardService
+  constructor(private dash: DashboardService, private dialog: MatDialog) {}
+
   async ngOnInit() {
-    this.overview = await this.dash.getIncomeOverview(this.mode);
-    this.IncomeSourceData = await this.dash.fetchIncomeSources();
-    this.IncomeProductData = await this.dash.fetchIncomeProducts();
+    try {
+      await this.dash.loadCurrentUser();
+      this.isBusiness = this.dash.isBusinessCached();
+
+      this.showProductTable = await this.dash.isBusinessAccountSmart();
+      if (this.showProductTable) this.title = "Income Source";
+
+      const [overview, sources, products] = await Promise.all([
+        this.dash.getIncomeOverview(this.mode),
+        this.dash.fetchIncomeSources(),
+        this.dash.fetchIncomeProducts()
+      ]);
+
+      this.overview = overview;
+      this.IncomeSourceData = sources;
+      this.IncomeProductData = products;
+      this.loading = false;
+    } catch (err) {
+      console.error("Failed to load income data:", err);
+    } finally {
+      this.loading = false;
+    }
   }
 
-  // ---------------------------------------------------
-  //  When dropdown mode changes
-  // ---------------------------------------------------
   async onModeChange(m: 'weekly' | 'monthly' | 'yearly') {
     this.mode = m;
     this.overview = await this.dash.getIncomeOverview(m);
@@ -95,6 +123,6 @@ export class Income implements OnInit {
       autoFocus: false
     });
   }
-
+  msg="Income"
 
 }

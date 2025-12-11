@@ -1,0 +1,21 @@
+<div id="main-container">
+  <header>
+    <h1 class="title">Delete Income Product</h1>
+    <button class="close-btn" (click)="closeDialog()">
+      <img src="assets/icons/close.svg" alt="">
+    </button>
+  </header>
+  <hr>
+  <main>
+    <p class="warning">⚠️ Are you sure you want to delete this income product?</p>
+    <p class="detail"><strong>Product:</strong> {{ data.rowData.product }}</p>
+    <p class="detail"><strong>Category:</strong> {{ data.rowData.category }}</p>
+    <p class="detail"><strong>Quantity:</strong> {{ data.rowData.quantity }}</p>
+    <p class="detail"><strong>Amount:</strong> ${{ data.rowData.amount }}</p>
+    <p class="note">This action cannot be undone.</p>
+  </main>
+  <footer>
+    <button class="btn discard" (click)="closeDialog()">Cancel</button>
+    <button class="btn delete" (click)="confirmDelete()">Delete</button>
+  </footer>
+</div>

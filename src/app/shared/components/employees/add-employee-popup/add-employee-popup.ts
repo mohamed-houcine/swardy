@@ -2,12 +2,12 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef} from '@angular/material/dialog';
 import { FormsModule, NgForm} from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
-import { DashboardService } from '../../../services/dashboard.service';
-import { addProductCategoryPopup } from '../add-category/product-category/add-product-category-popup';
+import { DashboardService } from '../../../../services/dashboard.service';
+import { addProductCategoryPopup } from '../../add-category/product-category/add-product-category-popup';
 
 @Component({
   selector: 'app-add-income-source-popup',
-  imports: [FormsModule, NgIf, NgFor],
+  imports: [FormsModule, NgIf],
   templateUrl: './add-employee-popup.html',
   styleUrl: './add-employee-popup.css'
 })
@@ -15,12 +15,8 @@ export class addEmployeePopup {
   @ViewChild('fileInput') fileInput!: ElementRef;
 
   addClicked: boolean = false;
-  model = {
-    name: "",
-    category: "",
-    price: 0,
-    description: ""
-  };
+  model = this.resetModel();
+  password: string = "";
   errorMessage: string = "";
   selectedFile: File | null = null;
 
@@ -46,8 +42,8 @@ export class addEmployeePopup {
 
     try {
 
-      await this.dash.addProduct(
-        this.model
+      await this.dash.addEmployee(
+        {...this.model, password: this.password}
       );
       f.reset(this.resetModel());
       this.model = this.resetModel();
@@ -74,11 +70,11 @@ export class addEmployeePopup {
   }
 
   resetModel() {
-    return {name: "", category: "", price: 0, description: ""};
+    return { first_name: "", last_name: "", gender: "", tel_number: 0, email: "" };
   }
 
   checkValidity(f: NgForm) {
-    return f.valid && this.model.price != 0 && this.model.name != '' && this.model.category != '';
+    return f.valid && this.model.first_name != '' && this.model.last_name != '' && this.model.email != '' && this.model.gender != '' && this.model.tel_number != null;
   }
   isValidImage(file: File | null): boolean {
     if(file === null) return true;

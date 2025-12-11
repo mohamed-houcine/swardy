@@ -40,6 +40,7 @@
             [data]="GenderData"
             [colors]="GenderColors"
             legentPosition="right"
+            [entityName]="msg"
         ></app-pie-chart>
     </div>
     <app-data-table
@@ -47,5 +48,17 @@
         [columns]="EmployeesColumnsNames"
         [data]="EmployeesData"
         [SearchFactors]="EmployeesSearchFactors"
+        [entityName]="msg"
+        (onAdd)="onAddEmployee()"
+        [useRouterForDetails]="true"
+        [detailsRoutePrefix]="'/profile'"
+        [deleteDialogComponent]="deleteEmployeeDialog"
     ></app-data-table>
 </main>
+
+<div class="loading-screen" *ngIf="loading">
+  <span>
+    <img src="assets/logo.svg" alt="swardy_logo">
+    <h2>Swardy</h2>
+  </span>
+</div>

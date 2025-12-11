@@ -26,4 +26,6 @@ export interface User {
   currency: string;
   language: string;
   theme: ThemeMode;
+  id_manager?:string;
 }
+

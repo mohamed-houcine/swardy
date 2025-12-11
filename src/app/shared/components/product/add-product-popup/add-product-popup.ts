@@ -2,8 +2,8 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef} from '@angular/material/dialog';
 import { FormsModule, NgForm} from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
-import { DashboardService } from '../../../services/dashboard.service';
-import { addProductCategoryPopup } from '../add-category/product-category/add-product-category-popup';
+import { DashboardService } from '../../../../services/dashboard.service';
+import { addProductCategoryPopup } from '../../add-category/product-category/add-product-category-popup';
 
 @Component({
   selector: 'app-add-income-source-popup',

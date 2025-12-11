@@ -16,10 +16,11 @@ export class addExpenseProductPopup {
   model = {
     product: "",
     category: "",
-    amount: 0,
+    quantity: 0,
     notes: '',
     date: new Date().toISOString().split('T')[0]
   };
+  selectedFile: File | null = null;
   errorMessage: string = "";
 
   categories!: {id: string, name: string}[];
@@ -44,13 +45,16 @@ export class addExpenseProductPopup {
     if (!this.checkValidity(f)) return;
 
     try {
-      await this.dash.addIncomeSource(this.model);
+      await this.dash.addExpenseProduct(
+        this.model,
+        this.selectedFile
+      );
       f.reset(this.resetModel());
       this.model = this.resetModel();
       this.errorMessage = "";
       this.animateAdd();
     } catch(err) {
-      this.errorMessage = "An Error occured while adding income source";
+      this.errorMessage = "An Error occured while adding expense";
     }
   }
 
@@ -75,7 +79,7 @@ export class addExpenseProductPopup {
   }
 
   async updateCategories() {
-    this.categories = await this.dash.fetchCategoriesByType('income');
+    this.categories = await this.dash.fetchCategoriesByType('expense');
   }
 
   async onCategoryChange(category: string) {
@@ -88,10 +92,26 @@ export class addExpenseProductPopup {
   }
 
   resetModel() {
-    return {product: "", category: "", amount: 0, notes: '', date: new Date().toISOString().split('T')[0]};
+    return {product: "", category: "", quantity: 0, notes: '', date: new Date().toISOString().split('T')[0]};
   }
 
   checkValidity(f: NgForm) {
-    return f.valid && this.model.amount != 0 && this.model.product != '' && !this.isDateInFuture() && this.model.category != '';
+    return f.valid && this.model.quantity != 0 && this.model.product != '' && !this.isDateInFuture() && this.model.category != '' && this.isValidImage(this.selectedFile);
   }
+
+  isValidImage(file: File | null): boolean {
+    if(file === null) return true;
+    const allowedExtensions = ['png', 'jpg', 'jpeg'];
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    return fileExtension ? allowedExtensions.includes(fileExtension) : false;
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+    }
+  }
+
 }

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
+import { Router } from '@angular/router';
 
 import html2canvas from 'html2canvas';
 import { FormsModule } from '@angular/forms';
@@ -13,7 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./data-table.css'],
 })
 export class DataTable {
-  constructor (private dialog: MatDialog) {}
+  constructor (private dialog: MatDialog, private router: Router) {}
   
   Math = Math;
 
@@ -22,14 +23,80 @@ export class DataTable {
   @Input() columns!: TableColumn[];
   @Input() data!: any[];
   @Input() SearchFactors!: string[];
+  @Input() entityName:string="Data"
+  @Input() detailsDialogComponent!: any; // Component for details popup
+  @Input() deleteDialogComponent!: any;  // Component for delete popup
+  @Input() detailsRoutePrefix?: string;  // NEW: e.g., '/products' or '/employees'
+  @Input() useRouterForDetails: boolean = false; // NEW: Flag to use router instead of dialog
 
   // Outputs
   @Output() onAdd = new EventEmitter<void>();
+  @Output() onDetailsClick = new EventEmitter<any>(); // NEW: For custom logic
 
   handleAddClick() {
     this.onAdd.emit();
   }
 
+  // Open Details Dialog or Navigate
+  openDetails(row: any) {
+    // Option 1: Emit event for parent to handle (most flexible)
+    if (this.onDetailsClick.observers.length > 0) {
+      this.onDetailsClick.emit(row);
+      return;
+    }
+
+    // Option 2: Use router navigation
+    if (this.useRouterForDetails && this.detailsRoutePrefix) {
+      this.router.navigate([`${this.detailsRoutePrefix}/${row.id}`]);
+      return;
+    }
+
+    // Option 3: Use dialog (default behavior)
+    if (!this.detailsDialogComponent) {
+      console.error('No details dialog component provided');
+      return;
+    }
+
+    const dialogRef = this.dialog.open(this.detailsDialogComponent, {
+      data: { id: row.id, rowData: { ...row } },
+      width: '600px',
+      panelClass: 'popup'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.updatedRow) {
+        const index = this.data.findIndex(item => item.id === result.updatedRow.id);
+        if (index !== -1) {
+          this.data[index] = { ...result.updatedRow };
+          this.sortedData = [...this.data];
+        }
+      }
+    });
+  }
+
+  // Open Delete Dialog
+  openDelete(row: any) {
+    if (!this.deleteDialogComponent) {
+      console.error('No delete dialog component provided');
+      return;
+    }
+
+    const dialogRef = this.dialog.open(this.deleteDialogComponent, {
+      data: { id: row.id, rowData: row },
+      width: '400px',
+      panelClass: 'popup'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'deleted') {
+        this.data = this.data.filter(item => item.id !== row.id);
+        this.sortedData = [...this.data];
+      }
+    });
+  }
+
+  // ... rest of the code remains the same
+  
   // Pagination
   pageSizeOptions = [5, 10, 20, 50];
   pageSize = 5;
@@ -53,21 +120,17 @@ export class DataTable {
     }
   }
 
-  // ------------ Computed properties ------------
-
   get filteredData() {
     if (!this.searchTerm) return this.sortedData;
 
     const term = this.searchTerm.toLowerCase();
 
-    // Search in primary factors first
     let results = this.sortedData.filter(item =>
       this.SearchFactors.some(factor =>
         item[factor] != null && String(item[factor]).toLowerCase().includes(term)
       )
     );
 
-    // Fallback: search in all fields
     if (results.length === 0) {
       results = this.sortedData.filter(item =>
         Object.keys(item).some(key =>
@@ -88,8 +151,6 @@ export class DataTable {
   get totalPages() {
     return Math.max(1, Math.ceil(this.filteredData.length / this.pageSize));
   }
-
-  // ------------ Methods ------------
 
   ngOnChanges() {
     this.sortedData = [...this.data];
@@ -131,7 +192,6 @@ export class DataTable {
     this.currentPage = 1;
   }
 
-  // ------------ Export ------------
   isExportMenuOpen: boolean = false;
 
   toggleMenu() {
@@ -193,7 +253,6 @@ export class DataTable {
       alert('PNG export failed. Check console.');
     }
   }
-
 
   private convertToCSV(data: any[]) {
     if (!data || data.length === 0) return '';
