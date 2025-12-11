@@ -7,6 +7,7 @@ import { RecentTransactionComponent } from "../../shared/components/recent-trans
 import { DashboardService } from '../../services/dashboard.service';
 import { Transaction, Type } from '../../shared/model/transaction';
 import { NgIf } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,7 +25,11 @@ import { NgIf } from '@angular/common';
 })
 export class Dashboard implements OnInit {
 
-  constructor(private dash: DashboardService) {}
+
+   constructor(
+    private dash: DashboardService,
+    private router: Router
+  ) {}
 
   name: string = 'User';
   loading: boolean = true;
@@ -49,7 +54,23 @@ export class Dashboard implements OnInit {
   // GOAL (example: user sets 40K goal)
   goalAmount!: number | null;
 
+  // Navigation method to profile
+  navigateToProfile() {
+    this.router.navigate(['/profile']);
+  }
+
   async getCurrentUserProfile() {
+    // Use the cached user from DashboardService
+    const user = await this.dash.loadCurrentUser();
+    
+    if (user) {
+      return {
+        first_name: user.first_name,
+        last_name: user.last_name
+      };
+    }
+
+    // Fallback to direct query if needed
     const { data: auth } = await this.dash.supabase.client.auth.getUser();
     const uid = auth.user?.id;
     if (!uid) return null;
@@ -73,7 +94,7 @@ export class Dashboard implements OnInit {
     // 1️⃣ Load user name
     const profile = await this.getCurrentUserProfile();
 
-    this.name = profile?.first_name + ' ' + profile?.last_name;
+    this.name = profile ? `${profile.first_name} ${profile.last_name}` : 'User';
 
     // 2️⃣ Load everything from Supabase in parallel
     const [incomes, expenses, categories, goal] = await Promise.all([

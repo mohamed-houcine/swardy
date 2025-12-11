@@ -1,19 +1,120 @@
-<div class="login-wrapper">
-  <div class="login-card">
+<div class="layout">
+  <!-- Left Poster Section -->
+  <div class="poster">
+    <div class="text">
+      <h3>Track, Analyze, Succeed</h3>
+      <h2>Your financial journey starts here</h2>
+    </div>
+    <div class="poster-image">
+      <img src="/assets/images/dashboard.png" alt="">
+    </div>
+  </div>
 
-    <h2>Welcome To Swardi</h2>
-    <p class="subtitle">Please login to continue</p>
+  <!-- Right Login Section -->
+  <div class="main-container">
+    <!-- Logo avec image SVG -->
+    <div class="logo-container">
+      <img src="/assets/logo.svg" alt="Swardy Logo">
+      <h1 class="logo">Swardy</h1>
+    </div>
+    
+    <div class="login-container">
+      <h2>Welcome Back</h2>
+      <h4>Enter your credentials to access your account</h4>
 
-    <form (submit)="submit($event)">
-      <input type="email" placeholder="Email" [(ngModel)]="email" name="email" required />
+      <form #f="ngForm" (ngSubmit)="submit($event)" novalidate>
+        
+        <!-- Email Input -->
+        <div class="input-form">
+          <label for="email">Email</label>
+          <div class="input-box" 
+               [class.invalid]="emailRef.invalid && (emailRef.touched || f.submitted) || error">
+            <span class="left-icon icon-email"></span>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              [(ngModel)]="email"
+              #emailRef="ngModel"
+              placeholder="Enter your email address"
+              required
+              email
+            >
+          </div>
+          <div class="error" *ngIf="emailRef.invalid && (emailRef.touched || f.submitted)">
+            <span *ngIf="emailRef.errors?.['required']">Email is required</span>
+            <span *ngIf="emailRef.errors?.['email']">Invalid email format</span>
+          </div>
+        </div>
 
-      <input type="password" placeholder="Password" [(ngModel)]="password" name="password" required />
+        <!-- Password Input -->
+        <div class="input-form">
+          <label for="password">Password</label>
+          <div class="input-box"
+               [class.invalid]="passwordRef.invalid && (passwordRef.touched || f.submitted) || error">
+            <span class="left-icon icon-lock"></span>
+            <input 
+              [type]="showPassword ? 'text' : 'password'"
+              id="password" 
+              name="password" 
+              [(ngModel)]="password"
+              #passwordRef="ngModel"
+              placeholder="Enter your password"
+              required
+              minlength="6"
+            >
+            <span 
+              [class]="showPassword ? 'right-icon icon-eye-off' : 'right-icon icon-eye'"
+              (click)="showPassword = !showPassword"
+            ></span>
+          </div>
+          <div class="error" *ngIf="passwordRef.invalid && (passwordRef.touched || f.submitted)">
+            <span *ngIf="passwordRef.errors?.['required']">Password is required</span>
+            <span *ngIf="passwordRef.errors?.['minlength']">Minimum 6 characters</span>
+          </div>
+        </div>
 
-      <button type="submit">Login</button>
-    </form>
+        <!-- Remember Me & Forgot Password -->
+        <div class="remember-forgot">
+          <label class="remember-me">
+            <input type="checkbox" name="rememberMe" [(ngModel)]="rememberMe">
+            <span>Remember me</span>
+          </label>
+          <a routerLink="/forgot-password" class="forgot-password">Forgot password?</a>
+        </div>
 
-    <p *ngIf="error" class="error">{{ error }}</p>
+        <!-- Error Message -->
+        <div class="error" *ngIf="error" style="margin-bottom: 15px; text-align: center;">
+          {{ error }}
+        </div>
 
-    <p class="switch">No account ? <a routerLink="/signup">Sign up</a></p>
+        <!-- Submit Button -->
+        <button type="submit" [disabled]="f.invalid">Login</button>
+
+        <!-- Social Login -->
+        <div class="alternative">
+          <div class="title">
+            <hr>
+            <span>or continue with</span>
+            <hr>
+          </div>
+          <div class="platforms">
+            <div title="Login with Google"><span class="icon-google"></span></div>
+            <div title="Login with Facebook"><span class="icon-facebook"></span></div>
+            <div title="Login with GitHub"><span class="icon-github"></span></div>
+            <div title="Login with LinkedIn"><span class="icon-linkedin"></span></div>
+          </div>
+          <div class="signup-link">
+            Don't have an account?<a routerLink="/signup">Sign up</a>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>By logging in to Swardy you agree to our</p>
+      <p><a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+    </div>
   </div>
 </div>

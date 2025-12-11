@@ -8,8 +8,7 @@
     <a *ngFor="let f of interfOptions"
        (click)="setActiveinterfOptionsKey(f.key)"
        [class.active]="f.key === activeinterfOptionsKey"
-       [routerLink]="f.path"
-       >
+       [routerLink]="f.path">
       <div class="icon-wrap" [class.active]="f.key === activeinterfOptionsKey">
         <img [src]="f.key === activeinterfOptionsKey ? f.activeIconUrl : f.iconUrl" />
       </div>
@@ -17,12 +16,25 @@
     </a>
   </div>
 
-  <div class="profile">
-    <img src="/assets/images/hama.png" alt="avatar">
+  <a class="profile" 
+     routerLink="/profile"
+     (click)="setActiveinterfOptionsKey(-1)"
+     [class.active]="activeinterfOptionsKey === -1">
+    <!-- Dynamic Avatar Display -->
+    <div class="profile-avatar" [class.has-image]="hasAvatar()">
+      <img *ngIf="hasAvatar()" 
+           [src]="getAvatarUrl()" 
+           alt="Profile avatar"
+           class="avatar-image">
+      <span *ngIf="!hasAvatar()" class="avatar-initials">
+        {{ getInitials() }}
+      </span>
+    </div>
     <span>Profile</span>
-  </div>
-
-  <li (click)="logout()" class="logout-btn">
+     <li class="logout-btn" (click)="logout()" role="button" tabindex="0">
   <span>Logout</span>
 </li>
+  </a>
+
+
 </div>

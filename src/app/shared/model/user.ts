@@ -1,6 +1,6 @@
 export enum UserType {
-  PERSONAL = 'Personal',
-  BUSINESS = 'Business'
+  PERSONAL = 'personal',
+  BUSINESS = 'business'
 }
 
 export enum UserRole {
@@ -27,5 +27,8 @@ export interface User {
   language: string;
   theme: ThemeMode;
   id_manager?:string;
+  avatar_url?: string| null;
+  goal?: number;
+
 }
 

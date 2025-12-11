@@ -315,7 +315,6 @@ export class EmployeeProductFormComponent implements OnInit {
         this.model.product = this.products[0].id;
       } else {
         this.model.product = "";
-        this.errorMessage = "No products available in this category";
       }
     } catch (err) {
       console.error('Error loading products:', err);

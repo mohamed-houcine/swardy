@@ -14,6 +14,9 @@
     padding: 30px;
     color: white;
     box-shadow: 0 4px 20px rgba(101, 88, 191, 0.2);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .welcome-section {
@@ -234,6 +237,13 @@
     }
 }
 
+
+.avatar-image{
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+}
+
 @media (max-width: 450px) {
     .title {
         font-size: 20px;
@@ -256,4 +266,55 @@
     .stat-value {
         font-size: 18px;
     }
+}
+
+
+.logout-btn {
+  list-style: none;
+  padding: 10px 16px;
+  margin: 12px 0;
+  background: linear-gradient(180deg, #ffffff, #fafbfc);
+  border: 1px solid #e6e8ec;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #2d2d2d;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  user-select: none;
+}
+
+.logout-btn:hover {
+  background: #ff2f32;
+  border-color: #d32b2c;
+  transform: translateX(2px);
+  box-shadow: 0 4px 10px rgba(255, 0, 0, 0.18);
+  color: white;
+}
+
+.logout-btn:active {
+  transform: translateX(1px) scale(0.98);
+  background: #e6282a;
+  color: white;
+}
+
+.logout-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.4);
+}
+
+
+.divi{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+a{
+    text-decoration: none   ;
+    color: white;
 }
