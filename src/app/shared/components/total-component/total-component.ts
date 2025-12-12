@@ -13,4 +13,5 @@ export class TotalComponent {
   @Input() imagePath!: string;
   @Input() bigPicture: boolean = false;
   @Input() currency!: string | undefined;
+  @Input() withCurrency: boolean = true;
 }

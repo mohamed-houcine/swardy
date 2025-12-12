@@ -21,7 +21,7 @@
             </div>
 
             <div class="right" [style.color]="getAmountColor(t)" [style.backgroundColor]="getbackgroundcolor(t)">
-                ${{ t.amount }}
+                {{currency}} {{ t.amount }}
                 <img [src]="getArrow(t)" class="arrow" alt="" />
             </div>
         </div>

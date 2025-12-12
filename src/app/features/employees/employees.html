@@ -7,6 +7,7 @@
                 [value]="totalEmployees"
                 imagePath="/assets/icons/employees_1.svg"
                 [currency]="user?.currency"
+                [withCurrency]="false"
             ></app-total-component>
             
             <app-total-component *ngIf="EOMname && EOMimg"
@@ -15,6 +16,7 @@
                 [imagePath]="EOMimg"
                 [bigPicture]="true"
                 [currency]="user?.currency"
+                [withCurrency]="false"
             ></app-total-component>
     
         </div>
@@ -33,6 +35,7 @@
                 [value]="activeEmployees"
                 imagePath="/assets/icons/employees_1.svg"
                 [currency]="user?.currency"
+                [withCurrency]="false"
             ></app-total-component>
         </div>
         <app-pie-chart

@@ -13,6 +13,7 @@ import { NgFor, NgIf } from '@angular/common';
 export class RecentTransactionComponent {
 
   @Input() arr! : Transaction[];
+  @Input() currency!: string | undefined;
 
   getIcon(t: Transaction) {
     if (t.type === Type.EXPENSE) return "/assets/icons/expense_1.svg  ";

@@ -71,7 +71,7 @@ export class Expenses implements OnInit {
   NormalExpensesColumnsNames: TableColumn[] = [
     { title: "Name", iconUrl: "assets/icons/data-table/name.svg", canBeSorted: true, key: "name" },
     { title: "Category", iconUrl: "assets/icons/data-table/numbers.svg", canBeSorted: true, key: "category" },
-    { title: "Amount ($)", iconUrl: "assets/icons/data-table/amount.svg", canBeSorted: true, key: "amount" },
+    { title: "Amount", iconUrl: "assets/icons/data-table/amount.svg", canBeSorted: true, key: "amount" },
     { title: "Date", iconUrl: "assets/icons/data-table/date.svg", canBeSorted: true, key: "date" },
     {title: "Actions", iconUrl: "assets/icons/data-table/actions.svg", canBeSorted: false, key: ""}
   ];
@@ -80,7 +80,7 @@ export class Expenses implements OnInit {
     { title: "Product Name", iconUrl: "assets/icons/data-table/name.svg", canBeSorted: true, key: 'productName'},
     { title: "Category", iconUrl: "assets/icons/data-table/category.svg", canBeSorted: true, key: 'category'},
     { title: "Quantity", iconUrl: "assets/icons/data-table/numbers.svg", canBeSorted: true, key: 'quantity'},
-    { title: "Amount ($)", iconUrl: "assets/icons/data-table/amount.svg", canBeSorted: true, key: 'amount'},
+    { title: "Amount", iconUrl: "assets/icons/data-table/amount.svg", canBeSorted: true, key: 'amount'},
     { title: "Date", iconUrl: "assets/icons/data-table/date.svg", canBeSorted: true, key: 'date'},
     {title: "Actions", iconUrl: "assets/icons/data-table/actions.svg", canBeSorted: false, key: ""}
   ];

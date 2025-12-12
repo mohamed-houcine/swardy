@@ -30,12 +30,11 @@
                 [currency]="user?.currency"
             ></app-total-component>
 
-
-
             <div class="left">
                 <app-net-balance></app-net-balance>
                 <app-recent-transaction-component
                     [arr]="transactions"
+                    [currency]="user?.currency"
                 ></app-recent-transaction-component>
 
             </div>

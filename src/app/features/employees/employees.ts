@@ -58,6 +58,7 @@ export class Employees {
       this.dash.fetchEmployees(),
       this.dash.loadCurrentUser()
     ]);
+    console.log(EOM);
 
     this.totalEmployees = totalEmployees;
     this.EOMname = EOM?.name;
