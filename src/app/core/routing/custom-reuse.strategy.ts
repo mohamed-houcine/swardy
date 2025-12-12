@@ -4,7 +4,7 @@ import { BaseRouteReuseStrategy } from './base-route-reuse-strategy.service';
 export class CustomRouteReuseStrategy extends BaseRouteReuseStrategy {
   private storedRoutes = new Map<string, DetachedRouteHandle>();
 
-  // ✅ Choose ONLY the pages you want to cache
+  
   override shouldDetach(route: ActivatedRouteSnapshot): boolean {
     const path = route.routeConfig?.path;
 
@@ -13,7 +13,6 @@ export class CustomRouteReuseStrategy extends BaseRouteReuseStrategy {
       'income',
       'expenses',
       'employees',
-      'notifications',
       'products',
       'employee'
     ];

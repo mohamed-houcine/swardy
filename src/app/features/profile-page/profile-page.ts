@@ -2,14 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { User, UserRole, UserType, ThemeMode } from '../../shared/model/user';
 import { FormsModule } from '@angular/forms';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass, NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { Country } from '../../shared/model/country';
+import { Currency } from '../../shared/model/currency';
 
 
 @Component({
   selector: 'app-profile-page',
-  imports: [FormsModule,NgIf,NgClass,RouterLink],
+  imports: [FormsModule,NgIf,NgFor,NgClass,RouterLink],
   templateUrl: './profile-page.html',
   styleUrl: './profile-page.css',
 })
@@ -22,18 +24,14 @@ user: User | null = null;
   uploadingAvatar = false;
   error: string | null = null;
   successMessage: string | null = null;
+  countries!: Country[];
+  currencies!: Currency[];
 
   // Enums for template
   UserRole = UserRole;
   UserType = UserType;
   ThemeMode = ThemeMode;
 
-  // Options for dropdowns
-  languages = [
-    { value: 'en', label: 'English' },
-    { value: 'fr', label: 'Français' },
-    { value: 'ar', label: 'العربية' }
-  ];
 
   genders = ['Male', 'Female'];
 
@@ -42,11 +40,38 @@ user: User | null = null;
 
   async ngOnInit() {
     await this.loadUserProfile();
+    const [countries, currencies] = await Promise.all([
+      this.dashboardService.fetchCountries(),
+      this.dashboardService.fetchCurrencies()
+    ]);
+    this.countries = countries;
+    this.currencies = currencies;
+
+    const matchedCountry = countries.find(
+      c => c.name === this.user?.country
+    );
+
+    // Set the model value to the category id so the <select> preselects
+    if (matchedCountry) {
+      this.formData.country = matchedCountry.id;
+      console.log(this.formData.country);
+    }
+
+    const matchedCurrency = currencies.find(
+      c => c.name === this.user?.currency
+    );
+
+    // Set the model value to the category id so the <select> preselects
+    if (matchedCurrency) {
+      this.formData.currency = matchedCurrency.id;
+      console.log(this.formData.currency);
+    }
+    
+    this.loading = false;
   }
 
   async loadUserProfile() {
     try {
-      this.loading = true;
       this.error = null;
       
       const userData = await this.dashboardService.loadCurrentUser(true);
@@ -60,8 +85,6 @@ user: User | null = null;
     } catch (err) {
       console.error('Error loading profile:', err);
       this.error = 'An error occurred while loading your profile';
-    } finally {
-      this.loading = false;
     }
   }
 
@@ -203,11 +226,6 @@ user: User | null = null;
 
   hasAvatar(): boolean {
     return !!this.user?.avatar_url;
-  }
-
-  getLanguageLabel(code: string): string {
-    const lang = this.languages.find(l => l.value === code);
-    return lang ? lang.label : code;
   }
 
   getThemeIcon(): string {

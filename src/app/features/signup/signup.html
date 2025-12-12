@@ -40,7 +40,7 @@
                 type="text" 
                 id="firstName" 
                 name="firstName" 
-                [(ngModel)]="first_name"
+                [(ngModel)]="model.first_name"
                 #firstNameRef="ngModel"
                 placeholder="John"
                 required
@@ -63,7 +63,7 @@
                 type="text" 
                 id="lastName" 
                 name="lastName" 
-                [(ngModel)]="last_name"
+                [(ngModel)]="model.last_name"
                 #lastNameRef="ngModel"
                 placeholder="Doe"
                 required
@@ -74,6 +74,55 @@
             <div class="error" *ngIf="lastNameRef.invalid && (lastNameRef.touched || f.submitted)">
               <span *ngIf="lastNameRef.errors?.['required']">Last name is required</span>
               <span *ngIf="lastNameRef.errors?.['minlength']">Min 2 characters</span>
+            </div>
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="input-form half">
+            <label for="country">Country *</label>
+            <div class="input-box" 
+                 [class.invalid]="countryRef.invalid && (countryRef.touched || f.submitted)">
+              <div class="custom-select">
+              <select 
+                id="country" 
+                name="country" 
+                [(ngModel)]="model.country"
+                #countryRef="ngModel"
+                required
+                [disabled]="isLoading"
+              >
+                <option value="" disabled selected>Select a country</option>
+                <option value="" *ngFor="let country of countries" [value]="country.id">{{country.name}}</option>
+              </select>
+              <span class="custom-arrow"></span>
+            </div>
+            </div>
+            <div class="error" *ngIf="countryRef.invalid && (countryRef.touched || f.submitted)">
+              <span *ngIf="countryRef.errors?.['required']">The country is required</span>
+            </div>
+          </div>
+
+          <div class="input-form half">
+            <label for="currency">Currency *</label>
+            <div class="input-box" 
+                 [class.invalid]="currencyRef.invalid && (currencyRef.touched || f.submitted)">
+              <div class="custom-select">
+              <select 
+                id="currency" 
+                name="currency" 
+                [(ngModel)]="model.currency"
+                #currencyRef="ngModel"
+                required
+                [disabled]="isLoading"
+              >
+                <option value="" disabled selected>Select a currency</option>
+                <option value="" *ngFor="let currency of currencies" [value]="currency.id">{{currency.name}}</option>
+              </select>
+              <span class="custom-arrow"></span>
+            </div>
+            </div>
+            <div class="error" *ngIf="currencyRef.invalid && (currencyRef.touched || f.submitted)">
+              <span *ngIf="currencyRef.errors?.['required']">The currency is required</span>
             </div>
           </div>
         </div>
@@ -90,7 +139,7 @@
               type="email" 
               id="email" 
               name="email" 
-              [(ngModel)]="email"
+              [(ngModel)]="model.email"
               #emailRef="ngModel"
               placeholder="john.doe@example.com"
               required
@@ -104,20 +153,48 @@
           </div>
         </div>
 
-        <!-- Phone -->
-        <div class="input-form">
-          <label for="phone">Phone Number (Optional)</label>
-          <div class="input-box">
-            <span class="left-icon icon-phone"></span>
-            <input 
-              type="tel" 
-              id="phone" 
-              name="phone" 
-              [(ngModel)]="tel_number"
-              #phoneRef="ngModel"
-              placeholder="+216 12 345 678"
-              [disabled]="isLoading"
-            >
+        <div class="input-row">
+          <!-- Phone -->
+          <div class="input-form half">
+            <label for="phone">Phone Number (Optional)</label>
+            <div class="input-box">
+              <span class="left-icon icon-phone"></span>
+              <input 
+                type="tel" 
+                id="phone" 
+                name="phone" 
+                [(ngModel)]="model.tel_number"
+                #phoneRef="ngModel"
+                placeholder="+216 12 345 678"
+                [disabled]="isLoading"
+              >
+            </div>
+          </div>
+
+          <div class="input-form half">
+            <!-- Gender -->
+            <label for="gender">Gender *</label>
+            <div class="input-box" 
+                 [class.invalid]="genderRef.invalid && (genderRef.touched || f.submitted)">
+              <div class="custom-select">
+              <select 
+                id="gender" 
+                name="gender" 
+                [(ngModel)]="model.gender"
+                #genderRef="ngModel"
+                required
+                [disabled]="isLoading"
+              >
+                <option value="" disabled selected>Select a gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+              <span class="custom-arrow"></span>
+            </div>
+            </div>
+            <div class="error" *ngIf="genderRef.invalid && (genderRef.touched || f.submitted)">
+              <span *ngIf="genderRef.errors?.['required']">The gender is required</span>
+            </div>
           </div>
         </div>
 
@@ -131,7 +208,7 @@
               [type]="showPassword ? 'text' : 'password'"
               id="password" 
               name="password" 
-              [(ngModel)]="password"
+              [(ngModel)]="model.password"
               #passwordRef="ngModel"
               placeholder="Create a strong password"
               required
@@ -145,7 +222,7 @@
           </div>
           
           <!-- Password Strength Indicator -->
-          <div class="password-strength" *ngIf="password.length > 0">
+          <div class="password-strength" *ngIf="model.password.length > 0">
             <div class="strength-bar">
               <div class="strength-fill" 
                    [class.weak]="getPasswordStrength() === 'weak'"
@@ -174,7 +251,7 @@
               [type]="showConfirmPassword ? 'text' : 'password'"
               id="confirmPassword" 
               name="confirmPassword" 
-              [(ngModel)]="confirmPassword"
+              [(ngModel)]="model.confirmPassword"
               #confirmPasswordRef="ngModel"
               placeholder="Confirm your password"
               required
@@ -200,7 +277,7 @@
               <select 
                 id="accountType" 
                 name="accountType" 
-                [(ngModel)]="type"
+                [(ngModel)]="model.accountType"
                 #typeRef="ngModel"
                 required
                 [disabled]="isLoading"

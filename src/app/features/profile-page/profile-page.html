@@ -184,10 +184,10 @@
           <select 
             *ngIf="editing"
             class="form-input"
-            [(ngModel)]="formData.gender">
-            <option *ngFor="let gender of genders" [value]="gender">
-              {{ gender }}
-            </option>
+            [(ngModel)]="formData.gender"
+          >
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
           </select>
         </div>
 
@@ -198,14 +198,13 @@
             <span class="info-icon">🌍</span>
             <span class="info-text">{{ user.country }}</span>
           </div>
-          <input 
+          <select 
             *ngIf="editing"
-            type="text"
             class="form-input"
             [(ngModel)]="formData.country"
-            placeholder="Enter country"
-            readonly
-            title="Country cannot be changed">
+          >
+            <option *ngFor="let country of countries" [value]="country.id">{{country.name}}</option>
+          </select>
         </div>
 
         <!-- Currency -->
@@ -215,14 +214,13 @@
             <span class="info-icon">💰</span>
             <span class="info-text">{{ user.currency }}</span>
           </div>
-          <input 
+          <select 
             *ngIf="editing"
-            type="text"
             class="form-input"
             [(ngModel)]="formData.currency"
-            placeholder="Enter currency"
-            readonly
-            title="Currency cannot be changed">
+          >
+            <option *ngFor="let currency of currencies" [value]="currency.id">{{currency.name}}</option>
+          </select>
         </div>
 
         <!-- Language -->
@@ -230,16 +228,15 @@
           <label class="form-label">Language</label>
           <div *ngIf="!editing" class="info-display">
             <span class="info-icon">🌐</span>
-            <span class="info-text">{{ getLanguageLabel(user.language) }}</span>
+            <span class="info-text">English</span>
           </div>
           <select 
             *ngIf="editing"
             class="form-input"
             [(ngModel)]="formData.language">
-            <option *ngFor="let lang of languages" [value]="lang.value">
-              {{ lang.label }}
-            </option>
+            <option value="English">English</option>
           </select>
+          
         </div>
 
         <!-- Theme -->
@@ -265,4 +262,11 @@
   </div>
 
 
+</div>
+
+<div class="loading-screen" *ngIf="loading">
+  <span>
+    <img src="assets/logo.svg" alt="swardy_logo">
+    <h2>Swardy</h2>
+  </span>
 </div>

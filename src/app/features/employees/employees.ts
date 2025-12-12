@@ -24,6 +24,7 @@ export class Employees {
 
   deleteEmployeeDialog = EmployeeDeletePopup;
 
+  user!: User | null;
   loading: boolean = true;
   totalEmployees!: number;
   EOMname!: string | undefined;
@@ -48,13 +49,14 @@ export class Employees {
   EmployeesSearchFactors: string[] = ["first_name", 'last_name'];
 
   async ngOnInit() {
-    const [totalEmployees, EOM, ASPE, AET, GenderDist, employees] = await Promise.all([
+    const [totalEmployees, EOM, ASPE, AET, GenderDist, employees, USER] = await Promise.all([
       this.dash.fetchTotalEmployees(),
       this.dash.fetchEmployeeOfTheMonth(),
       this.dash.fetchAverageSalesPerEmployee(),
       this.dash.fetchActiveEmployeesToday(),
       this.dash.fetchGenderDistribution(),
-      this.dash.fetchEmployees()
+      this.dash.fetchEmployees(),
+      this.dash.loadCurrentUser()
     ]);
 
     this.totalEmployees = totalEmployees;
@@ -67,6 +69,7 @@ export class Employees {
     this.GenderColors = GenderDist.map(x => x.color);
     this.EmployeesData = employees;
     this.loading = false;
+    this.user = USER;
   }
 
   onAddEmployee() {

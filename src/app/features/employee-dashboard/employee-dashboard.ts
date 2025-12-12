@@ -87,7 +87,7 @@ export class EmployeeDashboard implements OnInit {
 
   // Profile avatar helpers (same behavior as InterfOptions)
   getAvatarUrl(): string {
-    return this.avatarUrl || '/assets/images/default-avatar.png';
+    return this.avatarUrl || '/assets/images/default_avatar.jpg';
   }
 
   hasAvatar(): boolean {

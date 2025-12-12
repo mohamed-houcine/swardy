@@ -193,20 +193,15 @@
         <div class="input-form">
           <label for="date">Date</label>
 
-          <div class="input-box"
-              [class.invalid]="date.invalid && (date.touched || f.submitted) || errorMessage || isDateInFuture()">
+          <div class="input-box">
 
             <input 
                 type="date"
                 id="date"
                 name="date"
                 [(ngModel)]="model.date"
-                #date="ngModel"
+                disabled
             >
-          </div>
-
-          <div class="error" *ngIf="isDateInFuture()">
-            <span>The given date is invalid.</span>
           </div>
         </div>
 

@@ -14,7 +14,7 @@ export class GoalComponent implements OnChanges {
   constructor(private dialog: MatDialog, private dash: DashboardService) {}
   @Input() goal!: number | null;
   @Input() current!: number;
-  @Input() currency: string = '$';
+  @Input() currency!: string | undefined;
   @Input() accent: string = '#A78BFA';
 
   // computed

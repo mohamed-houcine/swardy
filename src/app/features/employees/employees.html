@@ -6,15 +6,15 @@
                 title="Total Employees"
                 [value]="totalEmployees"
                 imagePath="/assets/icons/employees_1.svg"
-                [withCurrency]="false"
+                [currency]="user?.currency"
             ></app-total-component>
             
             <app-total-component *ngIf="EOMname && EOMimg"
                 title="Employee of the month"
                 [value]="EOMname"
                 [imagePath]="EOMimg"
-                [withCurrency]="false"
                 [bigPicture]="true"
+                [currency]="user?.currency"
             ></app-total-component>
     
         </div>
@@ -24,6 +24,7 @@
                 title="Avg. Sales/Employee"
                 [value]="avgSalePerEmployee"
                 imagePath="/assets/icons/employees_1.svg"
+                [currency]="user?.currency"
             ></app-total-component>
             
             <app-total-component
@@ -31,7 +32,7 @@
                 title="Active Today"
                 [value]="activeEmployees"
                 imagePath="/assets/icons/employees_1.svg"
-                [withCurrency]="false"
+                [currency]="user?.currency"
             ></app-total-component>
         </div>
         <app-pie-chart

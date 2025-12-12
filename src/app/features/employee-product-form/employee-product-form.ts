@@ -243,11 +243,7 @@ export class EmployeeProductFormComponent implements OnInit {
       this.errorMessage = "";
       
       // Réinitialiser
-      this.model.quantity = 1;
-      this.model.notes = '';
-      this.model.paymentMethod = 'cash';
-      this.model.date = new Date().toISOString().split('T')[0];
-      this.barcodeValue = "";
+      this.resetForm(f);
       
       // Si en mode barcode, garder le focus sur l'input
       if (this.scanMode === 'barcode') {
@@ -324,13 +320,8 @@ export class EmployeeProductFormComponent implements OnInit {
   }
 
   resetForm(f: NgForm) {
-    f.reset();
-    this.model.quantity = 1;
-    this.model.paymentMethod = 'cash';
-    this.model.date = new Date().toISOString().split('T')[0];
-    this.errorMessage = "";
-    this.successMessage = "";
-    this.barcodeValue = "";
+    f.reset(this.resetModel());
+    this.model = this.resetModel();
     
     if (this.categories.length > 0) {
       this.model.category = this.categories[0].id;
@@ -364,5 +355,15 @@ export class EmployeeProductFormComponent implements OnInit {
     }
     
     return product?.name || '';
+  }
+  resetModel() {
+    return {
+      product: "",
+      category: "",
+      quantity: 1,
+      notes: '',
+      paymentMethod: 'cash',
+      date: new Date().toISOString().split('T')[0]
+    };
   }
 }

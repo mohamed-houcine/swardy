@@ -10,6 +10,8 @@ import { NormalExpense } from '../shared/model/normal_expense';
 import { ProductExpense } from '../shared/model/product_expense';
 import { ThemeMode, User, UserRole, UserType } from '../shared/model/user';
 import { AuthService } from '../core/auth/auth.service';
+import { Country } from '../shared/model/country';
+import { Currency } from '../shared/model/currency';
 
 // returned objects
 export interface MonthlyPoint {
@@ -2140,13 +2142,15 @@ async addProductSale(sale: {
       // Check if current user is admin
       const { data: currentUser, error: userError } = await this.supabase.client
         .from('users')
-        .select('role')
+        .select('*')
         .eq('id', adminId)
         .single();
 
       if (userError || !currentUser || currentUser.role !== 'Admin') {
         throw new Error('Only admins can add employees');
       }
+
+      
 
       try {
         // 1. Create auth user
@@ -2159,7 +2163,9 @@ async addProductSale(sale: {
           type: UserType.BUSINESS,
           role: UserRole.EMPLOYEE,
           manager_id: adminId,
-          gender: employee.gender
+          gender: employee.gender,
+          country: currentUser.id_country,
+          currency: currentUser.id_currency
         });
 
       } catch (error: any) {
@@ -2559,9 +2565,36 @@ async deleteAvatar(): Promise<boolean> {
   }
 }
 
-public clearCache(): void {
-  this._cachedUser = undefined;
-  console.log('User cache cleared');
-}
+  public clearCache(): void {
+    this._cachedUser = undefined;
+    console.log('User cache cleared');
+  }
+  async fetchCountries(): Promise<Country[]> {
+    const { data, error } = await this.supabase.client
+      .from('country')
+      .select('id, name')
+      .order('name', { ascending: true });
+
+    if (error) {
+      console.error('fetchCountries error:', error);
+      return [];
+    }
+
+    return data || [];
+  }
+
+  async fetchCurrencies(): Promise<Currency[]> {
+    const { data, error } = await this.supabase.client
+      .from('currency')
+      .select('id, name')
+      .order('name', { ascending: true });
+
+    if (error) {
+      console.error('fetchCurrencies error:', error);
+      return [];
+    }
+
+    return data || [];
+  }
 
 }

@@ -10,7 +10,10 @@ export interface SignupData {
   password: string;
   first_name: string;
   last_name: string;
-  tel_number?: number;
+  gender: string;
+  tel_number?: number | null;
+  country: string;
+  currency: string;
   type: UserType;
   role: UserRole;
 }
@@ -38,18 +41,18 @@ export class AuthService {
     try {
       console.log('🔵 Starting signup process...');
 
-      // ÉTAPE 1: Vérifier si l'utilisateur existe déjà
+      // STEP 1: Check if user already exists
       const { data: existingUser } = await this.supabase.client
         .from('users')
         .select('id, email')
         .eq('email', signupData.email)
-        .single();
+        .maybeSingle(); // ← Changed from .single() to .maybeSingle()
 
       if (existingUser) {
         throw new Error('This email is already registered. Please login instead.');
       }
 
-      // ÉTAPE 2: Créer l'utilisateur auth
+      // STEP 2: Create auth user
       console.log('📤 Creating auth user...');
       
       const { data: authData, error: authError } = await this.supabase.client.auth.signUp({
@@ -60,7 +63,10 @@ export class AuthService {
             first_name: signupData.first_name,
             last_name: signupData.last_name,
             type: signupData.type,
-            role: signupData.role
+            role: signupData.role,
+            id_country: signupData.country,
+            id_currency: signupData.currency,
+            tel_number: signupData.tel_number
           }
         }
       });
@@ -76,20 +82,20 @@ export class AuthService {
 
       console.log('✅ Auth user created:', authData.user.id);
 
-      // ÉTAPE 3: Attendre un peu pour que le trigger s'exécute
+      // STEP 3: Wait for trigger to execute
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // ÉTAPE 4: Vérifier si le profil a été créé par le trigger
-      const { data: profileCheck, error: checkError } = await this.supabase.client
+      // STEP 4: Check if profile was created by trigger
+      const { data: profileCheck } = await this.supabase.client
         .from('users')
         .select('id')
         .eq('id', authData.user.id)
-        .maybeSingle();
+        .maybeSingle(); // ← Already using maybeSingle() here ✅
 
-      if (!profileCheck || checkError) {
+      if (!profileCheck) {
         console.warn('⚠️ Profile not created by trigger, creating manually...');
 
-        // ÉTAPE 5: Créer le profil manuellement
+        // STEP 5: Create profile manually
         const profileData: any = {
           id: authData.user.id,
           email: signupData.email,
@@ -98,12 +104,19 @@ export class AuthService {
           type: signupData.type,
           role: signupData.role,
           language: 'en',
-          theme: 'light'
+          theme: 'light',
+          gender: signupData.gender
         };
 
-        // Only add tel_number if it exists
+        // Add optional fields only if they exist
         if (signupData.tel_number) {
           profileData.tel_number = signupData.tel_number;
+        }
+        if (signupData.country) {
+          profileData.id_country = signupData.country;
+        }
+        if (signupData.currency) {
+          profileData.id_currency = signupData.currency;
         }
 
         console.log('📝 Inserting profile data:', profileData);
@@ -115,15 +128,7 @@ export class AuthService {
           .single();
 
         if (profileError) {
-          console.error('❌ Profile creation error:', {
-            message: profileError.message,
-            details: profileError.details,
-            hint: profileError.hint,
-            code: profileError.code
-          });
-          
-          // ⚠️ Note: Cannot delete auth user from client side
-          // The user will remain in auth.users without a profile
+          console.error('❌ Profile creation error:', profileError);
           throw new Error(`Failed to create user profile: ${profileError.message}`);
         }
 
